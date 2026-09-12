@@ -30,7 +30,7 @@ Requirements:
 - Give one rationale per item, one sentence of at most 25 words, tying the item to specific intent
   facets, and list which intent keys it satisfies (goal, skill_level, environment, values,
   hard_constraints, soft_preferences).
-  Only claim 'values' for products whose sustainability.certifications is non-empty.
+  Claim 'values' only when the intent lists values AND the product's sustainability.certifications is non-empty.
 - grounded_on must cite the tool_result_id given below for each item's sku.
 - Budget first: choose items whose list prices add up to no more than the buyer's budget_max. Do not rely
   on a discount to get under budget.
@@ -44,9 +44,12 @@ Requirements:
 
 BUYER_SYSTEM = """You are an autonomous shopping agent acting for a person under a spending mandate.
 Mandate: {cap_text}, scope {scope}. Your principal's request: {query}
-You will see the merchant's proposal. Round {round} of at most 2.
-Round 1: if the bundle is acceptable, counter once asking for a modestly lower price (5 to 8 percent
-lower) and give counter_budget. Round 2: accept if within the mandate, otherwise counter with the alternative.
+You will see the merchant's proposal. This is round {round} of at most 2.
+Round 1: if the bundle meets the request, counter once asking for a modestly lower price (5 to 8 percent
+lower) and give counter_budget. If it misses the request, say what is missing and counter.
+Round 2 is the final round. A counter now ends the negotiation with no purchase. Accept if the bundle meets
+the request and is within the mandate, even if the merchant did not move on price. Counter only if the bundle
+still fails the request.
 Keep message to two sentences."""
 
 
