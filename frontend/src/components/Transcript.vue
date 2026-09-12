@@ -27,8 +27,8 @@ const rows = computed(() => {
   return out
 })
 
-// Open by default: intent, proposal, order. Closed: gates and tool calls (their summaries carry the verdict).
-const OPEN_BY_DEFAULT = { intent: true, proposal: true, order: true, gate: false, tools: false }
+// Every row starts collapsed except the order; the one-line summaries carry the verdict, coverage, and price.
+const OPEN_BY_DEFAULT = { intent: false, proposal: false, order: true, gate: false, tools: false }
 const openState = reactive({})
 const isOpen = (row) => (row.id in openState ? openState[row.id] : OPEN_BY_DEFAULT[row.kind])
 const toggle = (row) => (openState[row.id] = !isOpen(row))
