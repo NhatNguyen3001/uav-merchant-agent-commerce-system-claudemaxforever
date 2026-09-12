@@ -8,7 +8,8 @@ from typing import Type, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
-MODEL_ID = "claude-opus-5"
+# Override with MACS_MODEL. Haiku 4.5 is the fast default for the demo; claude-opus-5 gives the richest proposals.
+MODEL_ID = os.environ.get("MACS_MODEL", "claude-haiku-4-5")
 FIXTURES = Path(__file__).with_name("fixtures")
 T = TypeVar("T", bound=BaseModel)
 
@@ -46,14 +47,11 @@ class LLM:
         last_err: Exception | None = None
         for attempt in range(2):
             try:
-                resp = await self._client.messages.parse(
-                    model=MODEL_ID,
-                    max_tokens=8000,
-                    system=system,
-                    messages=[{"role": "user", "content": user}],
-                    output_format=model_cls,
-                    output_config={"effort": "low"},
-                )
+                kwargs = dict(model=MODEL_ID, max_tokens=8000, system=system,
+                              messages=[{"role": "user", "content": user}], output_format=model_cls)
+                if "haiku" not in MODEL_ID:
+                    kwargs["output_config"] = {"effort": "low"}  # effort is not accepted on Haiku 4.5
+                resp = await self._client.messages.parse(**kwargs)
                 if resp.stop_reason == "refusal" or resp.parsed_output is None:
                     raise LLMOutputError(f"no structured output (stop_reason={resp.stop_reason})")
                 return resp.parsed_output
