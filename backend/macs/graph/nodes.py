@@ -112,7 +112,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         tid = next(iter(cands.values()))["tool_result_id"]
         expires = (now + timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=0).isoformat()
         system = PROPOSAL_SYSTEM.format(soft_rules=json.dumps(soft, indent=2), expires_at=expires)
-        drop = ("specs", "embedding", "compatibility", "tool_result_id")
+        drop = ("specs", "embedding", "compatibility", "tool_result_id", "title_full", "url", "image_url", "ratings", "source_category")
         slim = [{k: v for k, v in p.items() if k not in drop} for p in cands.values()]
         user = (f"Decoded intent:\n{json.dumps(state['intent'], indent=2)}\n\n"
                 f"Candidate products (tool_result_id for every sku is {tid}):\n{json.dumps(slim, indent=2)}")

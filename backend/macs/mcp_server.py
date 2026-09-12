@@ -29,7 +29,8 @@ def build_server(store: Store) -> FastMCP:
                         sku_in: list[str] | None = None) -> list[dict]:
         """Filter the catalogue. Returns full product records that match every given filter."""
         out = []
-        for p in store.list("catalogue"):
+        source = store.get_many("catalogue", sku_in) if sku_in is not None else store.list("catalogue")
+        for p in source:
             if type and p["type"] != type:
                 continue
             if max_price is not None and p["list_price"] > max_price:
@@ -37,8 +38,6 @@ def build_server(store: Store) -> FastMCP:
             if max_ship_days is not None and p["ship_days"] > max_ship_days:
                 continue
             if suited_for and suited_for not in p.get("suited_for", []):
-                continue
-            if sku_in is not None and p["sku"] not in sku_in:
                 continue
             out.append(_public(p))
         return out

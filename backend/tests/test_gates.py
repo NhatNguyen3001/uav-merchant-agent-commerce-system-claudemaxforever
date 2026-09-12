@@ -95,7 +95,10 @@ def test_execution_pass_and_blocks(seeded_store):
     r = check_execution(_proposal(1650, 0), types, uncapped, NOW)
     assert r.verdict == "pass" and "no spend cap" in r.reason
     assert "expired" in check_execution(_proposal(588, 15), types, seeded_store.get("mandates", "mandate-002"), NOW).reason
-    assert "scope" in check_execution(_proposal(588, 15), types + ["monitors"], mandate, NOW).reason
+    assert check_execution(_proposal(588, 15), types + ["monitors"], mandate, NOW).verdict == "pass"  # scope any
+    audio = {**mandate, "scope": "audio_equipment"}
+    assert "scope" in check_execution(_proposal(588, 15), types + ["monitors"], audio, NOW).reason
+    assert check_execution(_proposal(588, 15), types, audio, NOW).verdict == "pass"
     assert "signature" in check_execution(_proposal(588, 15), types, {**mandate, "signature": ""}, NOW).reason
 
 

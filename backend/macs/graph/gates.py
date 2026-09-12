@@ -128,8 +128,12 @@ def check_execution(proposal: Proposal, item_types: list[str], mandate: dict, no
         return ExecutionResult("blocked", "mandate signature missing")
     if _parse(mandate["expires_at"]) <= now:
         return ExecutionResult("blocked", f"mandate expired at {mandate['expires_at']}")
-    if mandate.get("scope") != "audio_equipment" or any(t not in AUDIO_TYPES for t in item_types):
-        return ExecutionResult("blocked", f"items outside mandate scope {mandate.get('scope')}")
+    scope = mandate.get("scope")
+    if scope == "audio_equipment":
+        if any(t not in AUDIO_TYPES for t in item_types):
+            return ExecutionResult("blocked", f"items outside mandate scope {scope}")
+    elif scope != "any":
+        return ExecutionResult("blocked", f"unsupported mandate scope {scope}")
     cap = mandate.get("spend_cap")
     if cap is None:
         return ExecutionResult("pass", f"total {proposal.bundle_price:g}; mandate has no spend cap; scope and expiry valid")

@@ -7,7 +7,7 @@ from typing import Protocol
 def product_text(p: dict) -> str:
     sus = p.get("sustainability") or {}
     parts = [
-        p.get("name", ""), p.get("type", ""),
+        p.get("name", ""), p.get("type", ""), p.get("description", ""),
         "suited for " + ", ".join(p.get("suited_for", [])),
         "outcomes " + ", ".join(p.get("outcome_tags", [])),
         "materials " + ", ".join(sus.get("materials", [])),
@@ -26,6 +26,7 @@ class Store(Protocol):
     def get(self, collection: str, doc_id: str) -> dict | None: ...
     def set(self, collection: str, doc_id: str, data: dict) -> None: ...
     def list(self, collection: str) -> list[dict]: ...
+    def get_many(self, collection: str, doc_ids: list[str]) -> list[dict]: ...
     def add_event(self, run_id: str, event: dict) -> None: ...
     def list_events(self, run_id: str) -> list[dict]: ...
     def list_runs(self) -> list[dict]: ...
@@ -65,6 +66,10 @@ class MemoryStore:
 
     def list(self, collection):
         return [dict(d) for d in self._docs.get(collection, {}).values()]
+
+    def get_many(self, collection, doc_ids):
+        col = self._docs.get(collection, {})
+        return [dict(col[i]) for i in doc_ids if i in col]
 
     def add_event(self, run_id, event):
         self._events.setdefault(run_id, []).append(dict(event))
@@ -115,6 +120,10 @@ class FirestoreStore:
 
     def list(self, collection):
         return [d.to_dict() for d in self._db.collection(collection).stream()]
+
+    def get_many(self, collection, doc_ids):
+        refs = [self._db.collection(collection).document(i) for i in doc_ids]
+        return [s.to_dict() for s in self._db.get_all(refs) if s.exists]
 
     def add_event(self, run_id, event):
         self._db.collection("runs").document(run_id).collection("events") \

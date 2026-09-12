@@ -39,6 +39,13 @@ def test_product_text_includes_reasoning_fields():
     assert "Alpha" in t and "beginner" in t and "microphone" in t
 
 
+def test_get_many_returns_only_known_ids_in_order():
+    s = MemoryStore()
+    for sku in ("A", "B", "C"):
+        s.set("catalogue", sku, _product(sku, sku, []))
+    assert [p["sku"] for p in s.get_many("catalogue", ["C", "X", "A"])] == ["C", "A"]
+
+
 def test_delete_run_removes_doc_and_events():
     s = MemoryStore()
     s.set("runs", "r1", {"run_id": "r1"})

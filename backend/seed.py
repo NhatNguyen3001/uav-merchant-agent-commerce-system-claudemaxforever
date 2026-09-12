@@ -26,15 +26,24 @@ def seed_governance(store: FirestoreStore) -> None:
     print("governance seeded")
 
 
-def seed_catalogue(store: FirestoreStore, embedder: VertexEmbedder | None) -> None:
-    products = j("catalogue.json")
-    vectors = embedder.embed([product_text(p) for p in products]) if embedder else [None] * len(products)
+def seed_catalogue(store: FirestoreStore, embedder: VertexEmbedder | None, files: list[str]) -> None:
+    products, seen = [], set()
+    for name in files:
+        for p in j(name):
+            if p["sku"] not in seen:
+                seen.add(p["sku"]); products.append(p)
+    vectors: list = []
+    if embedder:
+        for i in range(0, len(products), 100):  # Vertex accepts up to ~250 texts per call; stay well under
+            vectors.extend(embedder.embed([product_text(p) for p in products[i:i + 100]]))
+    else:
+        vectors = [None] * len(products)
     for p, v in zip(products, vectors):
         doc = dict(p)
         if v is not None:
             doc["embedding"] = Vector(v)
         store.set("catalogue", p["sku"], doc)
-    print(f"catalogue seeded: {len(products)} products, embedded={embedder is not None}")
+    print(f"catalogue seeded: {len(products)} products from {files}, embedded={embedder is not None}")
 
 
 def seed_golden(store: FirestoreStore) -> None:
@@ -57,12 +66,14 @@ def main() -> None:
     ap.add_argument("--project", required=True)
     ap.add_argument("--no-embed", action="store_true")
     ap.add_argument("--golden-only", action="store_true")
+    ap.add_argument("--catalogue", action="append", default=None,
+                    help="catalogue file(s) under data/; default catalogue.json (repeatable)")
     a = ap.parse_args()
     embedder = None if a.no_embed else VertexEmbedder(a.project)
     store = FirestoreStore(a.project, embedder)
     if not a.golden_only:
         seed_governance(store)
-        seed_catalogue(store, embedder)
+        seed_catalogue(store, embedder, a.catalogue or ["catalogue.json"])
     seed_golden(store)
 
 

@@ -93,6 +93,8 @@ Buyer's agent (external, simulated)
 
 **Storage.** Firestore only: catalogue, merchant rules, mandates, credentials, injection patterns, runs, events, and orders.
 
+**Catalogue.** Two sources, merged at seed time: a hand-built set of 32 podcasting SKUs that the demo scenario resolves against, and 499 scraped Amazon listings (electronics, health and beauty, Kindle books) enriched by `backend/enrich.py`. Enrichment asks Claude Haiku 4.5, ten listings per call, for a product type, who it suits, outcome tags, a one-sentence description, durability, compatibility, and any certification literally present in the title. Fields a scrape cannot provide are assigned by rule and stated here: cost is 60 percent of list, ship days are parsed from the delivery text (default 3), stock is 25. The full 499-product enrichment took 50 calls and about 90 seconds.
+
 ## The three gates
 
 Validate what comes in, govern what goes out, authorise what gets executed.
@@ -101,7 +103,7 @@ Validate what comes in, govern what goes out, authorise what gets executed.
 |---|---|---|
 | Inbound | credential exists and is active; mandate exists, belongs to the agent, and is unexpired; free text contains no injection pattern | blocked |
 | Outbound | every item cites a tool result from this run; item prices match list prices; ship days meet the deadline; bundle discount within the cap; margin above the floor; sustainability claims only for certified products; alternative priced within the cap | corrected, or blocked if ungrounded |
-| Execution | buyer's agent accepted the final proposal; mandate signature present; mandate unexpired; items within mandate scope; total within the spend cap when one is set | blocked, no order |
+| Execution | buyer's agent accepted the final proposal; mandate signature present; mandate unexpired; items within mandate scope (`any`, or `audio_equipment` for the audio-only mandate); total within the spend cap when one is set | blocked, no order |
 
 The hard rules (`max_discount_pct`, `min_margin_pct`) are read only by the gates and never enter a model prompt. A buyer's agent cannot extract them, and the retailer can change them in the console without touching a prompt.
 
@@ -136,7 +138,7 @@ Seed a fresh Firestore project and create the vector index:
 
 ```bash
 cd backend
-.venv/Scripts/python seed.py --project <project-id>
+.venv/Scripts/python seed.py --project <project-id> --catalogue catalogue.json --catalogue catalogue_scraped.json
 gcloud firestore indexes composite create --project=<project-id> --collection-group=catalogue \
   --query-scope=COLLECTION --field-config='vector-config={"dimension":"768","flat":"{}"},field-path=embedding'
 ```
@@ -180,12 +182,13 @@ backend/
     scenarios.py      canned scenarios and agent identities
     graph/            LangGraph state, nodes, gates, edges
     fixtures/         recorded model outputs for FAKE_LLM mode
-  seed.py             load data/ into Firestore, embed the catalogue, load examples
+  seed.py             load data/ into Firestore, embed the catalogue(s), load examples
+  enrich.py           turn scraped listings into catalogue records with Haiku 4.5
   record.py           run a scenario live and save it as a replayable example
   tests/              pytest suite
 frontend/             Vue 3 console
-data/                 catalogue (32 podcasting SKUs), rules, mandates, credentials,
-                      injection patterns, recorded example runs
+data/                 catalogue.json (32 podcasting SKUs), catalogue_scraped.json (499 enriched
+                      Amazon listings), rules, mandates, credentials, injection patterns, examples
 docs/superpowers/     design spec and implementation plan
 docker-compose.yml    local packaging
 deploy.sh             Cloud Run + Firebase Hosting deploy
@@ -220,7 +223,7 @@ A full live run takes about 30 seconds on Claude Sonnet 5, the default, and abou
 - AP2 is represented as a mandate with a cap, scope, expiry, and a signature presence check. Cryptographic verification is stubbed.
 - The buyer's agent is our own scripted agent, a Claude call under a mandate, so the demo is deterministic. Real agents would connect through the same adapter.
 - Retailer systems are mock data in Firestore. In production the MCP server sits beside the retailer's PIM and ERP. `create_order` records list prices; the negotiated bundle total is carried on the order event.
-- The catalogue holds 32 SKUs. Semantic search narrows them to 15 candidates; the same path scales to a full catalogue.
+- The catalogue holds 531 SKUs: 32 hand-built podcasting products plus 499 enriched Amazon listings. Semantic search narrows them to 15 candidates per run, so run time and cost do not grow with catalogue size. Scraped listings carry rule-assigned cost, stock, and ship days.
 - Gates are deterministic and run regardless of model output. They are the fail-safe, not the primary control.
 - Replay streams a recorded run. The live demo runs live first; if replay is used, we say so.
 
