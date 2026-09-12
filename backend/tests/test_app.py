@@ -62,6 +62,16 @@ async def test_replay_of_finished_run_streams_from_store(app):
         assert all(e["run_id"] == replay_id for e in second)
 
 
+async def test_replay_of_custom_run_keeps_query_in_history(app):
+    async with await _client(app) as c:
+        run_id = (await c.post("/api/runs", json={"agent_id": "buyer-999", "query": "typed text"})).json()["run_id"]
+        await _drain_sse(c, run_id)
+        replay_id = (await c.post("/api/runs", json={"scenario": run_id})).json()["run_id"]
+        await _drain_sse(c, replay_id)
+        runs = {r["run_id"]: r for r in (await c.get("/api/runs")).json()}
+        assert runs[replay_id]["query"] == "typed text" and runs[replay_id]["agent_id"] == "buyer-999"
+
+
 async def test_unknown_scenario_is_400(app):
     async with await _client(app) as c:
         assert (await c.post("/api/runs", json={"scenario": "nope"})).status_code == 400

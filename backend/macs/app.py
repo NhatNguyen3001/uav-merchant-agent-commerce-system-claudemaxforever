@@ -37,9 +37,10 @@ def _store_from_env() -> Store:
 
 
 async def _replay_run(source_id: str, run_id: str, store: Store, registry: RunRegistry, scenario: str) -> None:
+    src0 = store.get("runs", source_id) or {}
     store.set("runs", run_id, {"run_id": run_id, "scenario": scenario, "started_at": datetime.now(TZ).isoformat(timespec="seconds"),
                               "finished_at": None, "status": "running", "is_golden": False, "summary": {},
-                              "replay_of": source_id})
+                              "replay_of": source_id, **{k: src0[k] for k in ("agent_id", "query") if k in src0}})
     em = Emitter(run_id, store, registry)
     for ev in store.list_events(source_id):
         em.emit(ev["lane"], ev["type"], ev["payload"])
@@ -47,7 +48,8 @@ async def _replay_run(source_id: str, run_id: str, store: Store, registry: RunRe
     src = store.get("runs", source_id) or {}
     run = store.get("runs", run_id)
     run.update({"status": "finished", "finished_at": datetime.now(TZ).isoformat(timespec="seconds"),
-                "summary": src.get("summary", {})})
+                "summary": src.get("summary", {}),
+                **{k: src[k] for k in ("agent_id", "query") if k in src}})
     store.set("runs", run_id, run)
     registry.finish(run_id)
 
