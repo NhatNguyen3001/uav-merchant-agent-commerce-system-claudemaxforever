@@ -45,16 +45,11 @@ function title(row) {
   }
 }
 
+// Only the proposal row carries a summary next to its title; the others read as plain headings.
 function meta(row) {
   const p = row.event?.payload
-  switch (row.kind) {
-    case 'gate': return p.reason
-    case 'intent': return `${p.constraint_count} constraints, ${p.goal}`
-    case 'tools': return row.items.map((t) => t.payload.name).join(', ')
-    case 'proposal': return `${money(p.bundle_price)}, ${p.discount_pct}% off list, covers ${p.intent_coverage}`
-    case 'order': return `${p.skus.length} items, total ${money(p.total)}`
-    default: return ''
-  }
+  if (row.kind === 'proposal') return `${money(p.bundle_price)}, ${p.discount_pct}% off list, covers ${p.intent_coverage}`
+  return ''
 }
 
 const pending = computed(() => {
