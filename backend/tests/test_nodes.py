@@ -117,3 +117,19 @@ async def test_execution_gate_refuses_to_order_without_buyer_acceptance(seeded_s
     closing = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]
     assert closing["payload"]["text"].startswith("No order")
     await client.__aexit__(None, None, None)
+
+
+async def test_buyer_policy_overrides_model_action(seeded_store):
+    from macs.graph.nodes import buyer_action
+    assert (buyer_action("buyer-001", 1), buyer_action("buyer-001", 2)) == ("counter", "accept")
+    assert (buyer_action("buyer-002", 1), buyer_action("buyer-002", 2)) == ("accept", "accept")
+    # buyer-002 accepts the first proposal even though the round-1 fixture says counter
+    reg, em, client, tools, nodes, state = await _setup(seeded_store)
+    for name in ("protocol_adapter", "inbound_gate", "decode_intent", "match_catalogue", "compose_proposal", "outbound_gate"):
+        state.update(await nodes[name](state))
+    state["request"]["agent_id"] = "buyer-002"
+    state.update(await nodes["negotiate"](state))
+    assert state["buyer_reply"]["action"] == "accept" and state["buyer_reply"]["counter_budget"] is None
+    decision = [e for e in reg.events("r1") if e["type"] == "decision"][-1]["payload"]
+    assert decision["action"] == "accept" and decision["round"] == 1
+    await client.__aexit__(None, None, None)

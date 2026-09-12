@@ -10,7 +10,7 @@ from macs.graph.gates import check_execution, check_inbound, check_outbound
 from macs.graph.tools import ToolCaller
 from macs.llm import LLM
 from macs.models import BuyerDecision, HardRules, Intent, MerchantRequest, Proposal
-from macs.scenarios import SCENARIOS
+from macs.scenarios import AGENT_BY_ID, SCENARIOS
 from macs.store import Store
 
 INTENT_SYSTEM = """You are the intent decoder for a retailer that sells to AI shopping agents.
@@ -45,12 +45,24 @@ Requirements:
 BUYER_SYSTEM = """You are an autonomous shopping agent acting for a person under a spending mandate.
 Mandate: {cap_text}, scope {scope}. Your principal's request: {query}
 You will see the merchant's proposal. This is round {round} of at most 2.
-Round 1: if the bundle meets the request, counter once asking for a modestly lower price (5 to 8 percent
-lower) and give counter_budget. If it misses the request, say what is missing and counter.
-Round 2 is the final round. A counter now ends the negotiation with no purchase. Accept if the bundle meets
-the request and is within the mandate, even if the merchant did not move on price. Counter only if the bundle
-still fails the request.
+{stance}
 Keep message to two sentences."""
+
+BUYER_STANCE = {
+    "counter": ("Your stance this round: counter. Acknowledge what the bundle gets right, then ask for a modestly "
+                "lower price (5 to 8 percent lower) and give counter_budget. If something in the request is missing, "
+                "name it. Set action to counter."),
+    "accept": ("Your stance this round: accept. Confirm that the bundle meets the request and the mandate and that "
+               "the merchant may proceed. Set action to accept."),
+}
+
+
+def buyer_action(agent_id: str, rnd: int) -> str:
+    """Deterministic per-agent negotiation policy; the model writes the words, this decides the action."""
+    policy = AGENT_BY_ID.get(agent_id, {}).get("negotiation", "counter_then_accept")
+    if policy == "accept_first":
+        return "accept"
+    return "counter" if rnd == 1 else "accept"
 
 
 def _fixture_scenario(state: dict) -> str:
@@ -166,9 +178,14 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         rnd = state["negotiation_round"] + 1
         m = state["mandate"]
         cap_text = f"cap {m['spend_cap']:g} {m['currency']}" if m.get("spend_cap") is not None else "no spend cap"
-        system = BUYER_SYSTEM.format(cap_text=cap_text, scope=m["scope"], query=state["request"]["raw_query"], round=rnd)
+        action = buyer_action(state["request"]["agent_id"], rnd)
+        system = BUYER_SYSTEM.format(cap_text=cap_text, scope=m["scope"], query=state["request"]["raw_query"],
+                                     round=rnd, stance=BUYER_STANCE[action])
         user = "Merchant proposal:\n" + json.dumps(state["proposal"], indent=2)
         decision = await llm.structured(BuyerDecision, system, user, fixture=f"buyer_decision_{_fixture_scenario(state)}_{rnd}")
+        decision.action = action  # the policy decides; the model only wrote the reply
+        if action == "accept":
+            decision.counter_budget = None
         em.message("buyer_agent", decision.message)
         em.emit("a2a", "decision", {"round": rnd, "action": decision.action, "message": decision.message,
                                     "counter_budget": decision.counter_budget,
