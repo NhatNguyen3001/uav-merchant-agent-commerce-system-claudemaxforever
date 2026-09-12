@@ -48,7 +48,7 @@ function title(row) {
 // Only the proposal row carries a summary next to its title; the others read as plain headings.
 function meta(row) {
   const p = row.event?.payload
-  if (row.kind === 'proposal') return `${money(p.bundle_price)}, ${p.discount_pct}% off list, covers ${p.intent_coverage}`
+  if (row.kind === 'proposal') return `${money(p.bundle_price)}, ${p.discount_pct}% off`
   return ''
 }
 
@@ -126,7 +126,7 @@ watch(
           <template v-else-if="row.kind === 'proposal'">
             <ul class="items">
               <li v-for="it in row.event.payload.items" :key="it.sku">
-                <div class="item-head"><span class="item-name">{{ it.name }}</span><span class="item-price num">{{ money(it.price) }}</span></div>
+                <div class="item-head"><span class="item-name">{{ it.name }}<span class="sku">{{ it.sku }}</span></span><span class="item-price num">{{ money(it.price) }}</span></div>
                 <p class="text">{{ it.rationale }}</p>
                 <p class="quiet">Satisfies {{ it.satisfies.join(', ') }}</p>
               </li>

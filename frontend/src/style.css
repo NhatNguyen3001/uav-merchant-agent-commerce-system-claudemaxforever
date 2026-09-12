@@ -266,6 +266,7 @@ code { font: inherit; font-weight: 500; }
 .items { display: grid; gap: 12px; margin-top: 4px; }
 .item-head { display: flex; justify-content: space-between; gap: 12px; }
 .item-name { font-weight: 500; }
+.sku { margin-left: 10px; font-weight: 400; color: var(--muted); font-size: 14px; }
 .item-price { color: var(--ink-2); }
 .items .text { font-size: 16px; }
 .items .quiet { font-size: 14px; }
