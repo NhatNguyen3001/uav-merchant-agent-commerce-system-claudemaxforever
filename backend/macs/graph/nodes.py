@@ -204,7 +204,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
                                          "the final proposal stays open until it expires.")
             em.gate("execution", "blocked", reason)
             order = {"order_id": "", "skus": skus, "total": proposal.bundle_price,
-                     "mandate_id": state["mandate"]["mandate_id"], "status": "rejected"}
+                     "mandate_id": state["mandate"]["mandate_id"], "status": "rejected", "ship_days": None}
             em.emit("a2a", "order", order)
             return {"order": order, "blocked": True,
                     "gate_results": state["gate_results"] + [{"gate": "execution", "verdict": "blocked"}]}
@@ -215,7 +215,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         em.gate("execution", r.verdict, r.reason)
         if r.verdict == "blocked":
             order = {"order_id": "", "skus": skus, "total": proposal.bundle_price,
-                     "mandate_id": state["mandate"]["mandate_id"], "status": "rejected"}
+                     "mandate_id": state["mandate"]["mandate_id"], "status": "rejected", "ship_days": None}
             em.emit("a2a", "order", order)
             return {"order": order, "blocked": True,
                     "gate_results": state["gate_results"] + [{"gate": "execution", "verdict": "blocked"}]}
@@ -223,9 +223,11 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         data, _ = await tools.call("create_order", {"skus": skus, "mandate_id": state["mandate"]["mandate_id"]})
         order = {**data, "total": proposal.bundle_price}
         em.emit("a2a", "order", order)
-        em.message("merchant_agent", f"Order placed: {order['order_id']}, {len(skus)} items, total {order['total']:g}. "
-                                     f"Confirmation goes to mandate {order['mandate_id']}.")
-        em.stage("retailer_systems", "passed", f"order {order['order_id']} placed, total {order['total']:g}")
+        days = order.get("ship_days")
+        arrival = f" Arrives within {days} day{'s' if days != 1 else ''}." if days is not None else ""
+        em.message("merchant_agent", f"Order placed: {order['order_id']}, {len(skus)} items, total {order['total']:g}.{arrival}")
+        em.stage("retailer_systems", "passed", f"order {order['order_id']} placed, total {order['total']:g}"
+                                               + (f", ships in {days} day{'s' if days != 1 else ''}" if days is not None else ""))
         return {"order": order, "gate_results": state["gate_results"] + [{"gate": "execution", "verdict": "pass"}]}
 
     return {

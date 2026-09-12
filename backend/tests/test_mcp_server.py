@@ -45,5 +45,5 @@ async def test_products_with_stored_embedding_still_serialise(seeded_store):
 async def test_create_order_writes(seeded_store):
     async with Client(build_server(seeded_store)) as c:
         r = await c.call_tool("create_order", {"skus": ["MIC-DYN-01", "HP-REC-01"], "mandate_id": "mandate-001"})
-        assert r.data["status"] == "placed" and r.data["total"] == 328
+        assert r.data["status"] == "placed" and r.data["total"] == 328 and r.data["ship_days"] == 2
         assert seeded_store.get("orders", r.data["order_id"])["mandate_id"] == "mandate-001"

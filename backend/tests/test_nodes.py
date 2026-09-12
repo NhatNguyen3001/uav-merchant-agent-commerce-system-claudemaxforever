@@ -98,7 +98,9 @@ async def test_decode_match_compose_outbound_negotiate(seeded_store):
     evs = reg.events("r1")
     assert evs[-1]["payload"]["stage"] == "retailer_systems"
     closing = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]
-    assert closing["payload"]["text"].startswith("Order placed") and "588" in closing["payload"]["text"]
+    assert closing["payload"]["text"] == f"Order placed: {state['order']['order_id']}, 4 items, total 588. Arrives within 2 days."
+    assert state["order"]["ship_days"] == 2
+    assert evs[-1]["payload"]["note"].endswith("ships in 2 days")
     await client.__aexit__(None, None, None)
 
 

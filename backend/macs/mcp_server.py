@@ -67,13 +67,15 @@ def build_server(store: Store) -> FastMCP:
     @mcp.tool
     def create_order(skus: list[str], mandate_id: str) -> dict:
         """Place an order. The only tool that writes."""
-        total = sum(_product(s)["list_price"] for s in skus)
+        products = [_product(s) for s in skus]
+        total = sum(p["list_price"] for p in products)
+        ship_days = max((p["ship_days"] for p in products), default=0)
         order = {
             "order_id": "ord_" + uuid.uuid4().hex[:8], "skus": skus, "total": total,
-            "mandate_id": mandate_id, "status": "placed",
+            "mandate_id": mandate_id, "status": "placed", "ship_days": ship_days,
             "created_at": datetime.now(TZ).isoformat(timespec="seconds"),
         }
         store.set("orders", order["order_id"], order)
-        return {k: order[k] for k in ("order_id", "skus", "total", "mandate_id", "status")}
+        return {k: order[k] for k in ("order_id", "skus", "total", "mandate_id", "status", "ship_days")}
 
     return mcp

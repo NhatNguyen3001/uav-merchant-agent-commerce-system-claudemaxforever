@@ -39,5 +39,7 @@ def _summarise(name: str, data: Any) -> str:
     if name == "get_shipping":
         return f"{data['sku']}: ships in {data['ship_days']} day{'s' if data['ship_days'] != 1 else ''}, {data['stock']} in stock"
     if name == "create_order":
-        return f"order {data['order_id']} {data['status']}, total {data['total']}"
+        days = data.get("ship_days")
+        when = f", ships in {days} day{'s' if days != 1 else ''}" if days is not None else ""
+        return f"order {data['order_id']} {data['status']}, total {data['total']}{when}"
     return json.dumps(data)[:160]

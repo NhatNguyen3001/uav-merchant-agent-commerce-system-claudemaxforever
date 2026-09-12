@@ -172,6 +172,7 @@ class Order(BaseModel):
     total: float
     mandate_id: str
     status: Literal["placed", "rejected"]
+    ship_days: Optional[int] = None  # slowest item, from create_order
 
 
 class SoftRules(BaseModel):

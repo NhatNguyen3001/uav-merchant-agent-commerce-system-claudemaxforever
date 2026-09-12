@@ -17,7 +17,7 @@ async def test_happy_path_end_to_end(seeded_store):
     order = [e for e in evs if e["type"] == "order"][-1]["payload"]
     assert order["status"] == "placed" and order["total"] == 588
     assert evs[-1]["payload"] == {"stage": "retailer_systems", "status": "passed",
-                                  "note": f"order {order['order_id']} placed, total 588"}
+                                  "note": f"order {order['order_id']} placed, total 588, ships in 2 days"}
     for i, e in enumerate(evs):
         if e["type"] == "gate":
             assert evs[i + 1]["type"] == "stage"

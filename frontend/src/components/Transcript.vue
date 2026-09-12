@@ -144,7 +144,7 @@ watch(
           </template>
 
           <template v-else-if="row.kind === 'order'">
-            <p class="text">{{ row.event.payload.order_id ? row.event.payload.order_id + ', ' : '' }}{{ row.event.payload.skus.join(', ') }}, total {{ money(row.event.payload.total) }}</p>
+            <p class="text">{{ row.event.payload.order_id ? row.event.payload.order_id + ', ' : '' }}{{ row.event.payload.skus.join(', ') }}, total {{ money(row.event.payload.total) }}<template v-if="row.event.payload.ship_days != null">, ships in {{ row.event.payload.ship_days }} day{{ row.event.payload.ship_days === 1 ? '' : 's' }}</template></p>
           </template>
         </div>
       </li>
