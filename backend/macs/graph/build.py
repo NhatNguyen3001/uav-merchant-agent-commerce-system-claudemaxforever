@@ -55,14 +55,19 @@ def _summary(state: dict) -> dict:
 
 
 async def run_scenario(scenario: str, run_id: str, store: Store, llm: LLM, registry: RunRegistry,
-                       now: datetime | None = None) -> dict:
+                       now: datetime | None = None, input: dict | None = None) -> dict:
+    """Execute a canned scenario, or a custom ACP-shaped `input` (scenario label then becomes 'custom')."""
     now = now or datetime.now(TZ)
     if not registry.has(run_id):
         registry.open(run_id)
-    store.set("runs", run_id, {"run_id": run_id, "scenario": scenario, "started_at": now.isoformat(timespec="seconds"),
-                              "finished_at": None, "status": "running", "is_golden": False, "summary": {}})
+    doc = {"run_id": run_id, "scenario": scenario, "started_at": now.isoformat(timespec="seconds"),
+           "finished_at": None, "status": "running", "is_golden": False, "summary": {}}
+    if input is not None:
+        doc.update({"agent_id": input["agent_id"], "query": input["messages"][-1]["content"]})
+    store.set("runs", run_id, doc)
     em = Emitter(run_id, store, registry)
-    state: dict = {"scenario": scenario, "gate_results": [], "negotiation_round": 0, "blocked": False, "candidates": {}}
+    state: dict = {"scenario": scenario, "input": input, "gate_results": [], "negotiation_round": 0,
+                   "blocked": False, "candidates": {}}
     status = "finished"
     try:
         async with Client(build_server(store)) as client:

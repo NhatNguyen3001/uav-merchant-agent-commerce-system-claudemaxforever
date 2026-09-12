@@ -3,6 +3,7 @@ from typing import Any, Optional, TypedDict
 
 class RunState(TypedDict, total=False):
     scenario: str
+    input: Optional[dict]                # custom ACP-shaped inbound message, else None
     request: dict
     credential: Optional[dict]
     mandate: Optional[dict]

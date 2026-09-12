@@ -8,7 +8,7 @@ from macs.graph.tools import ToolCaller
 from macs.llm import LLM
 from macs.mcp_server import build_server
 from macs.models import Intent
-from macs.scenarios import SCENARIOS
+from macs.scenarios import SCENARIOS, build_input
 
 TZ = timezone(timedelta(hours=10))
 NOW = datetime(2026, 9, 12, 10, 0, tzinfo=TZ)
@@ -43,6 +43,16 @@ async def test_adapter_and_inbound_pass(seeded_store):
     assert state["blocked"] is False and state["mandate"]["spend_cap"] == 600
     types = [e["type"] for e in reg.events("r1")]
     assert types == ["stage", "message", "stage", "stage", "gate", "stage"]
+    await client.__aexit__(None, None, None)
+
+
+async def test_adapter_uses_custom_input_when_present(seeded_store):
+    reg, em, client, tools, nodes, state = await _setup(seeded_store, "custom")
+    state["input"] = build_input(agent_id="buyer-002", query="Cheap lavalier for interviews")
+    state.update(await nodes["protocol_adapter"](state))
+    assert state["request"]["agent_id"] == "buyer-002" and state["request"]["mandate_id"] == "mandate-002"
+    assert state["request"]["raw_query"] == "Cheap lavalier for interviews"
+    assert reg.events("r1")[1]["payload"]["text"] == "Cheap lavalier for interviews"
     await client.__aexit__(None, None, None)
 
 

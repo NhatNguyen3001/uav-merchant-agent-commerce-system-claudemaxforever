@@ -14,7 +14,7 @@ from macs.emitter import TZ, Emitter, RunRegistry
 from macs.graph.build import new_run_id, run_scenario
 from macs.llm import LLM
 from macs.models import MerchantRules
-from macs.scenarios import SCENARIOS
+from macs.scenarios import AGENTS, AGENT_BY_ID, SCENARIOS, build_input
 from macs.seeddata import load_seed
 from macs.store import FirestoreStore, MemoryStore, Store, VertexEmbedder
 
@@ -22,7 +22,9 @@ REPLAY_GAP_S = 0.3
 
 
 class StartRun(BaseModel):
-    scenario: str
+    scenario: str | None = None
+    agent_id: str | None = None
+    query: str | None = None
 
 
 def _store_from_env() -> Store:
@@ -73,8 +75,22 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> F
         store.set("merchant_rules", "current", rules.model_dump())
         return rules
 
+    @app.get("/api/agents")
+    async def list_agents():
+        return AGENTS
+
     @app.post("/api/runs")
     async def start_run(body: StartRun):
+        if body.scenario is None:
+            if not body.agent_id or not (body.query or "").strip():
+                raise HTTPException(400, "provide either scenario, or agent_id and query")
+            if body.agent_id not in AGENT_BY_ID:
+                raise HTTPException(400, f"unknown agent_id {body.agent_id}")
+            run_id = new_run_id()
+            registry.open(run_id)
+            _spawn(run_scenario("custom", run_id, store, llm, registry,
+                                input=build_input(body.agent_id, body.query.strip())))
+            return {"run_id": run_id}
         run_id = new_run_id()
         registry.open(run_id)
         if body.scenario in SCENARIOS and not replay:

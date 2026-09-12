@@ -45,6 +45,10 @@ lower) and give counter_budget. Round 2: accept if within cap, otherwise counter
 Keep message to two sentences."""
 
 
+def _fixture_scenario(state: dict) -> str:
+    return state["scenario"] if state["scenario"] in SCENARIOS else "happy_path"
+
+
 def intent_query(intent: Intent) -> str:
     return (f"{intent.goal} for a {intent.skill_level}; environment: {', '.join(intent.environment)}; "
             f"values: {', '.join(intent.values)}; preferences: {', '.join(intent.soft_preferences)}")
@@ -54,7 +58,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
 
     async def protocol_adapter(state: dict) -> dict:
         em.stage("protocol_adapter", "running")
-        raw = SCENARIOS[state["scenario"]]
+        raw = state.get("input") or SCENARIOS[state["scenario"]]
         req = MerchantRequest(
             request_id="req_" + uuid.uuid4().hex[:8], protocol=raw["protocol"], agent_id=raw["agent_id"],
             mandate_id=raw["mandate_id"], raw_query=raw["messages"][-1]["content"],
@@ -75,7 +79,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
     async def decode_intent(state: dict) -> dict:
         em.stage("intent_decoder", "running")
         intent = await llm.structured(Intent, INTENT_SYSTEM, state["request"]["raw_query"],
-                                      fixture=f"record_intent_{state['scenario']}")
+                                      fixture=f"record_intent_{_fixture_scenario(state)}")
         em.emit("a2a", "intent", intent.model_dump())
         em.stage("intent_decoder", "passed", f"{intent.constraint_count} constraints decoded")
         return {"intent": intent.model_dump()}
@@ -108,7 +112,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
             user += (f"\n\nYour previous proposal was {state['proposal']['bundle_price']}. The buyer agent replied: "
                      f"{state['buyer_reply']['message']}\nRespond with your final proposal.")
         proposal = await llm.structured(Proposal, system, user,
-                                        fixture=f"record_proposal_{state['scenario']}_{rnd}", tool_result_id=tid)
+                                        fixture=f"record_proposal_{_fixture_scenario(state)}_{rnd}", tool_result_id=tid)
         em.emit("a2a", "proposal", proposal.model_dump())
         if proposal.alternative:
             text = (f"Proposed {len(proposal.items)} items at {proposal.bundle_price:g} "
@@ -137,7 +141,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         system = BUYER_SYSTEM.format(cap=m["spend_cap"], currency=m["currency"], scope=m["scope"],
                                      query=state["request"]["raw_query"], round=rnd)
         user = "Merchant proposal:\n" + json.dumps(state["proposal"], indent=2)
-        decision = await llm.structured(BuyerDecision, system, user, fixture=f"buyer_decision_{state['scenario']}_{rnd}")
+        decision = await llm.structured(BuyerDecision, system, user, fixture=f"buyer_decision_{_fixture_scenario(state)}_{rnd}")
         em.message("buyer_agent", decision.message)
         return {"negotiation_round": rnd, "buyer_reply": decision.model_dump(), "counter_budget": decision.counter_budget}
 

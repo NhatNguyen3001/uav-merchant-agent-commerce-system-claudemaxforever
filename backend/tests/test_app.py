@@ -65,3 +65,32 @@ async def test_replay_of_finished_run_streams_from_store(app):
 async def test_unknown_scenario_is_400(app):
     async with await _client(app) as c:
         assert (await c.post("/api/runs", json={"scenario": "nope"})).status_code == 400
+        assert (await c.post("/api/runs", json={})).status_code == 400
+        assert (await c.post("/api/runs", json={"agent_id": "buyer-042", "query": "hi"})).status_code == 400
+
+
+async def test_agents_endpoint_lists_identities(app):
+    async with await _client(app) as c:
+        agents = (await c.get("/api/agents")).json()
+        assert [a["agent_id"] for a in agents] == ["buyer-001", "buyer-002", "buyer-999"]
+        assert all({"agent_id", "label", "mandate_id"} <= set(a) for a in agents)
+
+
+async def test_custom_query_runs_pipeline_with_typed_text(app):
+    async with await _client(app) as c:
+        r = await c.post("/api/runs", json={"agent_id": "buyer-001", "query": "Need a quiet mic setup for a tiny flat, budget 500"})
+        run_id = r.json()["run_id"]
+        events = await _drain_sse(c, run_id)
+        first_msg = next(e for e in events if e["type"] == "message")
+        assert first_msg["payload"]["text"] == "Need a quiet mic setup for a tiny flat, budget 500"
+        assert events[-1]["payload"]["stage"] == "retailer_systems"
+        run = (await c.get("/api/runs")).json()[0]
+        assert run["scenario"] == "custom" and run["query"].startswith("Need a quiet") and run["agent_id"] == "buyer-001"
+
+
+async def test_custom_query_with_unregistered_agent_blocks(app):
+    async with await _client(app) as c:
+        run_id = (await c.post("/api/runs", json={"agent_id": "buyer-999", "query": "anything"})).json()["run_id"]
+        events = await _drain_sse(c, run_id)
+        assert events[-1]["payload"] == {"stage": "inbound_gate", "status": "blocked",
+                                         "note": "no credential on file for agent buyer-999"}
