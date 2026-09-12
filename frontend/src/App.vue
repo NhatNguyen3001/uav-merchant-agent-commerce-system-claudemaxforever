@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import Conversation from './components/Conversation.vue'
 import Pipeline from './components/Pipeline.vue'
 import { deleteRun, clearHistory, fetchRuns, useRun } from './composables/useRun.js'
@@ -7,6 +7,17 @@ import { deleteRun, clearHistory, fetchRuns, useRun } from './composables/useRun
 const { events, runId, running, error, start } = useRun()
 const runs = ref([])
 const draft = ref(null) // the typed query shown in the chat before the backend echoes it
+
+const PIPELINE_KEY = 'macs.pipeline.visible'
+const pipelineVisible = ref(true)
+try {
+  pipelineVisible.value = localStorage.getItem(PIPELINE_KEY) !== '0'
+} catch (_) {}
+watch(pipelineVisible, (v) => {
+  try {
+    localStorage.setItem(PIPELINE_KEY, v ? '1' : '0')
+  } catch (_) {}
+})
 
 async function refreshRuns() {
   runs.value = await fetchRuns()
@@ -36,7 +47,7 @@ const pipelineEvents = computed(() => events.value.filter((e) => e.lane === 'a2a
 </script>
 
 <template>
-  <div class="layout">
+  <div class="layout" :class="{ 'pipeline-hidden': !pipelineVisible }">
     <Conversation
       :messages="messages"
       :draft="draft"
@@ -44,11 +55,13 @@ const pipelineEvents = computed(() => events.value.filter((e) => e.lane === 'a2a
       :run-id="runId"
       :running="running"
       :error="error"
+      :pipeline-visible="pipelineVisible"
       @run="run"
       @replay="run({ scenario: $event })"
       @delete="onDelete"
       @clear="onClear"
+      @show-pipeline="pipelineVisible = true"
     />
-    <Pipeline :events="pipelineEvents" :stages="stageEvents" :running="running" />
+    <Pipeline v-if="pipelineVisible" :events="pipelineEvents" :stages="stageEvents" :running="running" @hide="pipelineVisible = false" />
   </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import Chevron from './Chevron.vue'
 import Composer from './Composer.vue'
 import HistoryPanel from './HistoryPanel.vue'
 import { fetchRules, saveRules } from '../composables/useRun.js'
@@ -11,8 +12,9 @@ const props = defineProps({
   runId: String,
   running: Boolean,
   error: String,
+  pipelineVisible: Boolean,
 })
-const emit = defineEmits(['run', 'replay', 'delete', 'clear'])
+const emit = defineEmits(['run', 'replay', 'delete', 'clear', 'show-pipeline'])
 
 const rules = ref(null)
 const drawerOpen = ref(false)
@@ -63,15 +65,16 @@ function time(ts) {
         <img class="brand-mark" src="/logo-mark.png" alt="" />
         <h1>MACS</h1>
       </div>
-      <button class="icon" type="button" :aria-expanded="drawerOpen" aria-label="Merchant rules" @click="drawerOpen = !drawerOpen">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <circle cx="8" cy="8" r="2.2" /><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" />
-        </svg>
-      </button>
+      <div class="brand-actions">
+        <button v-if="!pipelineVisible" type="button" class="ghost" @click="emit('show-pipeline')">Show pipeline</button>
+        <button type="button" class="ghost" :aria-expanded="drawerOpen" @click="drawerOpen = !drawerOpen">
+          Merchant rules
+          <Chevron :open="drawerOpen" />
+        </button>
+      </div>
     </header>
 
     <form v-if="drawerOpen && rules" class="drawer" @submit.prevent="onSave">
-      <p class="drawer-title">Merchant rules</p>
       <p class="drawer-note">Hard limits are enforced by the gates and never shown to the model.</p>
       <label>Max discount %<input type="number" v-model.number="rules.hard.max_discount_pct" min="0" max="90" /></label>
       <label>Min margin %<input type="number" v-model.number="rules.hard.min_margin_pct" min="0" max="90" /></label>
@@ -84,7 +87,7 @@ function time(ts) {
 
     <HistoryPanel :runs="runs" :run-id="runId" :running="running" @replay="emit('replay', $event)" @delete="emit('delete', $event)" @clear="emit('clear')" />
 
-    <div class="thread-wrap">
+    <div class="thread-wrap scroll">
       <div v-if="!bubbles.length && !running" class="thread-empty">
         <p>Type what an incoming shopping agent would say, and watch the merchant agent answer it.</p>
         <p>The pipeline on the right shows every gate, tool call, and proposal behind the reply.</p>

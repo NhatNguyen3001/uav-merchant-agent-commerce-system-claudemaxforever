@@ -8,6 +8,7 @@ const props = defineProps({
   stages: { type: Array, required: true },
   running: Boolean,
 })
+const emit = defineEmits(['hide'])
 
 const last = (type) => [...props.events].reverse().find((e) => e.type === type)
 const finished = computed(() => {
@@ -23,7 +24,10 @@ const money = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits
 
 <template>
   <main class="stage">
-    <ProgressBar :stages="stages" :running="running" />
+    <div class="stage-top">
+      <ProgressBar :stages="stages" :running="running" />
+      <button type="button" class="ghost hide-pipeline" @click="emit('hide')">Hide pipeline</button>
+    </div>
     <div v-if="finished" class="outcome" :class="order?.status === 'placed' ? 'placed' : 'blocked'">
       <template v-if="order?.status === 'placed'">
         <span class="outcome-title">Order placed</span>

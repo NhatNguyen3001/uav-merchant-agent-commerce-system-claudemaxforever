@@ -17,11 +17,11 @@ const nodes = computed(() =>
   ORDER.map(([key, label], i) => {
     const latest = [...props.stages].reverse().find((e) => e.payload.stage === key)
     const status = latest ? latest.payload.status : 'idle'
-    return { key, label, status, note: latest ? latest.payload.note : '', index: i }
+    return { key, label, status, note: latest ? latest.payload.note : '', index: i, pct: (i / (ORDER.length - 1)) * 100 }
   }),
 )
 
-// The track fills up to the furthest stage that has started; a blocked stage ends it.
+// The fill reaches the furthest stage that has started; a blocked stage ends it there.
 const reach = computed(() => {
   let last = -1
   nodes.value.forEach((n) => {
@@ -29,12 +29,9 @@ const reach = computed(() => {
   })
   return last
 })
-
-const current = computed(() => {
-  const n = nodes.value[reach.value]
-  if (!n) return null
-  return n
-})
+const current = computed(() => nodes.value[reach.value] || null)
+const fillPct = computed(() => (reach.value < 0 ? 0 : nodes.value[reach.value].pct))
+const state = computed(() => (current.value ? current.value.status : 'idle'))
 
 const caption = computed(() => {
   const n = current.value
@@ -46,27 +43,23 @@ const caption = computed(() => {
              retailer_systems: 'Placing the order' }[n.key]
   }
   if (n.status === 'blocked') return `Stopped at ${n.label.toLowerCase()}: ${n.note}`
-  if (n.key === 'retailer_systems') return '' // the outcome line below carries the result
+  if (n.key === 'retailer_systems') return ''
   return n.note
 })
-
-const fillPct = computed(() => (reach.value < 0 ? 0 : (reach.value / (ORDER.length - 1)) * 100))
-const state = computed(() => (current.value ? current.value.status : 'idle'))
 </script>
 
 <template>
   <section class="progress" :class="state">
-    <div class="track">
-      <div class="fill" :style="{ width: fillPct + '%' }"></div>
-      <ol class="nodes">
-        <li v-for="n in nodes" :key="n.key" :class="['node', n.status, { reached: n.index <= reach }]" :title="n.note">
-          <span class="dot"></span>
-          <span class="node-label">{{ n.label }}</span>
-        </li>
+    <div class="bar">
+      <div class="bar-track">
+        <div class="bar-fill" :style="{ width: fillPct + '%' }"></div>
+        <span v-for="n in nodes" :key="n.key" class="tick" :class="[n.status, { reached: n.index <= reach }]" :style="{ left: n.pct + '%' }"></span>
+        <span v-if="reach >= 0" class="knob" :style="{ left: fillPct + '%' }"></span>
+      </div>
+      <ol class="bar-labels">
+        <li v-for="n in nodes" :key="n.key" :class="[n.status, { current: n.index === reach }]" :style="{ left: n.pct + '%' }" :title="n.note">{{ n.label }}</li>
       </ol>
     </div>
-    <p class="caption" :class="state">
-      <span v-if="state === 'running'" class="spinner" aria-hidden="true"></span>{{ caption }}
-    </p>
+    <p class="caption" :class="state">{{ caption }}</p>
   </section>
 </template>
