@@ -12,5 +12,5 @@ services:
       - ${ADC_FILE:-${APPDATA}/gcloud/application_default_credentials.json}:/gcp/adc.json:ro
   web:
     build: ./frontend
-    ports: ["8080:80"]
+    ports: ["${WEB_PORT:-8080}:80"]
     depends_on: [api]

@@ -18,7 +18,7 @@ Requirements: Docker, an Anthropic API key, and Google Application Default Crede
 ANTHROPIC_API_KEY=sk-ant-... docker compose up --build
 ```
 
-Console: http://localhost:8080 · API: http://localhost:8000/health
+Console: http://localhost:8080 · API: http://localhost:8000/health · If 8080 is taken, set `WEB_PORT=8081`.
 
 Offline development mode (no API key, no Firestore): from `backend/`, run
 `FAKE_LLM=1 python -m uvicorn macs.app:app --port 8000` with `GOOGLE_CLOUD_PROJECT` unset. The
