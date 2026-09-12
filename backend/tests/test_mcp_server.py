@@ -30,6 +30,18 @@ async def test_get_tools(seeded_store):
         assert (await c.call_tool("get_product", {"sku": "MIC-DYN-01"})).data["name"].startswith("Northwind")
 
 
+async def test_products_with_stored_embedding_still_serialise(seeded_store):
+    # Firestore catalogue docs carry a Vector under "embedding"; tools must strip it or FastMCP cannot build structured content.
+    p = seeded_store.get("catalogue", "MIC-DYN-01")
+    p["embedding"] = object()
+    seeded_store.set("catalogue", "MIC-DYN-01", p)
+    async with Client(build_server(seeded_store)) as c:
+        r = await c.call_tool("search_products", {"sku_in": ["MIC-DYN-01"]})
+        assert r.data[0]["sku"] == "MIC-DYN-01" and "embedding" not in r.data[0]
+        g = await c.call_tool("get_product", {"sku": "MIC-DYN-01"})
+        assert "embedding" not in g.data
+
+
 async def test_create_order_writes(seeded_store):
     async with Client(build_server(seeded_store)) as c:
         r = await c.call_tool("create_order", {"skus": ["MIC-DYN-01", "HP-REC-01"], "mandate_id": "mandate-001"})

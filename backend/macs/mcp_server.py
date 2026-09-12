@@ -13,11 +13,15 @@ TZ = timezone(timedelta(hours=10))
 def build_server(store: Store) -> FastMCP:
     mcp = FastMCP("retailer-systems")
 
+    def _public(p: dict) -> dict:
+        """Catalogue record without the stored embedding vector (not JSON-serialisable, not for the model)."""
+        return {k: v for k, v in p.items() if k != "embedding"}
+
     def _product(sku: str) -> dict:
         p = store.get("catalogue", sku)
         if p is None:
             raise ValueError(f"unknown sku {sku}")
-        return p
+        return _public(p)
 
     @mcp.tool
     def search_products(type: str | None = None, max_price: float | None = None,
@@ -36,7 +40,7 @@ def build_server(store: Store) -> FastMCP:
                 continue
             if sku_in is not None and p["sku"] not in sku_in:
                 continue
-            out.append(p)
+            out.append(_public(p))
         return out
 
     @mcp.tool
