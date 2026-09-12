@@ -80,6 +80,9 @@ async def test_decode_match_compose_outbound_negotiate(seeded_store):
     assert gate["payload"]["verdict"] == "corrected" and gate["payload"]["after"]["bundle_price"] == 588
     state.update(await nodes["negotiate"](state))
     assert state["negotiation_round"] == 1 and state["buyer_reply"]["action"] == "counter"
+    decision = [e for e in reg.events("r1") if e["type"] == "decision"][-1]["payload"]
+    assert decision == {"round": 1, "action": "counter", "message": state["buyer_reply"]["message"],
+                        "counter_budget": 560, "proposal_price": 588}
     state.update(await nodes["compose_proposal"](state))
     state.update(await nodes["outbound_gate"](state))
     state.update(await nodes["negotiate"](state))

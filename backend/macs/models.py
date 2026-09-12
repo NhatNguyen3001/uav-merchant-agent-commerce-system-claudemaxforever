@@ -5,7 +5,7 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field, computed_field
 
 Lane = Literal["merchant", "a2a", "system"]
-EventType = Literal["message", "tool", "gate", "stage", "intent", "proposal", "order"]
+EventType = Literal["message", "tool", "gate", "stage", "intent", "proposal", "decision", "order"]
 StageName = Literal[
     "protocol_adapter", "inbound_gate", "intent_decoder", "proposal_engine",
     "outbound_gate", "execution_gate", "retailer_systems",

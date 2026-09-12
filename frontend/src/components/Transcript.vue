@@ -28,7 +28,7 @@ const rows = computed(() => {
 })
 
 // Every row starts collapsed except the order; the one-line summaries carry the verdict, coverage, and price.
-const OPEN_BY_DEFAULT = { intent: false, proposal: false, order: true, gate: false, tools: false }
+const OPEN_BY_DEFAULT = { intent: false, proposal: false, decision: false, order: true, gate: false, tools: false }
 const openState = reactive({})
 const isOpen = (row) => (row.id in openState ? openState[row.id] : OPEN_BY_DEFAULT[row.kind])
 const toggle = (row) => (openState[row.id] = !isOpen(row))
@@ -40,6 +40,7 @@ function title(row) {
     case 'intent': return 'Decoded intent'
     case 'tools': return `Tool calls (${row.items.length})`
     case 'proposal': return 'Proposal'
+    case 'decision': return p.action === 'accept' ? `Buyer agrees (round ${p.round})` : `Buyer counters (round ${p.round})`
     case 'order': return p.status === 'placed' ? 'Order placed' : 'Order rejected'
     default: return row.kind
   }
@@ -86,7 +87,7 @@ watch(
     </div>
 
     <ol ref="list" class="blocks">
-      <li v-for="row in rows" :key="row.id" :class="['block', row.kind, row.kind === 'gate' ? row.event.payload.verdict : '', { open: isOpen(row) }]">
+      <li v-for="row in rows" :key="row.id" :class="['block', row.kind, row.kind === 'gate' ? row.event.payload.verdict : '', row.kind === 'decision' ? row.event.payload.action : '', { open: isOpen(row) }]">
         <button type="button" class="row-head" :aria-expanded="isOpen(row)" @click="toggle(row)">
           <span class="who">{{ title(row) }}</span>
           <span class="tag">{{ meta(row) }}</span>
@@ -134,6 +135,12 @@ watch(
             <p v-if="row.event.payload.alternative" class="alt">
               Alternative: {{ row.event.payload.alternative.name }} brings the bundle to {{ money(row.event.payload.alternative.bundle_price) }}. {{ row.event.payload.alternative.tradeoff }}
             </p>
+          </template>
+
+          <template v-else-if="row.kind === 'decision'">
+            <p class="text">{{ row.event.payload.message }}</p>
+            <p v-if="row.event.payload.action === 'counter' && row.event.payload.counter_budget" class="quiet">Proposed {{ money(row.event.payload.proposal_price) }}, buyer asks for {{ money(row.event.payload.counter_budget) }}</p>
+            <p v-else class="quiet">Accepted at {{ money(row.event.payload.proposal_price) }}</p>
           </template>
 
           <template v-else-if="row.kind === 'order'">

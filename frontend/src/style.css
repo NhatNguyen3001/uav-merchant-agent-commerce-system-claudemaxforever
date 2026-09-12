@@ -237,6 +237,8 @@ code { font: inherit; font-weight: 500; }
 .block.gate.blocked { border-left-color: var(--blocked-fill); }
 .block.order { border-left-color: var(--pass); }
 .block.tools { border-left-color: var(--muted); }
+.block.decision.accept { border-left-color: var(--pass); }
+.block.decision.counter { border-left-color: var(--corrected); }
 @keyframes reveal {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }

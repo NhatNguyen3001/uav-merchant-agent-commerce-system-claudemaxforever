@@ -147,6 +147,9 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         user = "Merchant proposal:\n" + json.dumps(state["proposal"], indent=2)
         decision = await llm.structured(BuyerDecision, system, user, fixture=f"buyer_decision_{_fixture_scenario(state)}_{rnd}")
         em.message("buyer_agent", decision.message)
+        em.emit("a2a", "decision", {"round": rnd, "action": decision.action, "message": decision.message,
+                                    "counter_budget": decision.counter_budget,
+                                    "proposal_price": state["proposal"]["bundle_price"]})
         return {"negotiation_round": rnd, "buyer_reply": decision.model_dump(), "counter_budget": decision.counter_budget}
 
     async def execution_gate(state: dict) -> dict:
