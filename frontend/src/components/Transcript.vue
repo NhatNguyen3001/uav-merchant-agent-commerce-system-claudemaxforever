@@ -133,7 +133,7 @@ watch(
               </li>
             </ul>
             <p v-if="row.event.payload.alternative" class="alt">
-              Alternative: {{ row.event.payload.alternative.name }} brings the bundle to {{ money(row.event.payload.alternative.bundle_price) }}. {{ row.event.payload.alternative.tradeoff }}
+              Alternative: {{ row.event.payload.alternative.name }} brings the bundle to {{ money(row.event.payload.alternative.bundle_price) }}. {{ row.event.payload.alternative.tradeoff }}<span v-if="row.event.payload.alternative.items?.length" class="sku">{{ row.event.payload.alternative.items.join(', ') }}</span>
             </p>
           </template>
 

@@ -101,13 +101,17 @@ def check_outbound(proposal: Proposal, candidates: dict[str, dict], valid_ids: s
 
     if p.alternative is not None:
         alt = p.alternative
-        if alt.sku not in candidates:
-            notes.append(f"alternative {alt.sku} not grounded; removed")
+        alt_skus = list(alt.items) if alt.items else None
+        if alt_skus is None:
+            # No item list given: assume the alternative swaps the one same-type item.
+            alt_type = candidates.get(alt.sku, {}).get("type")
+            alt_skus = [i.sku for i in p.items if candidates[i.sku]["type"] != alt_type] + [alt.sku]
+        unknown = [s for s in alt_skus if s not in candidates]
+        if unknown:
+            notes.append(f"alternative references {', '.join(unknown)} outside this run's tool results; removed")
             p.alternative = None
         else:
-            alt_type = candidates[alt.sku]["type"]
-            alt_list = sum(candidates[i.sku]["list_price"] for i in p.items if candidates[i.sku]["type"] != alt_type) \
-                + candidates[alt.sku]["list_price"]
+            alt_list = sum(candidates[s]["list_price"] for s in alt_skus)
             alt_cap = round(alt_list * (1 - hard.max_discount_pct / 100))
             if alt.bundle_price < alt_cap:
                 notes.append(f"alternative bundle {alt.bundle_price:g} corrected to {alt_cap:g}")

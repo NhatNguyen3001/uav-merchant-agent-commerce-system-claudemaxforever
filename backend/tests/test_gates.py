@@ -97,3 +97,23 @@ def test_execution_pass_and_blocks(seeded_store):
     assert "expired" in check_execution(_proposal(588, 15), types, seeded_store.get("mandates", "mandate-002"), NOW).reason
     assert "scope" in check_execution(_proposal(588, 15), types + ["monitors"], mandate, NOW).reason
     assert "signature" in check_execution(_proposal(588, 15), types, {**mandate, "signature": ""}, NOW).reason
+
+
+def test_outbound_prices_alternative_from_its_own_items(seeded_store):
+    # Alternative drops the 199 interface for a 99 USB mic: list 99+15+29 = 143, cap 122 at 15%.
+    p = _proposal(286, 5, items=[("MIC-LAV-01", 59), ("IF-USB-02", 199), ("POP-03", 15), ("STD-TAB-01", 29)], alt=False)
+    p.alternative = {"sku": "MIC-USB-01", "name": "U1", "bundle_price": 136, "tradeoff": "no interface needed",
+                     "items": ["MIC-USB-01", "POP-03", "STD-TAB-01"]}
+    p = Proposal.model_validate(p.model_dump())
+    r = check_outbound(p, _cands(seeded_store), {"t1"}, HARD, deliver_by_days=7)
+    assert "alternative" not in r.reason and r.proposal.alternative.bundle_price == 136
+    p.alternative.bundle_price = 100
+    r = check_outbound(p, _cands(seeded_store), {"t1"}, HARD, deliver_by_days=7)
+    assert "alternative bundle 100 corrected to 122" in r.reason and r.proposal.alternative.bundle_price == 122
+
+
+def test_outbound_removes_alternative_with_unknown_sku(seeded_store):
+    p = _proposal(588, 15)
+    p.alternative.items = ["IF-USB-01", "NOPE-01"]
+    r = check_outbound(p, _cands(seeded_store), {"t1"}, HARD, deliver_by_days=7)
+    assert r.verdict == "corrected" and r.proposal.alternative is None

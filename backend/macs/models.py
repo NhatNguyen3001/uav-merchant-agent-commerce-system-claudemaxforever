@@ -80,6 +80,18 @@ class LenientModel(BaseModel):
         return out
 
 
+_PLACEHOLDER = {"unknown", "none", "n/a", "na", "not specified", "not stated", "null", "nil", ""}
+
+
+def _drop_placeholders(items: list) -> list:
+    out = []
+    for x in items:
+        text = str(x).strip().strip("<>[]()").strip().lower()
+        if text not in _PLACEHOLDER:
+            out.append(x)
+    return out
+
+
 class Intent(LenientModel):
     goal: str
     skill_level: str
@@ -91,7 +103,7 @@ class Intent(LenientModel):
     @field_validator("environment", "values", "soft_preferences", mode="before")
     @classmethod
     def _lists(cls, v):
-        return _listify(v)
+        return _drop_placeholders(_listify(v))
 
     @computed_field
     @property
@@ -130,6 +142,12 @@ class Alternative(LenientModel):
     name: str
     bundle_price: float
     tradeoff: str
+    items: list[str] = Field(default_factory=list)  # every SKU in the alternative bundle; lets the gate price it exactly
+
+    @field_validator("items", mode="before")
+    @classmethod
+    def _lists(cls, v):
+        return _listify(v)
 
 
 class Proposal(LenientModel):

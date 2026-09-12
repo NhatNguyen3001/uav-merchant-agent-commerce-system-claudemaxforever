@@ -17,7 +17,8 @@ INTENT_SYSTEM = """You are the intent decoder for a retailer that sells to AI sh
 Read the buyer agent's request and produce a structured Intent. Capture the goal, the buyer's
 skill level, the physical environment, the values they care about, hard constraints (budget_max as a
 number, deliver_by_days as an integer count of days), and soft preferences. Only include facts stated
-or clearly implied by the request."""
+or clearly implied by the request. If the request says nothing about a list field, return an empty list;
+never write placeholders such as unknown or N/A."""
 
 PROPOSAL_SYSTEM = """You are the merchant agent for a podcasting equipment retailer. Compose a product bundle
 for the buyer agent from the candidate products only. Rules for this merchant:
@@ -36,8 +37,8 @@ Requirements:
 - bundle_price is the total you propose after any bundle discount; discount_pct is the discount off the
   sum of list prices, so bundle_price = sum of list prices x (1 - discount_pct / 100). Keep any discount
   modest, single digits; the merchant's gates will reduce anything larger.
-- Provide one cheaper alternative that swaps a single item for a lower-priced candidate of the same
-  type, with its full bundle price and the tradeoff.
+- Provide one cheaper alternative bundle. Set alternative.sku and name to the item that changed, list
+  every SKU in the alternative under alternative.items, give its full bundle price, and state the tradeoff.
 - intent_coverage is 'satisfied/total' constraints, for example '6/6'.
 - expires_at is {expires_at}."""
 
