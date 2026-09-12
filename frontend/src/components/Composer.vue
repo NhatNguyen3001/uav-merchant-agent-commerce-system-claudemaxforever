@@ -44,18 +44,18 @@ function onKeydown(e) {
 
 <template>
   <section class="composer">
+    <textarea
+      ref="box"
+      v-model="query"
+      rows="2"
+      class="query"
+      placeholder="What does the incoming agent say? Enter to run"
+      @keydown="onKeydown"
+    ></textarea>
     <div class="composer-row">
       <select v-model="agentId" class="agent" aria-label="Agent identity">
         <option v-for="a in agents" :key="a.agent_id" :value="a.agent_id">{{ a.agent_id }} ({{ a.label }})</option>
       </select>
-      <textarea
-        ref="box"
-        v-model="query"
-        rows="1"
-        class="query"
-        placeholder="Type what the incoming agent says, then press Enter"
-        @keydown="onKeydown"
-      ></textarea>
       <button class="primary" :disabled="running || !query.trim()" @click="submit">
         {{ running ? 'Running' : 'Run' }}
       </button>

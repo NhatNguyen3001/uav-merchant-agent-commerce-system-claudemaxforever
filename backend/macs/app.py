@@ -5,7 +5,7 @@ import json
 import os
 from datetime import datetime
 
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
@@ -117,7 +117,7 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> F
         others = sorted((r for r in runs if not r.get("is_golden")), key=lambda r: r.get("started_at") or "", reverse=True)
         return golden + others
 
-    @app.delete("/api/runs/{run_id}", status_code=204)
+    @app.delete("/api/runs/{run_id}")
     async def delete_run(run_id: str):
         run = store.get("runs", run_id)
         if run is None:
@@ -125,7 +125,7 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> F
         if run.get("is_golden"):
             raise HTTPException(403, "golden example runs cannot be deleted")
         store.delete_run(run_id)
-        return Response(status_code=204)
+        return {"deleted": run_id}
 
     @app.delete("/api/runs")
     async def clear_history():

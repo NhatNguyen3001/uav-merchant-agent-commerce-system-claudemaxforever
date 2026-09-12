@@ -41,18 +41,13 @@ const money = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits
 <template>
   <section class="transcript">
     <div v-if="!events.length && !running" class="transcript-empty">
-      <p>The conversation between the buyer's agent and the merchant agent appears here as it happens.</p>
-      <p>Every price the merchant quotes comes from a tool result, and every gate verdict is deterministic.</p>
+      <p>Gates, decoded intent, tool calls, proposals, and the order appear here as each stage finishes.</p>
+      <p>Every price comes from a tool result, and every gate verdict is deterministic.</p>
     </div>
 
     <ol ref="list" class="blocks">
-      <li v-for="e in events" :key="e.id" :class="['block', e.type, e.type === 'gate' ? e.payload.verdict : '', e.type === 'message' ? e.payload.from : '']">
-        <template v-if="e.type === 'message'">
-          <p class="who">{{ e.payload.from === 'buyer_agent' ? "Buyer's agent" : 'Merchant agent' }}<span v-if="e.payload.from === 'buyer_agent'" class="tag">external</span></p>
-          <p class="text">{{ e.payload.text }}</p>
-        </template>
-
-        <template v-else-if="e.type === 'intent'">
+      <li v-for="e in events" :key="e.id" :class="['block', e.type, e.type === 'gate' ? e.payload.verdict : '']">
+        <template v-if="e.type === 'intent'">
           <p class="who">Decoded intent<span class="tag">{{ e.payload.constraint_count }} constraints</span></p>
           <dl class="intent">
             <dt>Goal</dt><dd>{{ e.payload.goal }}</dd>

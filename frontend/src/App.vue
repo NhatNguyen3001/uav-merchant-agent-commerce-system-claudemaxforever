@@ -1,36 +1,54 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import Composer from './components/Composer.vue'
-import ProgressBar from './components/ProgressBar.vue'
-import Sidebar from './components/Sidebar.vue'
-import Transcript from './components/Transcript.vue'
-import { fetchRuns, useRun } from './composables/useRun.js'
+import Conversation from './components/Conversation.vue'
+import Pipeline from './components/Pipeline.vue'
+import { deleteRun, clearHistory, fetchRuns, useRun } from './composables/useRun.js'
 
 const { events, runId, running, error, start } = useRun()
 const runs = ref([])
+const draft = ref(null) // the typed query shown in the chat before the backend echoes it
 
 async function refreshRuns() {
   runs.value = await fetchRuns()
 }
 
 async function run(body) {
+  draft.value = body.query ? { agent_id: body.agent_id, text: body.query } : null
   await start(body)
   setTimeout(refreshRuns, 1200)
+}
+
+async function onDelete(id) {
+  await deleteRun(id)
+  await refreshRuns()
+}
+
+async function onClear() {
+  await clearHistory()
+  await refreshRuns()
 }
 
 onMounted(refreshRuns)
 
 const stageEvents = computed(() => events.value.filter((e) => e.type === 'stage'))
-const a2aEvents = computed(() => events.value.filter((e) => e.lane === 'a2a'))
+const messages = computed(() => events.value.filter((e) => e.type === 'message'))
+const pipelineEvents = computed(() => events.value.filter((e) => e.lane === 'a2a' && e.type !== 'message'))
 </script>
 
 <template>
   <div class="layout">
-    <Sidebar :events="events" :runs="runs" :run-id="runId" :running="running" @replay="run({ scenario: $event })" />
-    <main class="stage">
-      <Composer :running="running" :error="error" @run="run" />
-      <ProgressBar :stages="stageEvents" :running="running" />
-      <Transcript :events="a2aEvents" :stages="stageEvents" :running="running" />
-    </main>
+    <Conversation
+      :messages="messages"
+      :draft="draft"
+      :runs="runs"
+      :run-id="runId"
+      :running="running"
+      :error="error"
+      @run="run"
+      @replay="run({ scenario: $event })"
+      @delete="onDelete"
+      @clear="onClear"
+    />
+    <Pipeline :events="pipelineEvents" :stages="stageEvents" :running="running" />
   </div>
 </template>

@@ -114,7 +114,7 @@ async def test_delete_run_and_clear_history_keep_golden(app, seeded_store):
         await _drain_sse(c, r1)
         r2 = (await c.post("/api/runs", json={"scenario": "rejected_agent"})).json()["run_id"]
         await _drain_sse(c, r2)
-        assert (await c.delete(f"/api/runs/{r1}")).status_code == 204
+        assert (await c.delete(f"/api/runs/{r1}")).json() == {"deleted": r1}
         assert (await c.get(f"/api/runs/{r1}")).status_code == 404
         assert (await c.delete("/api/runs/golden_x")).status_code == 403
         assert (await c.delete("/api/runs/nope")).status_code == 404

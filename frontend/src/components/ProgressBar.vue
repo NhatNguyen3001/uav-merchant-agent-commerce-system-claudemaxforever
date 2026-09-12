@@ -46,7 +46,7 @@ const caption = computed(() => {
              retailer_systems: 'Placing the order' }[n.key]
   }
   if (n.status === 'blocked') return `Stopped at ${n.label.toLowerCase()}: ${n.note}`
-  if (n.key === 'retailer_systems') return n.note
+  if (n.key === 'retailer_systems') return '' // the outcome line below carries the result
   return n.note
 })
 

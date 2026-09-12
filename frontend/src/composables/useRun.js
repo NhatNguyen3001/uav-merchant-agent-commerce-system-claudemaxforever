@@ -62,3 +62,14 @@ export async function fetchRuns() {
 export async function fetchAgents() {
   return (await fetch(`${API}/api/agents`)).json()
 }
+
+export async function deleteRun(runId) {
+  const res = await fetch(`${API}/api/runs/${runId}`, { method: 'DELETE' })
+  if (!res.ok && res.status !== 404) throw new Error(await res.text())
+}
+
+export async function clearHistory() {
+  const res = await fetch(`${API}/api/runs`, { method: 'DELETE' })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
