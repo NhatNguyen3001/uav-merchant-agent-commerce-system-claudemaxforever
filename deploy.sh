@@ -10,8 +10,9 @@ IMAGE="$REGION-docker.pkg.dev/$PROJECT/$REPO/$SERVICE:$(date +%Y%m%d%H%M%S)"
 gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com \
   secretmanager.googleapis.com aiplatform.googleapis.com firestore.googleapis.com --project "$PROJECT"
 
+# Idempotent: a transient failure of the describe check must not abort the deploy on "already exists".
 gcloud artifacts repositories describe "$REPO" --location "$REGION" --project "$PROJECT" >/dev/null 2>&1 || \
-  gcloud artifacts repositories create "$REPO" --repository-format=docker --location "$REGION" --project "$PROJECT"
+  gcloud artifacts repositories create "$REPO" --repository-format=docker --location "$REGION" --project "$PROJECT" 2>&1 | grep -v ALREADY_EXISTS || true
 
 if ! gcloud secrets describe anthropic-api-key --project "$PROJECT" >/dev/null 2>&1; then
   printf '%s' "$ANTHROPIC_API_KEY" | gcloud secrets create anthropic-api-key --data-file=- --project "$PROJECT"
