@@ -34,3 +34,18 @@ def test_merchant_rules_split_soft_and_hard():
         hard={"max_discount_pct": 15, "min_margin_pct": 20, "category_overrides": {}},
     )
     assert rules.hard.max_discount_pct == 15
+
+
+def test_intent_accepts_scalar_where_list_expected():
+    intent = Intent(goal="g", skill_level="beginner", environment="noisy street", values="Sustainability",
+                    hard_constraints={"budget_max": 600, "deliver_by_days": 7}, soft_preferences=None)
+    assert intent.values == ["Sustainability"] and intent.environment == ["noisy street"] and intent.soft_preferences == []
+
+
+def test_proposal_accepts_json_encoded_items_string():
+    import json
+    items = [{"sku": "A", "name": "a", "price": 1, "rationale": "r", "satisfies": "goal",
+              "grounded_on": [{"tool_result_id": "t", "sku": "A"}]}]
+    p = Proposal(items=json.dumps(items), bundle_price=1, discount_pct=0, intent_coverage="1/6",
+                 alternative='{"sku": "B", "name": "b", "bundle_price": 2, "tradeoff": "x"}', expires_at="2026-09-13T00:00:00+10:00")
+    assert p.items[0].sku == "A" and p.items[0].satisfies == ["goal"] and p.alternative.sku == "B"

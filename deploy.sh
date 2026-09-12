@@ -27,7 +27,7 @@ gcloud builds submit backend --tag "$IMAGE" --project "$PROJECT"
 
 gcloud run deploy "$SERVICE" --image "$IMAGE" --region "$REGION" --project "$PROJECT" \
   --allow-unauthenticated --min-instances 1 --max-instances 3 --memory 1Gi --timeout 900 \
-  --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT,FAKE_LLM=0,REPLAY=0,MACS_MODEL=${MACS_MODEL:-claude-haiku-4-5}" \
+  --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT,FAKE_LLM=0,REPLAY=0,MACS_MODEL=${MACS_MODEL:-claude-opus-5}" \
   --set-secrets "ANTHROPIC_API_KEY=anthropic-api-key:latest"
 
 (cd frontend && npm ci && npm run build)

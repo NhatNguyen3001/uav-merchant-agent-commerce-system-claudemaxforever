@@ -26,12 +26,16 @@ for the buyer agent from the candidate products only. Rules for this merchant:
 Requirements:
 - Choose 3 to 5 items that together satisfy the decoded intent. Use one item per type.
 - Every item price must equal the candidate's list_price.
-- Give one rationale per item that ties the item to specific intent facets, and list which intent
-  keys it satisfies (goal, skill_level, environment, values, hard_constraints, soft_preferences).
+- Give one rationale per item, one sentence of at most 25 words, tying the item to specific intent
+  facets, and list which intent keys it satisfies (goal, skill_level, environment, values,
+  hard_constraints, soft_preferences).
   Only claim 'values' for products whose sustainability.certifications is non-empty.
 - grounded_on must cite the tool_result_id given below for each item's sku.
-- bundle_price is the total you propose after any bundle discount; discount_pct is the discount off
-  the sum of list prices. A modest discount can help close, but the bundle must stay within the buyer's budget.
+- Budget first: choose items whose list prices add up to no more than the buyer's budget_max. Do not rely
+  on a discount to get under budget.
+- bundle_price is the total you propose after any bundle discount; discount_pct is the discount off the
+  sum of list prices, so bundle_price = sum of list prices x (1 - discount_pct / 100). Keep any discount
+  modest, single digits; the merchant's gates will reduce anything larger.
 - Provide one cheaper alternative that swaps a single item for a lower-priced candidate of the same
   type, with its full bundle price and the tradeoff.
 - intent_coverage is 'satisfied/total' constraints, for example '6/6'.
@@ -107,7 +111,8 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         tid = next(iter(cands.values()))["tool_result_id"]
         expires = (now + timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=0).isoformat()
         system = PROPOSAL_SYSTEM.format(soft_rules=json.dumps(soft, indent=2), expires_at=expires)
-        slim = [{k: v for k, v in p.items() if k not in ("specs", "embedding")} for p in cands.values()]
+        drop = ("specs", "embedding", "compatibility", "tool_result_id")
+        slim = [{k: v for k, v in p.items() if k not in drop} for p in cands.values()]
         user = (f"Decoded intent:\n{json.dumps(state['intent'], indent=2)}\n\n"
                 f"Candidate products (tool_result_id for every sku is {tid}):\n{json.dumps(slim, indent=2)}")
         if state.get("buyer_reply"):
