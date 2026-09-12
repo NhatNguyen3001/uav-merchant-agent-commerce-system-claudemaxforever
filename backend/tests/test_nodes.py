@@ -91,3 +91,20 @@ async def test_decode_match_compose_outbound_negotiate(seeded_store):
     closing = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]
     assert closing["payload"]["text"].startswith("Order placed") and "588" in closing["payload"]["text"]
     await client.__aexit__(None, None, None)
+
+
+async def test_execution_gate_refuses_to_order_without_buyer_acceptance(seeded_store):
+    reg, em, client, tools, nodes, state = await _setup(seeded_store)
+    for name in ("protocol_adapter", "inbound_gate", "decode_intent", "match_catalogue", "compose_proposal", "outbound_gate"):
+        state.update(await nodes[name](state))
+    state["negotiation_round"] = 2
+    state["buyer_reply"] = {"action": "counter", "message": "Still not right.", "counter_budget": 500}
+    state.update(await nodes["execution_gate"](state))
+    assert state["order"]["status"] == "rejected" and state["blocked"] is True
+    evs = reg.events("r1")
+    gate = [e for e in evs if e["type"] == "gate" and e["payload"]["gate"] == "execution"][-1]["payload"]
+    assert gate["verdict"] == "blocked" and "did not accept" in gate["reason"]
+    assert not any(e["type"] == "tool" and e["payload"]["name"] == "create_order" for e in evs)
+    closing = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]
+    assert closing["payload"]["text"].startswith("No order")
+    await client.__aexit__(None, None, None)

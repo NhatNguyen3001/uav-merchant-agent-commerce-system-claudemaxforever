@@ -152,12 +152,24 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
     async def execution_gate(state: dict) -> dict:
         em.stage("execution_gate", "running")
         proposal = Proposal.model_validate(state["proposal"])
+        skus = [i.sku for i in proposal.items]
+        reply = state.get("buyer_reply") or {}
+        if reply.get("action") != "accept":
+            # Two rounds are up and the buyer's agent has not accepted: nothing is ordered.
+            reason = "buyer's agent did not accept the final proposal; no order placed"
+            em.message("merchant_agent", "No order placed. We could not reach agreement within two rounds; "
+                                         "the final proposal stays open until it expires.")
+            em.gate("execution", "blocked", reason)
+            order = {"order_id": "", "skus": skus, "total": proposal.bundle_price,
+                     "mandate_id": state["mandate"]["mandate_id"], "status": "rejected"}
+            em.emit("a2a", "order", order)
+            return {"order": order, "blocked": True,
+                    "gate_results": state["gate_results"] + [{"gate": "execution", "verdict": "blocked"}]}
         types = [state["candidates"][i.sku]["type"] for i in proposal.items]
         r = check_execution(proposal, types, state["mandate"], now)
         if r.verdict == "blocked":
             em.message("merchant_agent", f"Cannot proceed: {r.reason}.")
         em.gate("execution", r.verdict, r.reason)
-        skus = [i.sku for i in proposal.items]
         if r.verdict == "blocked":
             order = {"order_id": "", "skus": skus, "total": proposal.bundle_price,
                      "mandate_id": state["mandate"]["mandate_id"], "status": "rejected"}
