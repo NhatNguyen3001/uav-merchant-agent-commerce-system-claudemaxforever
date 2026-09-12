@@ -1,0 +1,1040 @@
+[
+  {
+    "sku": "MIC-DYN-01",
+    "name": "Northwind D1 dynamic microphone",
+    "type": "microphone",
+    "list_price": 179,
+    "cost": 110,
+    "stock": 12,
+    "ship_days": 2,
+    "specs": {
+      "weight_g": 400
+    },
+    "suited_for": [
+      "beginner",
+      "noisy_room",
+      "small_space"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "high",
+    "compatibility": [
+      "usb_interface",
+      "xlr"
+    ],
+    "outcome_tags": [
+      "podcast",
+      "voice",
+      "rejects_background_noise"
+    ]
+  },
+  {
+    "sku": "MIC-DYN-02",
+    "name": "Northwind D2 broadcast dynamic",
+    "type": "microphone",
+    "list_price": 329,
+    "cost": 210,
+    "stock": 5,
+    "ship_days": 3,
+    "specs": {
+      "weight_g": 400
+    },
+    "suited_for": [
+      "intermediate",
+      "noisy_room"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "high",
+    "compatibility": [
+      "xlr"
+    ],
+    "outcome_tags": [
+      "podcast",
+      "broadcast",
+      "rejects_background_noise"
+    ]
+  },
+  {
+    "sku": "MIC-CON-01",
+    "name": "Clearline C1 large diaphragm condenser",
+    "type": "microphone",
+    "list_price": 249,
+    "cost": 150,
+    "stock": 8,
+    "ship_days": 2,
+    "specs": {
+      "weight_g": 400
+    },
+    "suited_for": [
+      "intermediate",
+      "treated_room"
+    ],
+    "sustainability": {
+      "materials": [
+        "aluminium",
+        "steel"
+      ],
+      "certifications": [],
+      "brand_practice": "repair program"
+    },
+    "durability": "medium",
+    "compatibility": [
+      "xlr"
+    ],
+    "outcome_tags": [
+      "vocals",
+      "studio",
+      "detailed"
+    ]
+  },
+  {
+    "sku": "MIC-CON-02",
+    "name": "Clearline C2 pencil condenser pair",
+    "type": "microphone",
+    "list_price": 299,
+    "cost": 180,
+    "stock": 4,
+    "ship_days": 4,
+    "specs": {
+      "weight_g": 400
+    },
+    "suited_for": [
+      "advanced",
+      "treated_room"
+    ],
+    "sustainability": {
+      "materials": [
+        "aluminium",
+        "steel"
+      ],
+      "certifications": [],
+      "brand_practice": "repair program"
+    },
+    "durability": "medium",
+    "compatibility": [
+      "xlr"
+    ],
+    "outcome_tags": [
+      "instruments",
+      "stereo"
+    ]
+  },
+  {
+    "sku": "MIC-USB-01",
+    "name": "Plugtalk U1 USB microphone",
+    "type": "microphone",
+    "list_price": 99,
+    "cost": 60,
+    "stock": 20,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 400
+    },
+    "suited_for": [
+      "beginner",
+      "small_space"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "medium",
+    "compatibility": [
+      "usb"
+    ],
+    "outcome_tags": [
+      "podcast",
+      "calls",
+      "plug_and_play"
+    ]
+  },
+  {
+    "sku": "MIC-USB-02",
+    "name": "Plugtalk U2 USB microphone with mute",
+    "type": "microphone",
+    "list_price": 129,
+    "cost": 80,
+    "stock": 15,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 400
+    },
+    "suited_for": [
+      "beginner",
+      "small_space"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "medium",
+    "compatibility": [
+      "usb"
+    ],
+    "outcome_tags": [
+      "podcast",
+      "streaming",
+      "plug_and_play"
+    ]
+  },
+  {
+    "sku": "MIC-LAV-01",
+    "name": "Whisper L1 lavalier",
+    "type": "microphone",
+    "list_price": 59,
+    "cost": 30,
+    "stock": 30,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 400
+    },
+    "suited_for": [
+      "beginner",
+      "mobile"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "low",
+    "compatibility": [
+      "3.5mm",
+      "usb_c"
+    ],
+    "outcome_tags": [
+      "interviews",
+      "mobile"
+    ]
+  },
+  {
+    "sku": "IF-USB-01",
+    "name": "Loopline U1 USB audio interface",
+    "type": "audio_interface",
+    "list_price": 144,
+    "cost": 95,
+    "stock": 9,
+    "ship_days": 2,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "high",
+    "compatibility": [
+      "xlr",
+      "usb"
+    ],
+    "outcome_tags": [
+      "podcast",
+      "plug_and_play",
+      "previous_generation"
+    ]
+  },
+  {
+    "sku": "IF-USB-02",
+    "name": "Loopline U2 USB audio interface",
+    "type": "audio_interface",
+    "list_price": 199,
+    "cost": 130,
+    "stock": 10,
+    "ship_days": 2,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner",
+      "small_space"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "high",
+    "compatibility": [
+      "xlr",
+      "usb_c"
+    ],
+    "outcome_tags": [
+      "podcast",
+      "plug_and_play",
+      "one_knob_gain"
+    ]
+  },
+  {
+    "sku": "IF-USB-03",
+    "name": "Loopline U4 four channel interface",
+    "type": "audio_interface",
+    "list_price": 349,
+    "cost": 230,
+    "stock": 6,
+    "ship_days": 3,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "intermediate"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "high",
+    "compatibility": [
+      "xlr",
+      "usb_c"
+    ],
+    "outcome_tags": [
+      "multi_guest",
+      "podcast"
+    ]
+  },
+  {
+    "sku": "IF-USB-04",
+    "name": "Gridwave G2 interface",
+    "type": "audio_interface",
+    "list_price": 229,
+    "cost": 150,
+    "stock": 7,
+    "ship_days": 2,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "intermediate"
+    ],
+    "sustainability": {
+      "materials": [
+        "aluminium",
+        "steel"
+      ],
+      "certifications": [],
+      "brand_practice": "repair program"
+    },
+    "durability": "medium",
+    "compatibility": [
+      "xlr",
+      "usb_c"
+    ],
+    "outcome_tags": [
+      "music",
+      "podcast"
+    ]
+  },
+  {
+    "sku": "IF-MIX-01",
+    "name": "Gridwave M6 podcast mixer",
+    "type": "audio_interface",
+    "list_price": 449,
+    "cost": 300,
+    "stock": 3,
+    "ship_days": 5,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "advanced"
+    ],
+    "sustainability": {
+      "materials": [
+        "aluminium",
+        "steel"
+      ],
+      "certifications": [],
+      "brand_practice": "repair program"
+    },
+    "durability": "high",
+    "compatibility": [
+      "xlr",
+      "usb_c"
+    ],
+    "outcome_tags": [
+      "multi_guest",
+      "live_show"
+    ]
+  },
+  {
+    "sku": "HP-REC-01",
+    "name": "Evergreen R1 recycled shell headphones",
+    "type": "headphones",
+    "list_price": 149,
+    "cost": 90,
+    "stock": 14,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner",
+      "small_space"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "high",
+    "compatibility": [
+      "3.5mm",
+      "6.35mm"
+    ],
+    "outcome_tags": [
+      "monitoring",
+      "closed_back",
+      "isolation"
+    ]
+  },
+  {
+    "sku": "HP-REC-02",
+    "name": "Evergreen R2 recycled shell headphones",
+    "type": "headphones",
+    "list_price": 199,
+    "cost": 120,
+    "stock": 8,
+    "ship_days": 2,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "intermediate"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "high",
+    "compatibility": [
+      "3.5mm",
+      "6.35mm"
+    ],
+    "outcome_tags": [
+      "monitoring",
+      "closed_back"
+    ]
+  },
+  {
+    "sku": "HP-STD-01",
+    "name": "Baseline S1 closed back headphones",
+    "type": "headphones",
+    "list_price": 89,
+    "cost": 50,
+    "stock": 25,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "medium",
+    "compatibility": [
+      "3.5mm"
+    ],
+    "outcome_tags": [
+      "monitoring",
+      "closed_back"
+    ]
+  },
+  {
+    "sku": "HP-STD-02",
+    "name": "Baseline S2 open back headphones",
+    "type": "headphones",
+    "list_price": 159,
+    "cost": 95,
+    "stock": 6,
+    "ship_days": 2,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "intermediate",
+      "treated_room"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "medium",
+    "compatibility": [
+      "3.5mm",
+      "6.35mm"
+    ],
+    "outcome_tags": [
+      "mixing",
+      "open_back"
+    ]
+  },
+  {
+    "sku": "HP-PRO-01",
+    "name": "Reference P1 studio headphones",
+    "type": "headphones",
+    "list_price": 299,
+    "cost": 190,
+    "stock": 4,
+    "ship_days": 3,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "advanced"
+    ],
+    "sustainability": {
+      "materials": [
+        "aluminium",
+        "steel"
+      ],
+      "certifications": [],
+      "brand_practice": "repair program"
+    },
+    "durability": "high",
+    "compatibility": [
+      "6.35mm"
+    ],
+    "outcome_tags": [
+      "mixing",
+      "mastering"
+    ]
+  },
+  {
+    "sku": "ARM-DESK-01",
+    "name": "Compact desk clamp boom arm",
+    "type": "boom_arm",
+    "list_price": 165,
+    "cost": 100,
+    "stock": 11,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "small_space",
+      "beginner"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "high",
+    "compatibility": [
+      "standard_thread"
+    ],
+    "outcome_tags": [
+      "desk_mount",
+      "small_space",
+      "low_profile"
+    ]
+  },
+  {
+    "sku": "ARM-DESK-02",
+    "name": "Standard desk boom arm",
+    "type": "boom_arm",
+    "list_price": 79,
+    "cost": 45,
+    "stock": 18,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "medium",
+    "compatibility": [
+      "standard_thread"
+    ],
+    "outcome_tags": [
+      "desk_mount"
+    ]
+  },
+  {
+    "sku": "ARM-PRO-01",
+    "name": "Broadcast boom arm with cable channel",
+    "type": "boom_arm",
+    "list_price": 219,
+    "cost": 140,
+    "stock": 5,
+    "ship_days": 3,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "advanced"
+    ],
+    "sustainability": {
+      "materials": [
+        "aluminium",
+        "steel"
+      ],
+      "certifications": [],
+      "brand_practice": "repair program"
+    },
+    "durability": "high",
+    "compatibility": [
+      "standard_thread"
+    ],
+    "outcome_tags": [
+      "desk_mount",
+      "broadcast"
+    ]
+  },
+  {
+    "sku": "STD-TAB-01",
+    "name": "Tabletop tripod stand",
+    "type": "boom_arm",
+    "list_price": 29,
+    "cost": 15,
+    "stock": 40,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner",
+      "mobile"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "low",
+    "compatibility": [
+      "standard_thread"
+    ],
+    "outcome_tags": [
+      "tabletop",
+      "mobile"
+    ]
+  },
+  {
+    "sku": "POP-01",
+    "name": "Mesh pop filter",
+    "type": "pop_filter",
+    "list_price": 25,
+    "cost": 10,
+    "stock": 50,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "medium",
+    "compatibility": [
+      "gooseneck_clamp"
+    ],
+    "outcome_tags": [
+      "plosives"
+    ]
+  },
+  {
+    "sku": "POP-02",
+    "name": "Metal pop filter",
+    "type": "pop_filter",
+    "list_price": 39,
+    "cost": 18,
+    "stock": 30,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "intermediate"
+    ],
+    "sustainability": {
+      "materials": [
+        "aluminium",
+        "steel"
+      ],
+      "certifications": [],
+      "brand_practice": "repair program"
+    },
+    "durability": "high",
+    "compatibility": [
+      "gooseneck_clamp"
+    ],
+    "outcome_tags": [
+      "plosives"
+    ]
+  },
+  {
+    "sku": "POP-03",
+    "name": "Foam windscreen for dynamic mics",
+    "type": "pop_filter",
+    "list_price": 15,
+    "cost": 6,
+    "stock": 60,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner",
+      "mobile"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "low",
+    "compatibility": [
+      "MIC-DYN-01",
+      "MIC-DYN-02"
+    ],
+    "outcome_tags": [
+      "plosives",
+      "wind"
+    ]
+  },
+  {
+    "sku": "PAN-01",
+    "name": "Acoustic panel 4 pack recycled PET",
+    "type": "acoustic_panel",
+    "list_price": 129,
+    "cost": 70,
+    "stock": 10,
+    "ship_days": 4,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "small_space",
+      "noisy_room"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "medium",
+    "compatibility": [],
+    "outcome_tags": [
+      "reflection_control",
+      "small_space"
+    ]
+  },
+  {
+    "sku": "PAN-02",
+    "name": "Acoustic panel 8 pack recycled PET",
+    "type": "acoustic_panel",
+    "list_price": 229,
+    "cost": 130,
+    "stock": 6,
+    "ship_days": 4,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "treated_room"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "medium",
+    "compatibility": [],
+    "outcome_tags": [
+      "reflection_control"
+    ]
+  },
+  {
+    "sku": "PAN-03",
+    "name": "Reflection filter shield",
+    "type": "acoustic_panel",
+    "list_price": 149,
+    "cost": 85,
+    "stock": 7,
+    "ship_days": 3,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "small_space",
+      "noisy_room"
+    ],
+    "sustainability": {
+      "materials": [
+        "aluminium",
+        "steel"
+      ],
+      "certifications": [],
+      "brand_practice": "repair program"
+    },
+    "durability": "high",
+    "compatibility": [
+      "standard_thread"
+    ],
+    "outcome_tags": [
+      "reflection_control",
+      "isolation"
+    ]
+  },
+  {
+    "sku": "PAN-04",
+    "name": "Door seal kit",
+    "type": "acoustic_panel",
+    "list_price": 49,
+    "cost": 20,
+    "stock": 20,
+    "ship_days": 2,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "noisy_room"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "medium",
+    "compatibility": [],
+    "outcome_tags": [
+      "noise_reduction"
+    ]
+  },
+  {
+    "sku": "CAB-XLR-01",
+    "name": "XLR cable 3m recycled jacket",
+    "type": "cable",
+    "list_price": 24,
+    "cost": 9,
+    "stock": 80,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner"
+    ],
+    "sustainability": {
+      "materials": [
+        "recycled ABS",
+        "aluminium"
+      ],
+      "certifications": [
+        "B Corp",
+        "FSC packaging"
+      ],
+      "brand_practice": "carbon neutral shipping"
+    },
+    "durability": "high",
+    "compatibility": [
+      "xlr"
+    ],
+    "outcome_tags": [
+      "connectivity"
+    ]
+  },
+  {
+    "sku": "CAB-USB-01",
+    "name": "USB-C cable 2m",
+    "type": "cable",
+    "list_price": 19,
+    "cost": 7,
+    "stock": 100,
+    "ship_days": 1,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "medium",
+    "compatibility": [
+      "usb_c"
+    ],
+    "outcome_tags": [
+      "connectivity"
+    ]
+  },
+  {
+    "sku": "BUN-STA-01",
+    "name": "Starter podcast kit (USB mic, stand, pop filter)",
+    "type": "kit",
+    "list_price": 149,
+    "cost": 95,
+    "stock": 6,
+    "ship_days": 2,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "beginner",
+      "small_space"
+    ],
+    "sustainability": {
+      "materials": [
+        "plastic"
+      ],
+      "certifications": [],
+      "brand_practice": ""
+    },
+    "durability": "medium",
+    "compatibility": [
+      "usb"
+    ],
+    "outcome_tags": [
+      "podcast",
+      "plug_and_play"
+    ]
+  },
+  {
+    "sku": "MON-01",
+    "name": "Compact studio monitors pair",
+    "type": "monitors",
+    "list_price": 279,
+    "cost": 180,
+    "stock": 4,
+    "ship_days": 5,
+    "specs": {
+      "weight_g": 300
+    },
+    "suited_for": [
+      "intermediate",
+      "treated_room"
+    ],
+    "sustainability": {
+      "materials": [
+        "aluminium",
+        "steel"
+      ],
+      "certifications": [],
+      "brand_practice": "repair program"
+    },
+    "durability": "high",
+    "compatibility": [
+      "6.35mm",
+      "rca"
+    ],
+    "outcome_tags": [
+      "mixing"
+    ]
+  }
+]
