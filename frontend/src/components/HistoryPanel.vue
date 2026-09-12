@@ -33,6 +33,7 @@ function outcome(r) {
   const s = r.summary || {}
   if (r.status === 'running') return 'running'
   if (r.status === 'failed') return 'failed'
+  if (r.status === 'interrupted') return 'interrupted'
   return s.order_status === 'placed' ? `placed ${s.bundle_price ?? ''}` : 'blocked'
 }
 </script>

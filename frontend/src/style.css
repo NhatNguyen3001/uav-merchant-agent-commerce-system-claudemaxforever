@@ -107,7 +107,7 @@ code { font: inherit; font-weight: 500; }
 .run-title { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .run-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
 .run-meta .placed { color: var(--pass); }
-.run-meta .blocked, .run-meta .failed { color: var(--blocked); }
+.run-meta .blocked, .run-meta .failed, .run-meta .interrupted { color: var(--blocked); }
 .run-meta .running { color: var(--active); }
 
 /* Thread */

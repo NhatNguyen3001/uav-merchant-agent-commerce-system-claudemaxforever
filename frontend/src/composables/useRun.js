@@ -31,10 +31,14 @@ export function useRun() {
       events.value.push(JSON.parse(e.data))
     })
     // The server closes the stream after the final stage event; the browser reports that as an error.
+    // If no terminal stage arrived, the connection was lost mid-run.
     source.onerror = () => {
       source.close()
       source = null
       running.value = false
+      const last = [...events.value].reverse().find((e) => e.type === 'stage')
+      const terminal = last && (last.payload.status === 'blocked' || (last.payload.status === 'passed' && last.payload.stage === 'retailer_systems'))
+      if (!terminal) error.value = 'Connection to the run was lost before it finished. The server may have restarted; run it again.'
     }
   }
 

@@ -62,14 +62,25 @@ async def test_replay_of_finished_run_streams_from_store(app):
         assert all(e["run_id"] == replay_id for e in second)
 
 
-async def test_replay_of_custom_run_keeps_query_in_history(app):
+async def test_replay_does_not_add_to_history(app):
     async with await _client(app) as c:
         run_id = (await c.post("/api/runs", json={"agent_id": "buyer-999", "query": "typed text"})).json()["run_id"]
         await _drain_sse(c, run_id)
-        replay_id = (await c.post("/api/runs", json={"scenario": run_id})).json()["run_id"]
-        await _drain_sse(c, replay_id)
-        runs = {r["run_id"]: r for r in (await c.get("/api/runs")).json()}
-        assert runs[replay_id]["query"] == "typed text" and runs[replay_id]["agent_id"] == "buyer-999"
+        before = [r["run_id"] for r in (await c.get("/api/runs")).json()]
+        res = (await c.post("/api/runs", json={"scenario": run_id})).json()
+        events = await _drain_sse(c, res["run_id"])
+        assert res["replay_of"] == run_id and len(events) > 0
+        after = [r["run_id"] for r in (await c.get("/api/runs")).json()]
+        assert after == before
+        assert (await c.get(f"/api/runs/{res['run_id']}")).status_code == 404
+
+
+async def test_stale_running_runs_are_marked_interrupted_on_startup(seeded_store):
+    seeded_store.set("runs", "r_stale", {"run_id": "r_stale", "scenario": "custom", "status": "running",
+                                         "started_at": "2026-09-12T10:00:00+10:00", "is_golden": False, "summary": {}})
+    create_app(seeded_store, LLM(fake=True), RunRegistry(), replay=False)
+    run = seeded_store.get("runs", "r_stale")
+    assert run["status"] == "interrupted" and run["summary"]["order_status"] == "none"
 
 
 async def test_unknown_scenario_is_400(app):

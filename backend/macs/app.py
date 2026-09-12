@@ -36,26 +36,37 @@ def _store_from_env() -> Store:
     return FirestoreStore(project, embedder)
 
 
-async def _replay_run(source_id: str, run_id: str, store: Store, registry: RunRegistry, scenario: str) -> None:
-    src0 = store.get("runs", source_id) or {}
-    store.set("runs", run_id, {"run_id": run_id, "scenario": scenario, "started_at": datetime.now(TZ).isoformat(timespec="seconds"),
-                              "finished_at": None, "status": "running", "is_golden": False, "summary": {},
-                              "replay_of": source_id, **{k: src0[k] for k in ("agent_id", "query") if k in src0}})
-    em = Emitter(run_id, store, registry)
-    for ev in store.list_events(source_id):
-        em.emit(ev["lane"], ev["type"], ev["payload"])
-        await asyncio.sleep(REPLAY_GAP_S)
-    src = store.get("runs", source_id) or {}
-    run = store.get("runs", run_id)
-    run.update({"status": "finished", "finished_at": datetime.now(TZ).isoformat(timespec="seconds"),
-                "summary": src.get("summary", {}),
-                **{k: src[k] for k in ("agent_id", "query") if k in src}})
-    store.set("runs", run_id, run)
-    registry.finish(run_id)
+class _TransientStore:
+    """Emitter sink for replays: events go to the registry (SSE) only, nothing is persisted."""
+
+    def add_event(self, run_id: str, event: dict) -> None:
+        return None
+
+
+async def _replay_run(source_id: str, run_id: str, store: Store, registry: RunRegistry) -> None:
+    em = Emitter(run_id, _TransientStore(), registry)
+    try:
+        for ev in store.list_events(source_id):
+            em.emit(ev["lane"], ev["type"], ev["payload"])
+            await asyncio.sleep(REPLAY_GAP_S)
+    finally:
+        registry.finish(run_id)
+
+
+def mark_interrupted_runs(store: Store) -> int:
+    """Runs left in 'running' by a previous process (restart, crash) can never finish; say so."""
+    stale = [r for r in store.list_runs() if r.get("status") == "running"]
+    for r in stale:
+        r.update({"status": "interrupted", "finished_at": datetime.now(TZ).isoformat(timespec="seconds"),
+                  "summary": {"order_status": "none", "bundle_price": None, "gate_verdicts": [],
+                              "note": "interrupted by a server restart"}})
+        store.set("runs", r["run_id"], r)
+    return len(stale)
 
 
 def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> FastAPI:
     app = FastAPI(title="MACS")
+    mark_interrupted_runs(store)
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
     tasks: set[asyncio.Task] = set()
 
@@ -104,11 +115,10 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> F
             if not golden:
                 raise HTTPException(400, f"no golden run recorded for scenario {source}")
             source = golden[0]["run_id"]
-        src = store.get("runs", source)
-        if src is None:
+        if store.get("runs", source) is None:
             raise HTTPException(400, f"unknown scenario or run id {body.scenario}")
-        _spawn(_replay_run(source, run_id, store, registry, src.get("scenario", "replay")))
-        return {"run_id": run_id}
+        _spawn(_replay_run(source, run_id, store, registry))
+        return {"run_id": run_id, "replay_of": source}
 
     @app.get("/api/runs")
     async def list_runs():
