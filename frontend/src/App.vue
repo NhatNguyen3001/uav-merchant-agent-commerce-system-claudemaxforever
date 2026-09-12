@@ -29,6 +29,12 @@ async function run(body) {
   setTimeout(refreshRuns, 1200)
 }
 
+// The run document is finalised before the stream closes, so refreshing when `running` drops
+// picks up the final status (placed, blocked, failed) without a page reload.
+watch(running, (now, before) => {
+  if (before && !now) refreshRuns()
+})
+
 async function onDelete(id) {
   await deleteRun(id)
   await refreshRuns()
