@@ -37,7 +37,7 @@ def test_governance_files():
     assert rules["hard"]["min_margin_pct"] == 20
     mandates = {m["mandate_id"]: m for m in _load("mandates.json")}
     assert mandates["mandate-001"]["spend_cap"] is None
-    assert mandates["mandate-002"]["spend_cap"] == 300
+    assert mandates["mandate-002"]["spend_cap"] is None and mandates["mandate-002"]["expires_at"] > "2026-09-13"
     creds = {c["agent_id"] for c in _load("credentials.json")}
     assert "buyer-001" in creds and "buyer-999" not in creds
     assert len(_load("injection_patterns.json")["phrases"]) >= 5

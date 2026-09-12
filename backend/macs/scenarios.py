@@ -7,7 +7,7 @@ HAPPY_QUERY = ("I'm starting a podcast from a small apartment on a noisy street.
 # "accept_first" accepts the first proposal without countering.
 AGENTS = [
     {"agent_id": "buyer-001", "mandate_id": "mandate-001", "label": "registered, no cap, counters once", "negotiation": "counter_then_accept"},
-    {"agent_id": "buyer-002", "mandate_id": "mandate-002", "label": "registered, mandate expired, accepts first offer", "negotiation": "accept_first"},
+    {"agent_id": "buyer-002", "mandate_id": "mandate-002", "label": "registered, no cap, accepts first offer", "negotiation": "accept_first"},
     {"agent_id": "buyer-999", "mandate_id": "mandate-999", "label": "unregistered", "negotiation": "counter_then_accept"},
 ]
 AGENT_BY_ID = {a["agent_id"]: a for a in AGENTS}
