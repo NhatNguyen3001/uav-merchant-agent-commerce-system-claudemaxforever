@@ -55,6 +55,7 @@ def seed_golden(store: FirestoreStore) -> None:
         rec = json.loads(path.read_text(encoding="utf-8"))
         run = rec["run"]
         run["is_golden"] = True
+        store.delete_run(run["run_id"])  # drop any events left over from a longer earlier recording
         store.set("runs", run["run_id"], run)
         for ev in rec["events"]:
             store.add_event(run["run_id"], ev)
