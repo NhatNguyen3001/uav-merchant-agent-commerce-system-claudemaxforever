@@ -104,3 +104,20 @@ async def test_custom_query_with_unregistered_agent_blocks(app):
         events = await _drain_sse(c, run_id)
         assert events[-1]["payload"] == {"stage": "inbound_gate", "status": "blocked",
                                          "note": "no credential on file for agent buyer-999"}
+
+
+async def test_delete_run_and_clear_history_keep_golden(app, seeded_store):
+    seeded_store.set("runs", "golden_x", {"run_id": "golden_x", "scenario": "happy_path", "is_golden": True,
+                                          "started_at": "2026-09-12T10:00:00+10:00", "status": "finished", "summary": {}})
+    async with await _client(app) as c:
+        r1 = (await c.post("/api/runs", json={"scenario": "rejected_agent"})).json()["run_id"]
+        await _drain_sse(c, r1)
+        r2 = (await c.post("/api/runs", json={"scenario": "rejected_agent"})).json()["run_id"]
+        await _drain_sse(c, r2)
+        assert (await c.delete(f"/api/runs/{r1}")).status_code == 204
+        assert (await c.get(f"/api/runs/{r1}")).status_code == 404
+        assert (await c.delete("/api/runs/golden_x")).status_code == 403
+        assert (await c.delete("/api/runs/nope")).status_code == 404
+        assert (await c.delete("/api/runs")).json() == {"deleted": 1}
+        ids = [r["run_id"] for r in (await c.get("/api/runs")).json()]
+        assert ids == ["golden_x"]

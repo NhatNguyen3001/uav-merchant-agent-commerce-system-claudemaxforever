@@ -40,7 +40,7 @@ async def test_adapter_and_inbound_pass(seeded_store):
     state.update(await nodes["protocol_adapter"](state))
     assert state["request"]["agent_id"] == "buyer-001"
     state.update(await nodes["inbound_gate"](state))
-    assert state["blocked"] is False and state["mandate"]["spend_cap"] == 600
+    assert state["blocked"] is False and state["mandate"]["spend_cap"] is None
     types = [e["type"] for e in reg.events("r1")]
     assert types == ["stage", "message", "stage", "stage", "gate", "stage"]
     await client.__aexit__(None, None, None)
@@ -61,8 +61,11 @@ async def test_inbound_blocks_rejected_agent(seeded_store):
     state.update(await nodes["protocol_adapter"](state))
     state.update(await nodes["inbound_gate"](state))
     assert state["blocked"] is True
-    assert reg.events("r1")[-1]["payload"] == {"stage": "inbound_gate", "status": "blocked",
-                                               "note": "no credential on file for agent buyer-999"}
+    evs = reg.events("r1")
+    assert evs[-1]["payload"] == {"stage": "inbound_gate", "status": "blocked",
+                                  "note": "no credential on file for agent buyer-999"}
+    merchant = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"]
+    assert merchant and merchant[-1]["payload"]["text"].startswith("Cannot proceed")
     await client.__aexit__(None, None, None)
 
 
@@ -83,5 +86,8 @@ async def test_decode_match_compose_outbound_negotiate(seeded_store):
     assert state["negotiation_round"] == 2 and state["buyer_reply"]["action"] == "accept"
     state.update(await nodes["execution_gate"](state))
     assert state["order"]["status"] == "placed" and state["order"]["total"] == 588
-    assert reg.events("r1")[-1]["payload"]["stage"] == "retailer_systems"
+    evs = reg.events("r1")
+    assert evs[-1]["payload"]["stage"] == "retailer_systems"
+    closing = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]
+    assert closing["payload"]["text"].startswith("Order placed") and "588" in closing["payload"]["text"]
     await client.__aexit__(None, None, None)

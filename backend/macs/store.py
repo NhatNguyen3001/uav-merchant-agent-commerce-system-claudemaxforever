@@ -29,6 +29,7 @@ class Store(Protocol):
     def add_event(self, run_id: str, event: dict) -> None: ...
     def list_events(self, run_id: str) -> list[dict]: ...
     def list_runs(self) -> list[dict]: ...
+    def delete_run(self, run_id: str) -> None: ...
     def nearest(self, query_text: str, k: int) -> list[dict]: ...
 
 
@@ -73,6 +74,10 @@ class MemoryStore:
 
     def list_runs(self):
         return self.list("runs")
+
+    def delete_run(self, run_id):
+        self._docs.get("runs", {}).pop(run_id, None)
+        self._events.pop(run_id, None)
 
     def nearest(self, query_text, k):
         return keyword_nearest(self.list("catalogue"), query_text, k)
@@ -121,6 +126,14 @@ class FirestoreStore:
 
     def list_runs(self):
         return self.list("runs")
+
+    def delete_run(self, run_id):
+        doc = self._db.collection("runs").document(run_id)
+        batch = self._db.batch()
+        for ev in doc.collection("events").stream():
+            batch.delete(ev.reference)
+        batch.delete(doc)
+        batch.commit()
 
     def nearest(self, query_text, k):
         from google.cloud.firestore_v1.base_vector_query import DistanceMeasure

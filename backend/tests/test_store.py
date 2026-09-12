@@ -37,3 +37,13 @@ def test_nearest_uses_keyword_overlap_and_returns_distance():
 def test_product_text_includes_reasoning_fields():
     t = product_text(_product("A", "Alpha", ["beginner"]))
     assert "Alpha" in t and "beginner" in t and "microphone" in t
+
+
+def test_delete_run_removes_doc_and_events():
+    s = MemoryStore()
+    s.set("runs", "r1", {"run_id": "r1"})
+    s.add_event("r1", {"id": 1})
+    s.set("runs", "r2", {"run_id": "r2"})
+    s.delete_run("r1")
+    assert s.get("runs", "r1") is None and s.list_events("r1") == []
+    assert [r["run_id"] for r in s.list_runs()] == ["r2"]

@@ -54,7 +54,9 @@ def check_inbound(store: Store, request: MerchantRequest, now: datetime) -> Inbo
     for phrase in patterns:
         if phrase.lower() in text:
             return InboundResult("blocked", f"injection pattern matched: '{phrase}'", cred, mandate)
-    return InboundResult("pass", f"agent {request.agent_id} verified; mandate cap {mandate['spend_cap']} {mandate['currency']}, "
+    cap = mandate.get("spend_cap")
+    cap_text = f"cap {cap:g} {mandate['currency']}" if cap is not None else "no spend cap"
+    return InboundResult("pass", f"agent {request.agent_id} verified; mandate {cap_text}, "
                                  f"scope {mandate['scope']}, expires {mandate['expires_at']}", cred, mandate)
 
 
@@ -124,6 +126,9 @@ def check_execution(proposal: Proposal, item_types: list[str], mandate: dict, no
         return ExecutionResult("blocked", f"mandate expired at {mandate['expires_at']}")
     if mandate.get("scope") != "audio_equipment" or any(t not in AUDIO_TYPES for t in item_types):
         return ExecutionResult("blocked", f"items outside mandate scope {mandate.get('scope')}")
-    if proposal.bundle_price > mandate["spend_cap"]:
-        return ExecutionResult("blocked", f"total {proposal.bundle_price:g} exceeds mandate cap {mandate['spend_cap']:g}")
-    return ExecutionResult("pass", f"total {proposal.bundle_price:g} within cap {mandate['spend_cap']:g}; scope and expiry valid")
+    cap = mandate.get("spend_cap")
+    if cap is None:
+        return ExecutionResult("pass", f"total {proposal.bundle_price:g}; mandate has no spend cap; scope and expiry valid")
+    if proposal.bundle_price > cap:
+        return ExecutionResult("blocked", f"total {proposal.bundle_price:g} exceeds mandate cap {cap:g}")
+    return ExecutionResult("pass", f"total {proposal.bundle_price:g} within cap {cap:g}; scope and expiry valid")

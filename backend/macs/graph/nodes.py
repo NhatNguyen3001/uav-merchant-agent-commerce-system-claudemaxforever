@@ -38,10 +38,10 @@ Requirements:
 - expires_at is {expires_at}."""
 
 BUYER_SYSTEM = """You are an autonomous shopping agent acting for a person under a spending mandate.
-Mandate: cap {cap} {currency}, scope {scope}. Your principal's request: {query}
+Mandate: {cap_text}, scope {scope}. Your principal's request: {query}
 You will see the merchant's proposal. Round {round} of at most 2.
-Round 1: if the bundle is within cap, counter once asking for a modestly lower price (5 to 8 percent
-lower) and give counter_budget. Round 2: accept if within cap, otherwise counter with the alternative.
+Round 1: if the bundle is acceptable, counter once asking for a modestly lower price (5 to 8 percent
+lower) and give counter_budget. Round 2: accept if within the mandate, otherwise counter with the alternative.
 Keep message to two sentences."""
 
 
@@ -72,6 +72,8 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         em.stage("inbound_gate", "running")
         req = MerchantRequest.model_validate(state["request"])
         r = check_inbound(store, req, now)
+        if r.verdict == "blocked":
+            em.message("merchant_agent", f"Cannot proceed: {r.reason}.")
         em.gate("inbound", r.verdict, r.reason)
         return {"credential": r.credential, "mandate": r.mandate, "blocked": r.verdict == "blocked",
                 "gate_results": state["gate_results"] + [{"gate": "inbound", "verdict": r.verdict}]}
@@ -129,6 +131,8 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         proposal = Proposal.model_validate(state["proposal"])
         r = check_outbound(proposal, state["candidates"], tools.issued, hard,
                            state["intent"]["hard_constraints"]["deliver_by_days"])
+        if r.verdict == "blocked":
+            em.message("merchant_agent", f"Cannot proceed: {r.reason}.")
         em.gate("outbound", r.verdict, r.reason, r.before, r.after)
         if r.verdict == "corrected":
             em.emit("a2a", "proposal", r.proposal.model_dump())
@@ -138,8 +142,8 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
     async def negotiate(state: dict) -> dict:
         rnd = state["negotiation_round"] + 1
         m = state["mandate"]
-        system = BUYER_SYSTEM.format(cap=m["spend_cap"], currency=m["currency"], scope=m["scope"],
-                                     query=state["request"]["raw_query"], round=rnd)
+        cap_text = f"cap {m['spend_cap']:g} {m['currency']}" if m.get("spend_cap") is not None else "no spend cap"
+        system = BUYER_SYSTEM.format(cap_text=cap_text, scope=m["scope"], query=state["request"]["raw_query"], round=rnd)
         user = "Merchant proposal:\n" + json.dumps(state["proposal"], indent=2)
         decision = await llm.structured(BuyerDecision, system, user, fixture=f"buyer_decision_{_fixture_scenario(state)}_{rnd}")
         em.message("buyer_agent", decision.message)
@@ -150,6 +154,8 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         proposal = Proposal.model_validate(state["proposal"])
         types = [state["candidates"][i.sku]["type"] for i in proposal.items]
         r = check_execution(proposal, types, state["mandate"], now)
+        if r.verdict == "blocked":
+            em.message("merchant_agent", f"Cannot proceed: {r.reason}.")
         em.gate("execution", r.verdict, r.reason)
         skus = [i.sku for i in proposal.items]
         if r.verdict == "blocked":
@@ -162,6 +168,8 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         data, _ = await tools.call("create_order", {"skus": skus, "mandate_id": state["mandate"]["mandate_id"]})
         order = {**data, "total": proposal.bundle_price}
         em.emit("a2a", "order", order)
+        em.message("merchant_agent", f"Order placed: {order['order_id']}, {len(skus)} items, total {order['total']:g}. "
+                                     f"Confirmation goes to mandate {order['mandate_id']}.")
         em.stage("retailer_systems", "passed", f"order {order['order_id']} placed, total {order['total']:g}")
         return {"order": order, "gate_results": state["gate_results"] + [{"gate": "execution", "verdict": "pass"}]}
 

@@ -2,7 +2,7 @@
   {
     "mandate_id": "mandate-001",
     "agent_id": "buyer-001",
-    "spend_cap": 600,
+    "spend_cap": null,
     "currency": "AUD",
     "scope": "audio_equipment",
     "expires_at": "2026-12-31T23:59:59+10:00",

@@ -4,7 +4,7 @@ HAPPY_QUERY = ("I'm starting a podcast from a small apartment on a noisy street.
 # Agent identities the console can simulate. Mandate ids follow the seed data in data/mandates.json;
 # buyer-999 has no credential and no mandate on purpose.
 AGENTS = [
-    {"agent_id": "buyer-001", "mandate_id": "mandate-001", "label": "registered, cap 600"},
+    {"agent_id": "buyer-001", "mandate_id": "mandate-001", "label": "registered, no cap"},
     {"agent_id": "buyer-002", "mandate_id": "mandate-002", "label": "registered, mandate expired"},
     {"agent_id": "buyer-999", "mandate_id": "mandate-999", "label": "unregistered"},
 ]

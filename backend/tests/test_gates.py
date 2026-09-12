@@ -13,7 +13,7 @@ def _req(agent="buyer-001", mandate="mandate-001", query="starting a podcast"):
 
 def test_inbound_pass(seeded_store):
     r = check_inbound(seeded_store, _req(), NOW)
-    assert r.verdict == "pass" and r.mandate["spend_cap"] == 600
+    assert r.verdict == "pass" and r.mandate["spend_cap"] is None and "no spend cap" in r.reason
 
 
 def test_inbound_blocks_unknown_agent(seeded_store):
@@ -87,10 +87,13 @@ def test_outbound_strips_unsupported_sustainability_claim(seeded_store):
 
 
 def test_execution_pass_and_blocks(seeded_store):
-    mandate = seeded_store.get("mandates", "mandate-001")
+    uncapped = seeded_store.get("mandates", "mandate-001")
+    mandate = {**uncapped, "spend_cap": 600}
     types = ["microphone", "audio_interface", "headphones", "boom_arm"]
     assert check_execution(_proposal(588, 15), types, mandate, NOW).verdict == "pass"
     assert "cap" in check_execution(_proposal(650, 6), types, mandate, NOW).reason
+    r = check_execution(_proposal(1650, 0), types, uncapped, NOW)
+    assert r.verdict == "pass" and "no spend cap" in r.reason
     assert "expired" in check_execution(_proposal(588, 15), types, seeded_store.get("mandates", "mandate-002"), NOW).reason
     assert "scope" in check_execution(_proposal(588, 15), types + ["monitors"], mandate, NOW).reason
     assert "signature" in check_execution(_proposal(588, 15), types, {**mandate, "signature": ""}, NOW).reason
