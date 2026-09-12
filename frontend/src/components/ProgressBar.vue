@@ -5,11 +5,11 @@ const props = defineProps({ stages: { type: Array, required: true }, running: Bo
 
 const ORDER = [
   ['protocol_adapter', 'Received'],
-  ['inbound_gate', 'Inbound gate'],
+  ['inbound_gate', 'Inbound'],
   ['intent_decoder', 'Intent'],
   ['proposal_engine', 'Proposal'],
-  ['outbound_gate', 'Outbound gate'],
-  ['execution_gate', 'Execution gate'],
+  ['outbound_gate', 'Outbound'],
+  ['execution_gate', 'Execution'],
   ['retailer_systems', 'Order'],
 ]
 

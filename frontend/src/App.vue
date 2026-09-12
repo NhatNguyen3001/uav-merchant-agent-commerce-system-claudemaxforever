@@ -9,9 +9,9 @@ const runs = ref([])
 const draft = ref(null) // the typed query shown in the chat before the backend echoes it
 
 const PIPELINE_KEY = 'macs.pipeline.visible'
-const pipelineVisible = ref(true)
+const pipelineVisible = ref(false)
 try {
-  pipelineVisible.value = localStorage.getItem(PIPELINE_KEY) !== '0'
+  pipelineVisible.value = localStorage.getItem(PIPELINE_KEY) === '1'
 } catch (_) {}
 watch(pipelineVisible, (v) => {
   try {
