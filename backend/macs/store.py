@@ -39,6 +39,17 @@ def _tokens(text: str) -> set[str]:
     return set(_WORD.findall(text.lower().replace("_", " ")))
 
 
+def keyword_nearest(products: list[dict], query_text: str, k: int) -> list[dict]:
+    """Offline stand-in for vector search: rank by token overlap, distance = 1/(1+overlap)."""
+    q = _tokens(query_text)
+    scored = []
+    for p in products:
+        overlap = len(q & _tokens(product_text(p)))
+        scored.append((1.0 / (1 + overlap), p))
+    scored.sort(key=lambda t: t[0])
+    return [{"sku": p["sku"], "name": p["name"], "distance": round(d, 4)} for d, p in scored[:k]]
+
+
 class MemoryStore:
     def __init__(self) -> None:
         self._docs: dict[str, dict[str, dict]] = {}
@@ -64,13 +75,7 @@ class MemoryStore:
         return self.list("runs")
 
     def nearest(self, query_text, k):
-        q = _tokens(query_text)
-        scored = []
-        for p in self.list("catalogue"):
-            overlap = len(q & _tokens(product_text(p)))
-            scored.append((1.0 / (1 + overlap), p))
-        scored.sort(key=lambda t: t[0])
-        return [{"sku": p["sku"], "name": p["name"], "distance": round(d, 4)} for d, p in scored[:k]]
+        return keyword_nearest(self.list("catalogue"), query_text, k)
 
 
 class VertexEmbedder:
@@ -121,7 +126,8 @@ class FirestoreStore:
         from google.cloud.firestore_v1.base_vector_query import DistanceMeasure
         from google.cloud.firestore_v1.vector import Vector
         if self._embedder is None:
-            raise RuntimeError("FirestoreStore.nearest needs an embedder")
+            # FAKE_LLM mode against Firestore: keyword ranking over the stored catalogue, no Vertex call.
+            return keyword_nearest(self.list("catalogue"), query_text, k)
         qv = self._embedder.embed([query_text])[0]
         query = self._db.collection("catalogue").find_nearest(
             vector_field="embedding", query_vector=Vector(qv),

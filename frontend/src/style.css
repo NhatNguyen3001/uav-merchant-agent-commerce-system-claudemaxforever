@@ -1,16 +1,16 @@
 :root { --idle: #9aa3ad; --running: #2b6cb0; --passed: #2f855a; --blocked: #c53030; --corrected: #b7791f; --bg: #f7f8fa; --card: #fff; --line: #e2e6ea; }
 * { box-sizing: border-box; }
 body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: var(--bg); color: #1a202c; }
-.layout { display: grid; grid-template-rows: auto 1fr; grid-template-columns: 360px 1fr; height: 100vh; }
-.strip { grid-column: 1 / -1; border-bottom: 1px solid var(--line); background: var(--card); padding: 10px 16px; }
-.console { border-right: 1px solid var(--line); padding: 16px; overflow-y: auto; background: var(--card); }
-.transcript { padding: 16px 24px; overflow-y: auto; }
+.layout { display: grid; grid-template-rows: auto minmax(0, 1fr); grid-template-columns: 360px minmax(0, 1fr); height: 100vh; overflow: hidden; }
+.strip { grid-column: 1 / -1; border-bottom: 1px solid var(--line); background: var(--card); padding: 10px 16px; min-width: 0; }
+.console { border-right: 1px solid var(--line); padding: 16px; overflow-y: auto; background: var(--card); min-width: 0; }
+.transcript { padding: 16px 24px; overflow-y: auto; min-width: 0; }
 h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #4a5568; margin: 18px 0 8px; }
 h2:first-child { margin-top: 0; }
 .muted { color: #718096; font-weight: normal; font-size: 12px; }
 .mono { font-family: ui-monospace, monospace; font-size: 12px; }
-.pipeline { list-style: none; display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin: 0; padding: 0; }
-.stage { border: 2px solid var(--idle); border-radius: 6px; padding: 8px 10px; min-height: 64px; }
+.pipeline { list-style: none; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; }
+.stage { border: 2px solid var(--idle); border-radius: 6px; padding: 8px 10px; min-height: 64px; min-width: 0; overflow: hidden; }
 .stage.running { border-color: var(--running); background: #ebf4ff; }
 .stage.passed { border-color: var(--passed); background: #f0fff4; }
 .stage.blocked { border-color: var(--blocked); background: #fff5f5; }
