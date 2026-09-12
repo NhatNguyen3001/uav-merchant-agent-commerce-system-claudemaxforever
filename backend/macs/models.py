@@ -157,6 +157,7 @@ class Proposal(LenientModel):
     intent_coverage: str
     alternative: Optional[Alternative] = None
     expires_at: str
+    delivery_days: Optional[int] = None  # longest ship time among the items; set from tool results, verified by the gate
 
 
 class BuyerDecision(LenientModel):

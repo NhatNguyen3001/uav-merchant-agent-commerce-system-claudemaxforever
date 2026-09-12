@@ -36,6 +36,8 @@ def _summarise(name: str, data: Any) -> str:
         return "top matches: " + ", ".join(f"{h['sku']} ({h['distance']:.3f})" for h in data[:5])
     if name == "search_products":
         return f"{len(data)} products after hard filters: " + ", ".join(p["sku"] for p in data[:8])
+    if name == "get_shipping":
+        return f"{data['sku']}: ships in {data['ship_days']} day{'s' if data['ship_days'] != 1 else ''}, {data['stock']} in stock"
     if name == "create_order":
         return f"order {data['order_id']} {data['status']}, total {data['total']}"
     return json.dumps(data)[:160]

@@ -61,9 +61,13 @@ def check_inbound(store: Store, request: MerchantRequest, now: datetime) -> Inbo
 
 
 def check_outbound(proposal: Proposal, candidates: dict[str, dict], valid_ids: set[str],
-                   hard: HardRules, deliver_by_days: int) -> OutboundResult:
+                   hard: HardRules, deliver_by_days: int, shipping: dict[str, dict] | None = None) -> OutboundResult:
+    """`shipping` maps sku -> {ship_days, stock} from get_shipping calls made for this proposal; when given it
+    overrides the candidate records so the delivery promise is checked against fresh retailer data."""
     p = proposal.model_copy(deep=True)
     notes: list[str] = []
+    if shipping:
+        candidates = {sku: {**rec, **shipping.get(sku, {})} for sku, rec in candidates.items()}
 
     for item in p.items:
         if item.sku not in candidates or not item.grounded_on or any(
@@ -75,6 +79,11 @@ def check_outbound(proposal: Proposal, candidates: dict[str, dict], valid_ids: s
             return OutboundResult("blocked", f"item {item.sku} ships in {prod['ship_days']} days, deadline is {deliver_by_days}", p)
         if prod["stock"] < 1:
             return OutboundResult("blocked", f"item {item.sku} is out of stock", p)
+    slowest = max(candidates[i.sku]["ship_days"] for i in p.items) if p.items else 0
+    if p.delivery_days != slowest:
+        if p.delivery_days is not None:
+            notes.append(f"delivery promise {p.delivery_days} days corrected to {slowest} (slowest item)")
+        p.delivery_days = slowest
 
     for item in p.items:
         prod = candidates[item.sku]
@@ -118,9 +127,10 @@ def check_outbound(proposal: Proposal, candidates: dict[str, dict], valid_ids: s
                 alt.bundle_price = alt_cap
 
     after = {"bundle_price": p.bundle_price, "discount_pct": p.discount_pct}
+    delivery = f"delivers in {slowest} day{'s' if slowest != 1 else ''} against a {deliver_by_days}-day deadline"
     if notes:
-        return OutboundResult("corrected", "; ".join(notes), p, before, after)
-    return OutboundResult("pass", f"bundle {p.bundle_price:g} within discount cap and margin floor; all items grounded", p)
+        return OutboundResult("corrected", "; ".join(notes) + f"; {delivery}", p, before, after)
+    return OutboundResult("pass", f"bundle {p.bundle_price:g} within discount cap and margin floor; all items grounded; {delivery}", p)
 
 
 def check_execution(proposal: Proposal, item_types: list[str], mandate: dict, now: datetime) -> ExecutionResult:

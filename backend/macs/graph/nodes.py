@@ -124,12 +124,20 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
                      f"{state['buyer_reply']['message']}\nRespond with your final proposal.")
         proposal = await llm.structured(Proposal, system, user,
                                         fixture=f"record_proposal_{_fixture_scenario(state)}_{rnd}", tool_result_id=tid)
+        known = [cands[i.sku]["ship_days"] for i in proposal.items if i.sku in cands]
+        proposal.delivery_days = max(known) if known else None
         em.emit("a2a", "proposal", proposal.model_dump())
+        deadline = state["intent"]["hard_constraints"]["deliver_by_days"]
+        delivery = ""
+        if proposal.delivery_days is not None:
+            fit = "inside" if proposal.delivery_days <= deadline else "outside"
+            delivery = (f" Delivered within {proposal.delivery_days} day{'s' if proposal.delivery_days != 1 else ''}, "
+                        f"{fit} your {deadline}-day window.")
         if proposal.alternative:
             text = (f"Proposed {len(proposal.items)} items at {proposal.bundle_price:g} "
-                    f"({proposal.discount_pct:g}% bundle discount). Alternative at {proposal.alternative.bundle_price:g}.")
+                    f"({proposal.discount_pct:g}% bundle discount).{delivery} Alternative at {proposal.alternative.bundle_price:g}.")
         else:
-            text = f"Proposed {len(proposal.items)} items at {proposal.bundle_price:g}."
+            text = f"Proposed {len(proposal.items)} items at {proposal.bundle_price:g}.{delivery}"
         em.message("merchant_agent", text)
         em.stage("proposal_engine", "passed", f"{len(proposal.items)} items, coverage {proposal.intent_coverage}")
         return {"proposal": proposal.model_dump()}
@@ -138,8 +146,14 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         em.stage("outbound_gate", "running")
         hard = HardRules.model_validate((store.get("merchant_rules", "current") or {})["hard"])
         proposal = Proposal.model_validate(state["proposal"])
+        # Verify the delivery promise against fresh retailer data: one get_shipping call per proposed item.
+        shipping: dict[str, dict] = {}
+        for sku in dict.fromkeys(i.sku for i in proposal.items):
+            if sku in state["candidates"]:
+                data, _ = await tools.call("get_shipping", {"sku": sku})
+                shipping[sku] = {"ship_days": data["ship_days"], "stock": data["stock"]}
         r = check_outbound(proposal, state["candidates"], tools.issued, hard,
-                           state["intent"]["hard_constraints"]["deliver_by_days"])
+                           state["intent"]["hard_constraints"]["deliver_by_days"], shipping)
         if r.verdict == "blocked":
             em.message("merchant_agent", f"Cannot proceed: {r.reason}.")
         em.gate("outbound", r.verdict, r.reason, r.before, r.after)

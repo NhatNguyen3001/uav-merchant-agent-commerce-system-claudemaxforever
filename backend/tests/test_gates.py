@@ -120,3 +120,18 @@ def test_outbound_removes_alternative_with_unknown_sku(seeded_store):
     p.alternative.items = ["IF-USB-01", "NOPE-01"]
     r = check_outbound(p, _cands(seeded_store), {"t1"}, HARD, deliver_by_days=7)
     assert r.verdict == "corrected" and r.proposal.alternative is None
+
+
+def test_outbound_states_delivery_and_uses_fresh_shipping(seeded_store):
+    p = _proposal(588, 15)
+    p.delivery_days = 2
+    r = check_outbound(p, _cands(seeded_store), {"t1"}, HARD, deliver_by_days=7)
+    assert "delivers in 2 days against a 7-day deadline" in r.reason and r.proposal.delivery_days == 2
+    # fresh shipping data says the interface now takes 9 days: blocked, whatever the candidate record said
+    late = {"IF-USB-02": {"ship_days": 9, "stock": 10}}
+    r = check_outbound(p, _cands(seeded_store), {"t1"}, HARD, deliver_by_days=7, shipping=late)
+    assert r.verdict == "blocked" and "ships in 9 days" in r.reason
+    # a wrong promise is corrected to the slowest item
+    p.delivery_days = 1
+    r = check_outbound(p, _cands(seeded_store), {"t1"}, HARD, deliver_by_days=7)
+    assert r.verdict == "corrected" and "delivery promise 1 days corrected to 2" in r.reason and r.proposal.delivery_days == 2

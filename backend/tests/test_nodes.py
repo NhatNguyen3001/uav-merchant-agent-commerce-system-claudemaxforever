@@ -76,8 +76,14 @@ async def test_decode_match_compose_outbound_negotiate(seeded_store):
     assert state["intent"]["constraint_count"] == 6
     assert {"MIC-DYN-01", "IF-USB-02", "HP-REC-01", "ARM-DESK-01", "IF-USB-01"} <= set(state["candidates"])
     assert state["proposal"]["bundle_price"] == 588 and state["proposal"]["discount_pct"] == 15
+    assert state["proposal"]["delivery_days"] == 2
     gate = [e for e in reg.events("r1") if e["type"] == "gate" and e["payload"]["gate"] == "outbound"][0]
     assert gate["payload"]["verdict"] == "corrected" and gate["payload"]["after"]["bundle_price"] == 588
+    assert "delivers in 2 days against a 7-day deadline" in gate["payload"]["reason"]
+    shipping_calls = [e for e in reg.events("r1") if e["type"] == "tool" and e["payload"]["name"] == "get_shipping"]
+    assert [c["payload"]["args"]["sku"] for c in shipping_calls] == ["MIC-DYN-01", "IF-USB-02", "HP-REC-01", "ARM-DESK-01"]
+    merchant = [e for e in reg.events("r1") if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]
+    assert "Delivered within 2 days, inside your 7-day window" in merchant["payload"]["text"]
     state.update(await nodes["negotiate"](state))
     assert state["negotiation_round"] == 1 and state["buyer_reply"]["action"] == "counter"
     decision = [e for e in reg.events("r1") if e["type"] == "decision"][-1]["payload"]

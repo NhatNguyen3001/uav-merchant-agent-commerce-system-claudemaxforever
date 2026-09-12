@@ -31,7 +31,7 @@ const money = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits
     <div v-if="finished" class="outcome" :class="order?.status === 'placed' ? 'placed' : 'blocked'">
       <template v-if="order?.status === 'placed'">
         <span class="outcome-title">Order placed</span>
-        <span>{{ proposal.items.length }} items, {{ money(proposal.bundle_price) }} total, {{ (100 - proposal.discount_pct).toFixed(0) }}% of list retained, intent coverage {{ proposal.intent_coverage }}</span>
+        <span>{{ proposal.items.length }} items, {{ money(proposal.bundle_price) }} total, {{ (100 - proposal.discount_pct).toFixed(0) }}% of list retained, intent coverage {{ proposal.intent_coverage }}<template v-if="proposal.delivery_days != null">, arrives in {{ proposal.delivery_days }} day{{ proposal.delivery_days === 1 ? '' : 's' }}</template></span>
       </template>
       <template v-else>
         <span class="outcome-title">No order</span>

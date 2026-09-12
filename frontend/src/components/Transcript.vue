@@ -49,7 +49,7 @@ function title(row) {
 // Only the proposal row carries a summary next to its title; the others read as plain headings.
 function meta(row) {
   const p = row.event?.payload
-  if (row.kind === 'proposal') return `${money(p.bundle_price)}, ${p.discount_pct}% off`
+  if (row.kind === 'proposal') return `${money(p.bundle_price)}, ${p.discount_pct}% off${p.delivery_days != null ? `, arrives in ${p.delivery_days} day${p.delivery_days === 1 ? '' : 's'}` : ''}`
   return ''
 }
 
