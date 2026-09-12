@@ -33,19 +33,6 @@ const current = computed(() => nodes.value[reach.value] || null)
 const fillPct = computed(() => (reach.value < 0 ? 0 : nodes.value[reach.value].pct))
 const state = computed(() => (current.value ? current.value.status : 'idle'))
 
-const caption = computed(() => {
-  const n = current.value
-  if (!n) return ''
-  if (n.status === 'running') {
-    return { protocol_adapter: 'Reading the message', inbound_gate: 'Checking credentials and mandate',
-             intent_decoder: 'Decoding intent', proposal_engine: 'Matching the catalogue and composing a bundle',
-             outbound_gate: 'Checking the proposal against merchant rules', execution_gate: 'Checking the mandate',
-             retailer_systems: 'Placing the order' }[n.key]
-  }
-  if (n.status === 'blocked') return `Stopped at ${n.label.toLowerCase()}: ${n.note}`
-  if (n.key === 'retailer_systems') return ''
-  return n.note
-})
 </script>
 
 <template>
@@ -60,6 +47,5 @@ const caption = computed(() => {
         <li v-for="n in nodes" :key="n.key" :class="[n.status, { current: n.index === reach }]" :style="{ left: n.pct + '%' }" :title="n.note">{{ n.label }}</li>
       </ol>
     </div>
-    <p class="caption" :class="state">{{ caption }}</p>
   </section>
 </template>

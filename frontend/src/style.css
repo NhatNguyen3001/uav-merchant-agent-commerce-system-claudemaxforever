@@ -204,16 +204,13 @@ code { font: inherit; font-weight: 500; }
   0% { box-shadow: 0 0 0 2.5px var(--pass), 0 0 0 2.5px rgba(88, 127, 252, 0.5); }
   100% { box-shadow: 0 0 0 2.5px var(--pass), 0 0 0 12px rgba(88, 127, 252, 0); }
 }
-.bar-labels { position: relative; height: 24px; margin-top: 14px; }
+.bar-labels { position: relative; height: 24px; margin-top: 14px; margin-bottom: 2px; }
 .bar-labels li {
   position: absolute; top: 0; transform: translateX(-50%); font-size: 14px; color: var(--muted); white-space: nowrap;
 }
 .bar-labels li.passed, .bar-labels li.running { color: var(--ink-2); }
 .bar-labels li.current { color: var(--ink); font-weight: 600; }
 .bar-labels li.blocked { color: var(--blocked); font-weight: 600; }
-.caption { margin: 4px 40px 0; font-size: 15px; color: var(--muted); min-height: 22px; }
-.caption.running { color: var(--ink-2); }
-.caption.blocked { color: var(--blocked); }
 
 /* Outcome line under the bar, shown when the run has ended. */
 .outcome { display: flex; gap: 12px; align-items: baseline; padding: 10px var(--gap) 12px; border-bottom: 1px solid var(--hair); font-size: 16px; animation: reveal var(--reveal) both; }
