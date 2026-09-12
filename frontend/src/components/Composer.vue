@@ -15,8 +15,22 @@ const EXAMPLES = [
     label: 'Podcast starter',
     text: "I'm starting a podcast from a small apartment on a noisy street. Complete beginner. Sustainable brands only. Budget is 600 and I need everything by next weekend.",
   },
-  { label: 'Field interviews', text: 'Two lavalier mics and a small recorder for street interviews, under 300, shipping within 3 days.' },
-  { label: 'Upgrade the room', text: 'Already have a USB mic. Want to tame echo in a 3 by 3 metre room and add closed back headphones, budget 400.' },
+  {
+    label: 'Gym earbuds',
+    text: 'Wireless earbuds with noise cancelling for the gym, plus a power bank for travel, under 250, need them by Sunday.',
+  },
+  {
+    label: 'Skincare routine',
+    text: 'A red light therapy mask and under-eye patches for sensitive skin, cruelty-free brands only, under 300, delivered within a week.',
+  },
+  {
+    label: 'Flight reading',
+    text: 'Three uplifting Kindle novels for a long flight on Friday, under 15 in total.',
+  },
+  {
+    label: 'Home theatre',
+    text: 'Mount a 55 inch TV in a rental apartment and add a surge-protected power strip, under 120, delivered this week.',
+  },
 ]
 
 onMounted(async () => {
