@@ -41,6 +41,7 @@ const money = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits
 <template>
   <section class="transcript">
     <div v-if="!events.length && !running" class="transcript-empty">
+      <img src="/logo-full.png" alt="MACS" />
       <p>Gates, decoded intent, tool calls, proposals, and the order appear here as each stage finishes.</p>
       <p>Every price comes from a tool result, and every gate verdict is deterministic.</p>
     </div>
