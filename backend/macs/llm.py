@@ -8,9 +8,9 @@ from typing import Type, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
-# Override with MACS_MODEL. Opus 5 is the default: about 30 s per run with the forced-tool wrapper and no schema
-# slips in testing. Haiku 4.5 is about 6 s faster but built over-budget bundles and slipped on the schema once in three runs.
-MODEL_ID = os.environ.get("MACS_MODEL", "claude-opus-5")
+# Override with MACS_MODEL. Sonnet 5 is the default (cost). Opus 5 gave the richest proposals at ~30 s per run;
+# Haiku 4.5 was ~6 s faster but built over-budget bundles and slipped on the schema once in three runs.
+MODEL_ID = os.environ.get("MACS_MODEL", "claude-sonnet-5")
 FIXTURES = Path(__file__).with_name("fixtures")
 T = TypeVar("T", bound=BaseModel)
 
