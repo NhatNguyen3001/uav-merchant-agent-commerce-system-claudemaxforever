@@ -1,0 +1,22 @@
+{
+  "items": [
+    {"sku": "MIC-DYN-01", "name": "Northwind D1 dynamic microphone", "price": 179,
+     "rationale": "Dynamic pattern rejects street noise from the small apartment; certified sustainable brand.",
+     "satisfies": ["environment", "values", "skill_level"], "grounded_on": [{"tool_result_id": "T", "sku": "MIC-DYN-01"}]},
+    {"sku": "IF-USB-02", "name": "Loopline U2 USB audio interface", "price": 199,
+     "rationale": "One-knob gain, plug and play for a complete beginner; certified sustainable.",
+     "satisfies": ["skill_level", "values", "soft_preferences"], "grounded_on": [{"tool_result_id": "T", "sku": "IF-USB-02"}]},
+    {"sku": "HP-REC-01", "name": "Evergreen R1 recycled shell headphones", "price": 149,
+     "rationale": "Closed back isolation for monitoring in a noisy room; recycled shell with certification.",
+     "satisfies": ["environment", "values"], "grounded_on": [{"tool_result_id": "T", "sku": "HP-REC-01"}]},
+    {"sku": "ARM-DESK-01", "name": "Compact desk clamp boom arm", "price": 165,
+     "rationale": "Low profile clamp keeps the mic close in a small space; certified sustainable brand.",
+     "satisfies": ["environment", "values"], "grounded_on": [{"tool_result_id": "T", "sku": "ARM-DESK-01"}]}
+  ],
+  "bundle_price": 540,
+  "discount_pct": 22,
+  "intent_coverage": "6/6",
+  "alternative": {"sku": "IF-USB-01", "name": "Loopline U1 USB audio interface", "bundle_price": 541,
+                  "tradeoff": "Previous generation interface, same connectivity, saves 47"},
+  "expires_at": "2026-09-13T23:59:59+10:00"
+}
