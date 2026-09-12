@@ -1,0 +1,16 @@
+services:
+  api:
+    build: ./backend
+    ports: ["8000:8000"]
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GOOGLE_CLOUD_PROJECT: merchant-agent-commerce-system
+      GOOGLE_APPLICATION_CREDENTIALS: /gcp/adc.json
+      FAKE_LLM: ${FAKE_LLM:-0}
+      REPLAY: ${REPLAY:-0}
+    volumes:
+      - ${ADC_FILE:-${APPDATA}/gcloud/application_default_credentials.json}:/gcp/adc.json:ro
+  web:
+    build: ./frontend
+    ports: ["${WEB_PORT:-8080}:80"]
+    depends_on: [api]

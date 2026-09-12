@@ -1,0 +1,14 @@
+{
+  "soft": {
+    "negotiation_style": "friendly, evidence-led, never pushy; one concession at most, then hold",
+    "allowed_claims": ["certified sustainability", "durability rated", "noise rejection", "plug and play"],
+    "bundling": true,
+    "category_restrictions": [],
+    "pricing_guidance": "Prefer bundles that cover every constraint. Offer a modest bundle discount when it helps close. Never quote a price that is not in a tool result."
+  },
+  "hard": {
+    "max_discount_pct": 15,
+    "min_margin_pct": 20,
+    "category_overrides": {}
+  }
+}

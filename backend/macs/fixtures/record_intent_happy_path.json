@@ -1,0 +1,8 @@
+{
+  "goal": "record a podcast",
+  "skill_level": "beginner",
+  "environment": ["noisy street", "small apartment"],
+  "values": ["sustainable brands only"],
+  "hard_constraints": {"budget_max": 600, "deliver_by_days": 7},
+  "soft_preferences": ["simple setup"]
+}
