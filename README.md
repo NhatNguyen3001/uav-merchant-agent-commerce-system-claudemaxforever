@@ -201,7 +201,7 @@ cd backend && .venv/Scripts/python -m pytest
 
 ## Deployment
 
-`deploy.sh` builds the backend with Cloud Build, deploys it to Cloud Run in `australia-southeast1` with the API key from Secret Manager, grants the runtime service account access to Firestore, Vertex AI, and the secret, builds the console, and publishes it to Firebase Hosting with `/api/**` rewritten to the Cloud Run service.
+`deploy.sh` builds the backend with Cloud Build, deploys it to Cloud Run in `australia-southeast1` with the API key from Secret Manager, grants the runtime service account access to Firestore, Vertex AI, and the secret, builds the console with the Cloud Run URL baked in, and publishes it to Firebase Hosting. The console calls Cloud Run directly because Firebase Hosting buffers rewritten responses, which would break the Server-Sent Events stream; the `/api/**` rewrite remains as a fallback for plain requests.
 
 ```bash
 ANTHROPIC_API_KEY=sk-ant-... bash deploy.sh

@@ -30,8 +30,11 @@ gcloud run deploy "$SERVICE" --image "$IMAGE" --region "$REGION" --project "$PRO
   --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT,FAKE_LLM=0,REPLAY=0,MACS_MODEL=${MACS_MODEL:-claude-opus-5}" \
   --set-secrets "ANTHROPIC_API_KEY=anthropic-api-key:latest"
 
-(cd frontend && npm ci && npm run build)
+# Firebase Hosting buffers rewritten responses, which breaks Server-Sent Events. The console therefore calls
+# the Cloud Run service directly (CORS is open on the API); Hosting only serves the static files.
+API_URL=$(gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT" --format 'value(status.url)')
+(cd frontend && npm ci && VITE_API_BASE="$API_URL" npm run build)
 firebase deploy --only hosting --project "$PROJECT"
 
-echo "API:  $(gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT" --format 'value(status.url)')"
+echo "API:  $API_URL"
 echo "Web:  https://$PROJECT.web.app"
