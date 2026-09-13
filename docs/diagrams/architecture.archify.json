@@ -5,7 +5,7 @@
     "title": "MACS MVP architecture",
     "quality_profile": "showcase",
     "viewBox": [
-      1120,
+      1180,
       640
     ],
     "views": [
@@ -157,27 +157,23 @@
   "boundaries": [
     {
       "kind": "security-group",
-      "label": "Cloud Run service macs-api",
+      "label": "Cloud Run service macs-api, australia-southeast1",
       "wraps": [
         "api",
         "graph",
         "gates",
         "mcp"
       ],
-      "pad": 28
+      "pad": 30
     },
     {
       "kind": "region",
-      "label": "Google Cloud australia-southeast1",
+      "label": "Google Cloud managed services, australia-southeast1",
       "wraps": [
-        "api",
-        "graph",
-        "gates",
-        "mcp",
         "firestore",
         "vertex"
       ],
-      "pad": 56
+      "pad": 30
     }
   ],
   "connections": [
@@ -243,7 +239,7 @@
       "to": "firestore",
       "label": "persist run events",
       "fromSide": "right",
-      "toSide": "top"
+      "toSide": "right"
     }
   ],
   "cards": [
