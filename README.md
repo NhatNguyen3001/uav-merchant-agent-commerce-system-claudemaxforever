@@ -12,6 +12,7 @@
     <img src="https://img.shields.io/badge/Claude-Sonnet%205-1E1E5D" alt="Claude Sonnet 5">
     <img src="https://img.shields.io/badge/Google%20Cloud-Run%20%7C%20Firestore%20%7C%20Vertex%20AI-4285F4" alt="Google Cloud">
     <img src="https://img.shields.io/badge/tests-65%20passing-brightgreen" alt="Tests">
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
   </p>
 
   <p>Built in 16 hours for the UAVS Hackathon 2026 by Team ClaudeMax Forever, in response to the problem statement set by FPT Australasia.</p>
@@ -292,4 +293,6 @@ Two design decisions came from measurement. Structured outputs and strict tool u
 
 ## License
 
-No licence has been published for this repository yet. All rights reserved by Team ClaudeMax Forever until one is chosen.
+MIT. See [LICENSE](LICENSE).
+
+The scraped catalogue entries describe publicly listed products and are included for demonstration only. The Claude, Vertex AI, and Google Cloud services used at runtime are subject to their own terms.
