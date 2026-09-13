@@ -66,19 +66,17 @@ function onKeydown(e) {
       placeholder="What does the buyer's agent ask for? Enter to run"
       @keydown="onKeydown"
     ></textarea>
-    <div class="composer-row">
-      <fieldset class="agents">
-        <legend>Send as</legend>
-        <label v-for="a in agents" :key="a.agent_id" class="agent-card" :class="{ picked: agentId === a.agent_id, refused: a.agent_id === 'buyer-999' }">
-          <input type="radio" name="agent" :value="a.agent_id" v-model="agentId" />
-          <span class="agent-label">{{ a.label }}</span>
-          <span class="agent-id">{{ a.agent_id }}</span>
-        </label>
-      </fieldset>
-      <button class="primary run-btn" :disabled="running || !query.trim()" @click="submit">
-        {{ running ? 'Running' : 'Run' }}
-      </button>
-    </div>
+    <fieldset class="agents">
+      <legend>Send as</legend>
+      <label v-for="a in agents" :key="a.agent_id" class="agent-card" :class="{ picked: agentId === a.agent_id, refused: a.agent_id === 'buyer-999' }">
+        <input type="radio" name="agent" :value="a.agent_id" v-model="agentId" />
+        <span class="agent-label">{{ a.label }}</span>
+        <span class="agent-id">{{ a.agent_id }}</span>
+      </label>
+    </fieldset>
+    <button class="primary run-btn" :disabled="running || !query.trim()" @click="submit">
+      {{ running ? 'Running' : 'Run' }}
+    </button>
     <div class="examples">
       <span class="examples-label">Try</span>
       <button v-for="ex in EXAMPLES" :key="ex.label" class="chip" type="button" @click="useExample(ex.text)">{{ ex.label }}</button>

@@ -8,6 +8,7 @@ const props = defineProps({
   events: { type: Array, required: true },
   stages: { type: Array, required: true },
   running: Boolean,
+  mobile: Boolean,
 })
 const emit = defineEmits(['hide'])
 
@@ -26,7 +27,7 @@ const blockedStage = computed(() => [...props.stages].reverse().find((e) => e.pa
   <main class="stage">
     <div class="stage-top">
       <ProgressBar :stages="stages" :running="running" />
-      <button type="button" class="ghost hide-pipeline" @click="emit('hide')">Hide pipeline</button>
+      <button v-if="!mobile" type="button" class="ghost hide-pipeline" @click="emit('hide')">Hide pipeline</button>
     </div>
     <div v-if="finished" class="outcome" :class="order?.status === 'placed' ? 'placed' : 'blocked'">
       <template v-if="order?.status === 'placed'">

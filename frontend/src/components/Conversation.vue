@@ -13,6 +13,7 @@ const props = defineProps({
   running: Boolean,
   error: String,
   pipelineVisible: Boolean,
+  mobile: Boolean,
 })
 const emit = defineEmits(['run', 'replay', 'delete', 'clear', 'show-pipeline'])
 
@@ -69,9 +70,9 @@ function time(ts) {
         </div>
       </div>
       <div class="brand-actions">
-        <button v-if="!pipelineVisible" type="button" class="ghost" @click="emit('show-pipeline')">Show pipeline</button>
+        <button v-if="!pipelineVisible && !mobile" type="button" class="ghost" @click="emit('show-pipeline')">Show pipeline</button>
         <button type="button" class="ghost" :aria-expanded="drawerOpen" @click="drawerOpen = !drawerOpen">
-          Merchant rules
+          <span class="lbl-full">Merchant rules</span><span class="lbl-short">Rules</span>
           <Chevron :open="drawerOpen" />
         </button>
       </div>

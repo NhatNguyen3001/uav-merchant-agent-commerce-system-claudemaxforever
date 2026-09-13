@@ -1,6 +1,7 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import Conversation from './components/Conversation.vue'
+import MobileTabs from './components/MobileTabs.vue'
 import Pipeline from './components/Pipeline.vue'
 import { deleteRun, clearHistory, fetchRuns, useRun } from './composables/useRun.js'
 
@@ -47,14 +48,32 @@ async function onClear() {
 
 onMounted(refreshRuns)
 
+// Phones and small tablets show one panel at a time behind a bottom tab bar.
+const mql = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 960px)') : null
+const isMobile = ref(mql ? mql.matches : false)
+const mobileTab = ref('chat')
+const onMedia = (e) => (isMobile.value = e.matches)
+onMounted(() => mql?.addEventListener('change', onMedia))
+onBeforeUnmount(() => mql?.removeEventListener('change', onMedia))
+
+const showConversation = computed(() => !isMobile.value || mobileTab.value === 'chat')
+const showPipeline = computed(() => (isMobile.value ? mobileTab.value === 'pipeline' : pipelineVisible.value))
+
 const stageEvents = computed(() => events.value.filter((e) => e.type === 'stage'))
 const messages = computed(() => events.value.filter((e) => e.type === 'message'))
 const pipelineEvents = computed(() => events.value.filter((e) => e.lane === 'a2a' && e.type !== 'message'))
+const outcome = computed(() => {
+  if (running.value || !stageEvents.value.length) return null
+  const last = stageEvents.value[stageEvents.value.length - 1].payload
+  if (last.status === 'blocked') return 'blocked'
+  return last.status === 'passed' && last.stage === 'retailer_systems' ? 'placed' : null
+})
 </script>
 
 <template>
-  <div class="layout" :class="{ 'pipeline-hidden': !pipelineVisible }">
+  <div class="layout" :class="{ 'pipeline-hidden': !showPipeline, mobile: isMobile }">
     <Conversation
+      v-if="showConversation"
       :messages="messages"
       :draft="draft"
       :runs="runs"
@@ -62,12 +81,14 @@ const pipelineEvents = computed(() => events.value.filter((e) => e.lane === 'a2a
       :running="running"
       :error="error"
       :pipeline-visible="pipelineVisible"
+      :mobile="isMobile"
       @run="run"
       @replay="run({ scenario: $event })"
       @delete="onDelete"
       @clear="onClear"
       @show-pipeline="pipelineVisible = true"
     />
-    <Pipeline v-if="pipelineVisible" :events="pipelineEvents" :stages="stageEvents" :running="running" @hide="pipelineVisible = false" />
+    <Pipeline v-if="showPipeline" :events="pipelineEvents" :stages="stageEvents" :running="running" :mobile="isMobile" @hide="pipelineVisible = false" />
+    <MobileTabs v-if="isMobile" :tab="mobileTab" :running="running" :outcome="outcome" @select="mobileTab = $event" />
   </div>
 </template>
