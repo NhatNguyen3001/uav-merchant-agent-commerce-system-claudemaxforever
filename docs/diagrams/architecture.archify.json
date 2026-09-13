@@ -13,6 +13,7 @@
         "id": "request-path",
         "label": "Request path",
         "focus": [
+          "hosting",
           "console",
           "api",
           "graph",
@@ -41,7 +42,7 @@
       "id": "console",
       "type": "frontend",
       "label": "Merchant console",
-      "sublabel": "Vue 3 on Firebase Hosting",
+      "sublabel": "Vue 3 single-page app",
       "pos": [
         40,
         100
@@ -51,6 +52,21 @@
         68
       ],
       "brand": "vue"
+    },
+    {
+      "id": "hosting",
+      "type": "cloud",
+      "label": "Firebase Hosting",
+      "sublabel": "serves the console build",
+      "pos": [
+        40,
+        240
+      ],
+      "size": [
+        170,
+        68
+      ],
+      "brand": "firebase"
     },
     {
       "id": "api",
@@ -73,7 +89,7 @@
       "sublabel": "Anthropic API",
       "pos": [
         40,
-        240
+        380
       ],
       "size": [
         170,
@@ -184,6 +200,12 @@
       "label": "POST /api/runs, SSE events",
       "variant": "emphasis",
       "labelDy": 58
+    },
+    {
+      "id": "hosting-to-console",
+      "from": "hosting",
+      "to": "console",
+      "label": "static assets over HTTPS"
     },
     {
       "id": "api-to-graph",
