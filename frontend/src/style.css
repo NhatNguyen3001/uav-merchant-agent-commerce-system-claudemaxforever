@@ -14,7 +14,8 @@
   --corrected: #b7791f;
   --lavender: #e5eaf5;
   --font: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;       /* pipeline side */
-  --font-chat: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; /* conversation side */
+  --font-chat: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; /* conversation side: labels, composer, history */
+  --font-prose: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; /* chat message text only */
   --gap: 24px;
   --col: 880px;
   --reveal: 260ms;
@@ -145,15 +146,16 @@ code { font: inherit; font-weight: 500; }
 .thread-wrap { flex: 1; min-height: 0; padding: 18px 18px; }
 .thread-empty { color: var(--muted); display: grid; gap: 10px; font-size: 16px; max-width: 42ch; }
 .thread { display: grid; gap: 14px; }
-.bubble { max-width: min(92%, 640px); padding: 11px 14px; border-radius: 12px; animation: reveal var(--reveal) cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-.bubble.buyer_agent { justify-self: end; background: transparent; border: 1.5px solid var(--ink); color: var(--ink); border-bottom-right-radius: 3px; }
-.bubble.merchant_agent { justify-self: start; background: var(--card); border: 1px solid var(--hair); border-bottom-left-radius: 3px; }
-.bubble-who { font-size: 13px; color: var(--muted); margin-bottom: 4px; display: flex; gap: 8px; }
-.bubble.buyer_agent .bubble-who { color: var(--ink-2); }
-.bubble-text { line-height: 1.55; font-size: 16.5px; overflow-wrap: anywhere; }
+/* Messenger-style: no borders, fill + placement carry the role. Buyer (the person typing) sits right in brand blue; merchant sits left in lavender. */
+.bubble { max-width: min(92%, 640px); padding: 11px 15px 12px; border-radius: 16px; border: 0; animation: reveal var(--reveal) cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.bubble.buyer_agent { justify-self: end; background: var(--pass); color: #fff; border-bottom-right-radius: 4px; }
+.bubble.merchant_agent { justify-self: start; background: var(--lavender); color: var(--ink); border-bottom-left-radius: 4px; }
+.bubble-who { font-family: var(--font-chat); font-size: 13px; color: var(--muted); margin-bottom: 4px; display: flex; gap: 8px; }
+.bubble.buyer_agent .bubble-who { color: rgba(255, 255, 255, 0.82); }
+.bubble-text { font-family: var(--font-prose); line-height: 1.5; font-size: 17px; overflow-wrap: anywhere; }
 .bubble.typing { padding: 13px 16px; }
 .dots { display: inline-flex; gap: 4px; }
-.dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: blink 1.2s infinite ease-in-out; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-2); animation: blink 1.2s infinite ease-in-out; }
 .dots i:nth-child(2) { animation-delay: 0.2s; }
 .dots i:nth-child(3) { animation-delay: 0.4s; }
 @keyframes blink { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
