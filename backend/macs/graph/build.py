@@ -31,8 +31,8 @@ def build_graph(nodes: dict):
     g.add_edge("protocol_adapter", "inbound_gate")
     g.add_conditional_edges("inbound_gate", lambda s: END if s.get("blocked") else "decode_intent")
     g.add_edge("decode_intent", "match_catalogue")
-    g.add_edge("match_catalogue", "compose_proposal")
-    g.add_edge("compose_proposal", "outbound_gate")
+    g.add_conditional_edges("match_catalogue", lambda s: END if s.get("blocked") else "compose_proposal")
+    g.add_conditional_edges("compose_proposal", lambda s: END if s.get("blocked") else "outbound_gate")
     g.add_conditional_edges("outbound_gate", lambda s: END if s.get("blocked") else "negotiate")
     g.add_conditional_edges(
         "negotiate",

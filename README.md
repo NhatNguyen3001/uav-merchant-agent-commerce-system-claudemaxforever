@@ -11,7 +11,7 @@
     <img src="https://img.shields.io/badge/Vue-3-42b883" alt="Vue 3">
     <img src="https://img.shields.io/badge/Claude-Sonnet%205-1E1E5D" alt="Claude Sonnet 5">
     <img src="https://img.shields.io/badge/Google%20Cloud-Run%20%7C%20Firestore%20%7C%20Vertex%20AI-4285F4" alt="Google Cloud">
-    <img src="https://img.shields.io/badge/tests-65%20passing-brightgreen" alt="Tests">
+    <img src="https://img.shields.io/badge/tests-71%20passing-brightgreen" alt="Tests">
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
   </p>
 
@@ -97,6 +97,8 @@ Validate what comes in, govern what goes out, authorise what gets executed.
 | Outbound | Every item cites a tool result from this run. Item prices match list prices. Shipping meets the deadline and items are in stock. Bundle discount is within the cap. Margin is above the floor. Sustainability claims apply only to certified products. The alternative is priced within the cap. | Corrected and re-issued, or blocked when an item is ungrounded, late, or out of stock. |
 | Execution | The buyer's agent accepted the final proposal. Mandate signature is present and the mandate is unexpired. Items are within the mandate scope. Total is within the spend cap when one is set. | Blocked. No order is written. |
 
+A deterministic catalogue check runs between the inbound gate and the proposal engine. If the best vector-search match is too far from the request (cosine distance above 0.45; on-catalogue requests score 0.24 to 0.33, off-catalogue ones 0.51 to 0.58), or no related product survives the budget, delivery, and stock filters, the run stops with a plain reply that names the closest items the store carries. If the model still cannot shape a bundle from good candidates, the run ends the same clean way instead of surfacing an error.
+
 ![Console: an unregistered agent stopped at the inbound gate](assets/console-refused.png)
 
 ---
@@ -114,7 +116,7 @@ Validate what comes in, govern what goes out, authorise what gets executed.
 | Storage | Firestore: catalogue, rules, mandates, credentials, injection patterns, runs, events, orders |
 | Console | Vue 3, Vite; IBM Plex Sans for chat text, JetBrains Mono and IBM Plex Mono for labels and the pipeline |
 | Hosting | Cloud Run (backend), Firebase Hosting (console), Cloud Build, Artifact Registry, Secret Manager |
-| Tests | pytest, 65 tests, recorded model outputs and an in-memory store, no network |
+| Tests | pytest, 71 tests, recorded model outputs and an in-memory store, no network |
 
 ---
 

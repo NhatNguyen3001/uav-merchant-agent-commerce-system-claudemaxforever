@@ -11,8 +11,8 @@ async def test_happy_path_end_to_end(seeded_store):
     assert [e["id"] for e in evs] == list(range(1, len(evs) + 1))
     assert reg.is_done(run_id)
     gates = [e["payload"]["verdict"] for e in evs if e["type"] == "gate"]
-    assert gates == ["pass", "corrected", "pass", "pass"]
-    assert [e["payload"]["gate"] for e in evs if e["type"] == "gate"] == ["inbound", "outbound", "outbound", "execution"]
+    assert gates == ["pass", "pass", "corrected", "pass", "pass"]
+    assert [e["payload"]["gate"] for e in evs if e["type"] == "gate"] == ["inbound", "catalogue", "outbound", "outbound", "execution"]
     assert sum(1 for e in evs if e["type"] == "proposal") == 3
     order = [e for e in evs if e["type"] == "order"][-1]["payload"]
     assert order["status"] == "placed" and order["total"] == 588

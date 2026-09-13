@@ -45,6 +45,7 @@ const toggle = (row) => (openState[row.id] = !isOpen(row))
 
 const GATE_TITLE = {
   inbound: { pass: 'Inbound gate: buyer verified', blocked: 'Inbound gate: refused' },
+  catalogue: { pass: 'Catalogue check: candidates found', blocked: 'Catalogue check: nothing suitable' },
   outbound: { pass: 'Outbound gate: within merchant rules', corrected: 'Outbound gate: corrected', blocked: 'Outbound gate: blocked' },
   execution: { pass: 'Execution gate: mandate allows it', blocked: 'Execution gate: blocked' },
 }

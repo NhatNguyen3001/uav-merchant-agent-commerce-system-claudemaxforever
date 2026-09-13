@@ -6,9 +6,9 @@ from datetime import datetime, timedelta
 from typing import Callable
 
 from macs.emitter import Emitter
-from macs.graph.gates import check_execution, check_inbound, check_outbound, money
+from macs.graph.gates import check_catalogue, check_execution, check_inbound, check_outbound, money
 from macs.graph.tools import ToolCaller
-from macs.llm import LLM
+from macs.llm import LLM, LLMOutputError
 from macs.models import BuyerDecision, HardRules, Intent, MerchantRequest, Proposal
 from macs.scenarios import AGENT_BY_ID, SCENARIOS
 from macs.store import Store
@@ -116,7 +116,14 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
             "max_ship_days": intent.hard_constraints.deliver_by_days,
         })
         candidates = {p["sku"]: {**p, "tool_result_id": tid} for p in products}
-        return {"candidates": candidates}
+        r = check_catalogue(hits, candidates, intent)
+        results = state["gate_results"] + [{"gate": "catalogue", "verdict": r.verdict}]
+        if r.verdict == "blocked":
+            em.message("merchant_agent", f"Cannot proceed. {r.message}")
+            em.gate("catalogue", "blocked", r.reason)  # pairs with a blocked proposal_engine stage
+            return {"candidates": candidates, "blocked": True, "gate_results": results}
+        em.gate("catalogue", "pass", r.reason)
+        return {"candidates": candidates, "gate_results": results}
 
     async def compose_proposal(state: dict) -> dict:
         rnd = state["negotiation_round"] + 1
@@ -124,6 +131,12 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
             em.stage("proposal_engine", "running", f"negotiation round {rnd}")
         soft = (store.get("merchant_rules", "current") or {})["soft"]
         cands = state["candidates"]
+        if not cands:
+            # Defensive: the catalogue check stops empty candidate sets earlier; never raise StopIteration here.
+            reason = "No matching products to build a bundle from."
+            em.message("merchant_agent", f"Cannot proceed. {reason}")
+            em.stage("proposal_engine", "blocked", reason)
+            return {"blocked": True}
         tid = next(iter(cands.values()))["tool_result_id"]
         expires = (now + timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=0).isoformat()
         system = PROPOSAL_SYSTEM.format(soft_rules=json.dumps(soft, indent=2), expires_at=expires)
@@ -134,8 +147,17 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         if state.get("buyer_reply"):
             user += (f"\n\nYour previous proposal was {state['proposal']['bundle_price']}. The buyer agent replied: "
                      f"{state['buyer_reply']['message']}\nRespond with your final proposal.")
-        proposal = await llm.structured(Proposal, system, user,
-                                        fixture=f"record_proposal_{_fixture_scenario(state)}_{rnd}", tool_result_id=tid)
+        try:
+            proposal = await llm.structured(Proposal, system, user,
+                                            fixture=f"record_proposal_{_fixture_scenario(state)}_{rnd}", tool_result_id=tid)
+        except LLMOutputError as e:
+            if "validation error" not in str(e):
+                raise
+            # The model could not shape a bundle from these candidates (typically an empty item list).
+            reason = "Could not compose a bundle from the matching products."
+            em.message("merchant_agent", f"Cannot proceed. We c{reason[1:]}")
+            em.stage("proposal_engine", "blocked", reason)
+            return {"blocked": True}
         known = [cands[i.sku]["ship_days"] for i in proposal.items if i.sku in cands]
         proposal.delivery_days = max(known) if known else None
         em.emit("a2a", "proposal", proposal.model_dump())

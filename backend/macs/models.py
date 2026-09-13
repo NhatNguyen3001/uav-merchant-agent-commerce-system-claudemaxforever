@@ -14,7 +14,7 @@ StageName = Literal[
     "outbound_gate", "execution_gate", "retailer_systems",
 ]
 StageStatus = Literal["idle", "running", "passed", "blocked"]
-GateName = Literal["inbound", "outbound", "execution"]
+GateName = Literal["inbound", "catalogue", "outbound", "execution"]
 Verdict = Literal["pass", "blocked", "corrected"]
 
 

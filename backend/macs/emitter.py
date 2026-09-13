@@ -7,7 +7,7 @@ from macs.models import Event
 from macs.store import Store
 
 TZ = timezone(timedelta(hours=10))
-GATE_STAGE = {"inbound": "inbound_gate", "outbound": "outbound_gate", "execution": "execution_gate"}
+GATE_STAGE = {"inbound": "inbound_gate", "catalogue": "proposal_engine", "outbound": "outbound_gate", "execution": "execution_gate"}
 
 
 class RunRegistry:
@@ -74,5 +74,11 @@ class Emitter:
 
     def gate(self, gate: str, verdict: str, reason: str, before: dict | None = None, after: dict | None = None) -> dict:
         ev = self.emit("a2a", "gate", {"gate": gate, "verdict": verdict, "reason": reason, "before": before, "after": after})
-        self.stage(GATE_STAGE[gate], "blocked" if verdict == "blocked" else "passed", reason)
+        stage = GATE_STAGE[gate]
+        if verdict == "blocked":
+            self.stage(stage, "blocked", reason)
+        elif gate == "catalogue":
+            self.stage(stage, "running", reason)  # the proposal engine is still working after the catalogue check
+        else:
+            self.stage(stage, "passed", reason)
         return ev

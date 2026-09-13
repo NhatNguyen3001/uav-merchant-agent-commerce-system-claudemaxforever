@@ -141,3 +141,23 @@ def test_outbound_states_delivery_and_uses_fresh_shipping(seeded_store):
     p.delivery_days = 1
     r = check_outbound(p, _cands(seeded_store), {"t1"}, HARD, deliver_by_days=7)
     assert r.verdict == "corrected" and "delivery promise corrected from 1 to 2 days" in r.reason and r.proposal.delivery_days == 2
+
+
+def test_catalogue_check_blocks_far_matches_and_empty_candidates():
+    from macs.graph.gates import check_catalogue
+    from macs.models import Intent
+    intent = Intent(goal="petrol lawn mower", skill_level="any", environment=[], values=[],
+                    hard_constraints={"budget_max": 400, "deliver_by_days": 7}, soft_preferences=[])
+    far = [{"sku": "A", "name": "Salt grinder", "distance": 0.55}, {"sku": "B", "name": "Echo Spot", "distance": 0.57}]
+    r = check_catalogue(far, {"A": {}}, intent)
+    assert r.verdict == "blocked"
+    assert r.reason == "Nothing in the catalogue is close to 'petrol lawn mower'. Closest items: Salt grinder, Echo Spot."
+    assert r.message == "We do not stock anything close to this request: 'petrol lawn mower'. The closest items we carry are Salt grinder and Echo Spot."
+    long_name = [{"sku": "L", "name": "Electric Salt and Pepper Grinder Set Automatic Battery Pepper Mill Shakers Adjustable", "distance": 0.6}]
+    assert check_catalogue(long_name, {}, intent).closest == ["Electric Salt and Pepper Grinder Set..."]
+    near = [{"sku": "MIC-DYN-01", "name": "Northwind D1", "distance": 0.30}]
+    r = check_catalogue(near, {}, intent)
+    assert r.verdict == "blocked" and "$400 budget and 7-day delivery" in r.reason and "Northwind D1" in r.message
+    r = check_catalogue(near, {"MIC-DYN-01": {}}, intent)
+    assert r.verdict == "pass" and r.reason == "1 candidate within budget and delivery; best match distance 0.30."
+    assert check_catalogue([], {}, intent).verdict == "blocked"

@@ -4,7 +4,7 @@ import math
 from dataclasses import dataclass
 from datetime import datetime
 
-from macs.models import HardRules, MerchantRequest, Proposal
+from macs.models import HardRules, Intent, MerchantRequest, Proposal
 from macs.store import Store
 
 AUDIO_TYPES = frozenset({"microphone", "audio_interface", "headphones", "boom_arm", "pop_filter",
@@ -32,6 +32,58 @@ class OutboundResult:
 class ExecutionResult:
     verdict: str
     reason: str
+
+
+# Cosine distance on text-embedding-005. Measured 13 Sep 2026 on the 531-product catalogue: on-catalogue
+# requests (podcast setup, gym earbuds, red light mask) score 0.24 to 0.33 on their best hit; off-catalogue
+# requests (lawn mower, used car, wedding dress) score 0.51 to 0.58. The in-memory keyword store scores
+# 1/(1+overlap), so two shared terms (0.33) pass and one (0.5) does not.
+MAX_MATCH_DISTANCE = 0.45
+
+
+@dataclass
+class CatalogueResult:
+    verdict: str
+    reason: str   # for the pipeline row
+    message: str  # for the merchant's chat reply
+    closest: list[str]
+
+
+def _short(name: str, limit: int = 44) -> str:
+    """Scraped listings carry long titles; cut at a word boundary for chat and gate text."""
+    if len(name) <= limit:
+        return name
+    cut = name[:limit].rsplit(" ", 1)[0]
+    return cut.rstrip(",;:-") + "..."
+
+
+def _join(names: list[str]) -> str:
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1] if names else "none"
+
+
+def check_catalogue(hits: list[dict], candidates: dict[str, dict], intent: Intent,
+                    max_distance: float = MAX_MATCH_DISTANCE) -> CatalogueResult:
+    """Deterministic relevance check before the proposal engine runs. `hits` are the vector-search results
+    (closest first), `candidates` the subset that survived the budget, delivery, and stock filters."""
+    closest = [_short(h["name"]) for h in hits[:3]]
+    if not hits or hits[0]["distance"] > max_distance:
+        return CatalogueResult(
+            "blocked",
+            f"Nothing in the catalogue is close to '{intent.goal}'. Closest items: {', '.join(closest) or 'none'}.",
+            f"We do not stock anything close to this request: '{intent.goal}'."
+            + (f" The closest items we carry are {_join(closest)}." if closest else ""),
+            closest)
+    hc = intent.hard_constraints
+    if not candidates:
+        limits = f"{money(hc.budget_max)} budget and {hc.deliver_by_days}-day delivery"
+        return CatalogueResult(
+            "blocked",
+            f"Related items exist, but none is within the {limits}. Closest items: {', '.join(closest)}.",
+            f"Related items exist, but none fits within your {limits}. The closest items we carry are {_join(closest)}.",
+            closest)
+    n = len(candidates)
+    return CatalogueResult("pass", f"{n} candidate{'s' if n != 1 else ''} within budget and delivery; "
+                                   f"best match distance {hits[0]['distance']:.2f}.", "", closest)
 
 
 def _parse(ts: str) -> datetime:

@@ -137,3 +137,78 @@ async def test_buyer_policy_overrides_model_action(seeded_store):
     decision = [e for e in reg.events("r1") if e["type"] == "decision"][-1]["payload"]
     assert decision["action"] == "accept" and decision["round"] == 1
     await client.__aexit__(None, None, None)
+
+
+async def test_match_catalogue_refuses_off_catalogue_request(seeded_store):
+    reg, em, client, tools, nodes, state = await _setup(seeded_store, "custom")
+    state["input"] = build_input(agent_id="buyer-002", query="Zorbing sphere rental for a birthday")
+    for name in ("protocol_adapter", "inbound_gate"):
+        state.update(await nodes[name](state))
+    state["intent"] = Intent(goal="zorbing sphere rental", skill_level="any", environment=["outdoors"], values=[],
+                             hard_constraints={"budget_max": 400, "deliver_by_days": 7}, soft_preferences=[]).model_dump()
+    state.update(await nodes["match_catalogue"](state))
+    assert state["blocked"] is True
+    evs = reg.events("r1")
+    gate = [e for e in evs if e["type"] == "gate"][-1]["payload"]
+    assert gate["gate"] == "catalogue" and gate["verdict"] == "blocked" and gate["reason"].startswith("Nothing in the catalogue is close to")
+    assert evs[-1]["payload"] == {"stage": "proposal_engine", "status": "blocked", "note": gate["reason"]}
+    merchant = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]["payload"]["text"]
+    assert merchant.startswith("Cannot proceed. We do not stock anything close to this request: 'zorbing sphere rental'.")
+    assert state["gate_results"][-1] == {"gate": "catalogue", "verdict": "blocked"}
+    await client.__aexit__(None, None, None)
+
+
+async def test_match_catalogue_refuses_when_nothing_fits_the_limits(seeded_store):
+    reg, em, client, tools, nodes, state = await _setup(seeded_store)
+    for name in ("protocol_adapter", "inbound_gate", "decode_intent"):
+        state.update(await nodes[name](state))
+    state["intent"]["hard_constraints"]["budget_max"] = 5
+    state.update(await nodes["match_catalogue"](state))
+    assert state["blocked"] is True
+    gate = [e for e in reg.events("r1") if e["type"] == "gate"][-1]["payload"]
+    assert gate["gate"] == "catalogue" and "$5 budget and 7-day delivery" in gate["reason"]
+    await client.__aexit__(None, None, None)
+
+
+async def test_match_catalogue_passes_and_records_verdict(seeded_store):
+    reg, em, client, tools, nodes, state = await _setup(seeded_store)
+    for name in ("protocol_adapter", "inbound_gate", "decode_intent", "match_catalogue"):
+        state.update(await nodes[name](state))
+    assert state["blocked"] is False and state["gate_results"][-1] == {"gate": "catalogue", "verdict": "pass"}
+    gate = [e for e in reg.events("r1") if e["type"] == "gate"][-1]["payload"]
+    assert gate["gate"] == "catalogue" and gate["verdict"] == "pass" and "candidates within budget and delivery" in gate["reason"]
+    await client.__aexit__(None, None, None)
+
+
+async def test_compose_proposal_falls_back_cleanly_when_the_model_cannot_bundle(seeded_store):
+    from macs.llm import LLMOutputError
+
+    class Boom:
+        async def structured(self, *a, **k):
+            raise LLMOutputError("5 validation errors for Proposal\nitems\n  Field required")
+
+    reg, em, client, tools, nodes, state = await _setup(seeded_store)
+    for name in ("protocol_adapter", "inbound_gate", "decode_intent", "match_catalogue"):
+        state.update(await nodes[name](state))
+    failing = make_nodes(seeded_store, Boom(), tools, em, NOW)
+    state.update(await failing["compose_proposal"](state))
+    assert state["blocked"] is True
+    evs = reg.events("r1")
+    assert evs[-1]["payload"] == {"stage": "proposal_engine", "status": "blocked",
+                                  "note": "Could not compose a bundle from the matching products."}
+    merchant = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]["payload"]["text"]
+    assert merchant == "Cannot proceed. We could not compose a bundle from the matching products."
+    assert not any(e["type"] == "proposal" for e in evs)
+    await client.__aexit__(None, None, None)
+
+
+async def test_compose_proposal_with_no_candidates_blocks_instead_of_raising(seeded_store):
+    reg, em, client, tools, nodes, state = await _setup(seeded_store)
+    for name in ("protocol_adapter", "inbound_gate", "decode_intent"):
+        state.update(await nodes[name](state))
+    state["candidates"] = {}
+    state.update(await nodes["compose_proposal"](state))
+    assert state["blocked"] is True
+    assert reg.events("r1")[-1]["payload"] == {"stage": "proposal_engine", "status": "blocked",
+                                               "note": "No matching products to build a bundle from."}
+    await client.__aexit__(None, None, None)
