@@ -1,10 +1,10 @@
 {
   "run": {
-    "finished_at": "2026-09-12T22:37:47+10:00",
+    "finished_at": "2026-09-13T10:43:39+10:00",
     "scenario": "happy_path",
-    "started_at": "2026-09-12T22:37:00+10:00",
+    "started_at": "2026-09-13T10:42:48+10:00",
     "summary": {
-      "bundle_price": 522.7,
+      "bundle_price": 590.0,
       "order_status": "placed",
       "gate_verdicts": [
         {
@@ -41,7 +41,7 @@
         "status": "running"
       },
       "id": 1,
-      "ts": "2026-09-12T22:37:01.884+10:00"
+      "ts": "2026-09-13T10:42:50.459+10:00"
     },
     {
       "type": "message",
@@ -52,7 +52,7 @@
         "text": "I'm starting a podcast from a small apartment on a noisy street. Complete beginner. Sustainable brands only. Budget is 600 and I need everything by next weekend."
       },
       "id": 2,
-      "ts": "2026-09-12T22:37:02.105+10:00"
+      "ts": "2026-09-13T10:42:50.727+10:00"
     },
     {
       "type": "stage",
@@ -64,7 +64,7 @@
         "status": "passed"
       },
       "id": 3,
-      "ts": "2026-09-12T22:37:02.307+10:00"
+      "ts": "2026-09-13T10:42:50.953+10:00"
     },
     {
       "type": "stage",
@@ -76,7 +76,7 @@
         "status": "running"
       },
       "id": 4,
-      "ts": "2026-09-12T22:37:02.537+10:00"
+      "ts": "2026-09-13T10:42:51.219+10:00"
     },
     {
       "type": "gate",
@@ -86,23 +86,23 @@
         "gate": "inbound",
         "after": null,
         "before": null,
-        "reason": "agent buyer-001 verified; mandate no spend cap, scope any, expires 2026-12-31T23:59:59+10:00",
+        "reason": "buyer-001 is a registered agent. Mandate: no spend cap, any product category, valid until 31 Dec 2026.",
         "verdict": "pass"
       },
       "id": 5,
-      "ts": "2026-09-12T22:37:03.007+10:00"
+      "ts": "2026-09-13T10:42:52.119+10:00"
     },
     {
       "type": "stage",
       "run_id": "golden_happy_path",
       "lane": "system",
       "payload": {
-        "note": "agent buyer-001 verified; mandate no spend cap, scope any, expires 2026-12-31T23:59:59+10:00",
+        "note": "buyer-001 is a registered agent. Mandate: no spend cap, any product category, valid until 31 Dec 2026.",
         "stage": "inbound_gate",
         "status": "passed"
       },
       "id": 6,
-      "ts": "2026-09-12T22:37:03.203+10:00"
+      "ts": "2026-09-13T10:42:52.176+10:00"
     },
     {
       "type": "stage",
@@ -114,18 +114,18 @@
         "status": "running"
       },
       "id": 7,
-      "ts": "2026-09-12T22:37:03.241+10:00"
+      "ts": "2026-09-13T10:42:52.235+10:00"
     },
     {
       "type": "intent",
       "run_id": "golden_happy_path",
       "lane": "a2a",
       "payload": {
-        "goal": "Set up a podcast recording setup for a beginner starting a podcast",
+        "goal": "Set up a podcast recording setup for a beginner",
         "constraint_count": 6,
         "soft_preferences": [
-          "prefers sustainable/eco-friendly brands",
-          "needs noise isolation/soundproofing due to street noise"
+          "noise isolation/soundproofing suited for noisy environment",
+          "beginner-friendly, easy to set up"
         ],
         "environment": [
           "small apartment",
@@ -141,7 +141,7 @@
         "skill_level": "beginner"
       },
       "id": 8,
-      "ts": "2026-09-12T22:37:07.475+10:00"
+      "ts": "2026-09-13T10:42:59.861+10:00"
     },
     {
       "type": "stage",
@@ -153,7 +153,7 @@
         "status": "passed"
       },
       "id": 9,
-      "ts": "2026-09-12T22:37:07.517+10:00"
+      "ts": "2026-09-13T10:42:59.931+10:00"
     },
     {
       "type": "stage",
@@ -165,7 +165,7 @@
         "status": "running"
       },
       "id": 10,
-      "ts": "2026-09-12T22:37:07.563+10:00"
+      "ts": "2026-09-13T10:43:00.014+10:00"
     },
     {
       "type": "tool",
@@ -174,15 +174,15 @@
       "payload": {
         "name": "semantic_search",
         "args": {
-          "query_text": "Set up a podcast recording setup for a beginner starting a podcast for a beginner; environment: small apartment, noisy street outside; values: sustainability; preferences: prefers sustainable/eco-friendly brands, needs noise isolation/soundproofing due to street noise",
+          "query_text": "Set up a podcast recording setup for a beginner for a beginner; environment: small apartment, noisy street outside; values: sustainability; preferences: noise isolation/soundproofing suited for noisy environment, beginner-friendly, easy to set up",
           "k": 15
         },
-        "result_summary": "top matches: BUN-STA-01 (0.262), MIC-DYN-01 (0.292), MIC-DYN-02 (0.318), IF-USB-02 (0.347), IF-USB-01 (0.349)",
-        "latency_ms": 2841,
-        "tool_result_id": "run_20260912_223700_6226-tool-1"
+        "result_summary": "15 closest matches: Starter podcast kit (USB mic, stand, pop filter), Northwind D1 dynamic microphone, Northwind D2 broadcast dynamic, Foam windscreen for dynamic mics, Compact desk clamp boom arm, and 10 more",
+        "latency_ms": 3119,
+        "tool_result_id": "run_20260913_104248_2935-tool-1"
       },
       "id": 11,
-      "ts": "2026-09-12T22:37:10.466+10:00"
+      "ts": "2026-09-13T10:43:03.201+10:00"
     },
     {
       "type": "tool",
@@ -197,48 +197,47 @@
             "BUN-STA-01",
             "MIC-DYN-01",
             "MIC-DYN-02",
-            "IF-USB-02",
-            "IF-USB-01",
             "POP-03",
-            "HP-REC-01",
             "ARM-DESK-01",
+            "IF-USB-02",
             "MIC-USB-01",
             "MIC-USB-02",
+            "IF-USB-01",
+            "HP-REC-01",
             "PAN-01",
-            "IF-USB-03",
-            "CAB-XLR-01",
             "ARM-DESK-02",
-            "MIC-LAV-01"
+            "POP-01",
+            "MIC-LAV-01",
+            "IF-USB-03"
           ]
         },
-        "result_summary": "15 products after hard filters: ARM-DESK-01, ARM-DESK-02, BUN-STA-01, CAB-XLR-01, HP-REC-01, IF-USB-01, IF-USB-02, IF-USB-03",
-        "latency_ms": 115,
-        "tool_result_id": "run_20260912_223700_6226-tool-2"
+        "result_summary": "15 products within budget, delivery, and stock limits: Compact desk clamp boom arm, Standard desk boom arm, Starter podcast kit (USB mic, stand, pop filter), Evergreen R1 recycled shell headphones, Loopline U1 USB audio interface, Loopline U2 USB audio interface, and 9 more",
+        "latency_ms": 160,
+        "tool_result_id": "run_20260913_104248_2935-tool-2"
       },
       "id": 12,
-      "ts": "2026-09-12T22:37:10.622+10:00"
+      "ts": "2026-09-13T10:43:03.429+10:00"
     },
     {
       "type": "proposal",
       "run_id": "golden_happy_path",
       "lane": "a2a",
       "payload": {
-        "bundle_price": 550.0,
+        "bundle_price": 513.0,
         "delivery_days": 2,
         "alternative": {
-          "name": "Loopline U1 USB audio interface",
-          "bundle_price": 500.0,
-          "sku": "IF-USB-01",
-          "tradeoff": "Slightly older-generation interface saves cost but loses the one-knob gain convenience.",
+          "name": "Standard desk boom arm",
+          "bundle_price": 457.0,
+          "sku": "ARM-DESK-02",
+          "tradeoff": "Saves money but drops the recycled-materials certification and low-profile design suited to small spaces.",
           "items": [
             "MIC-DYN-01",
-            "IF-USB-01",
-            "ARM-DESK-01",
-            "CAB-XLR-01"
+            "IF-USB-02",
+            "ARM-DESK-02"
           ]
         },
-        "expires_at": "2026-09-13T23:59:59+10:00",
-        "discount_pct": 5.19,
+        "expires_at": "2026-09-14T23:59:59+10:00",
+        "discount_pct": 6.0,
         "items": [
           {
             "name": "Northwind D1 dynamic microphone",
@@ -246,17 +245,17 @@
               "goal",
               "skill_level",
               "environment",
-              "hard_constraints",
+              "values",
               "soft_preferences"
             ],
             "grounded_on": [
               {
                 "sku": "MIC-DYN-01",
-                "tool_result_id": "run_20260912_223700_6226-tool-2"
+                "tool_result_id": "run_20260913_104248_2935-tool-2"
               }
             ],
             "price": 179.0,
-            "rationale": "Dynamic mic rejects background noise from the noisy street, ideal for a beginner in a small apartment.",
+            "rationale": "Dynamic mic rejects background noise from the noisy street, is beginner-friendly and sustainably certified.",
             "sku": "MIC-DYN-01"
           },
           {
@@ -264,16 +263,18 @@
             "satisfies": [
               "goal",
               "skill_level",
-              "environment"
+              "environment",
+              "values",
+              "soft_preferences"
             ],
             "grounded_on": [
               {
                 "sku": "IF-USB-02",
-                "tool_result_id": "run_20260912_223700_6226-tool-2"
+                "tool_result_id": "run_20260913_104248_2935-tool-2"
               }
             ],
             "price": 199.0,
-            "rationale": "Plug and play interface with one-knob gain suits a beginner's small-space podcast setup.",
+            "rationale": "Plug-and-play interface with one-knob gain suits a beginner in a small apartment setup, carbon-neutral shipping.",
             "sku": "IF-USB-02"
           },
           {
@@ -281,39 +282,24 @@
             "satisfies": [
               "environment",
               "values",
+              "hard_constraints",
               "soft_preferences"
             ],
             "grounded_on": [
               {
                 "sku": "ARM-DESK-01",
-                "tool_result_id": "run_20260912_223700_6226-tool-2"
+                "tool_result_id": "run_20260913_104248_2935-tool-2"
               }
             ],
             "price": 165.0,
-            "rationale": "Low-profile boom arm fits a small apartment desk and is certified sustainable, matching eco values.",
+            "rationale": "Low-profile clamp arm fits a small apartment desk and is durability rated with certified sustainable materials.",
             "sku": "ARM-DESK-01"
-          },
-          {
-            "name": "XLR cable 3m recycled jacket",
-            "satisfies": [
-              "values",
-              "hard_constraints"
-            ],
-            "grounded_on": [
-              {
-                "sku": "CAB-XLR-01",
-                "tool_result_id": "run_20260912_223700_6226-tool-2"
-              }
-            ],
-            "price": 24.0,
-            "rationale": "Recycled jacket cable connects mic to interface while supporting sustainability values within budget.",
-            "sku": "CAB-XLR-01"
           }
         ],
         "intent_coverage": "6/6"
       },
       "id": 13,
-      "ts": "2026-09-12T22:37:25.590+10:00"
+      "ts": "2026-09-13T10:43:11.680+10:00"
     },
     {
       "type": "message",
@@ -321,22 +307,22 @@
       "lane": "a2a",
       "payload": {
         "from": "merchant_agent",
-        "text": "Proposed 4 items at 550 (5.19% bundle discount). Delivered within 2 days, inside your 7-day window. Alternative at 500."
+        "text": "Proposed 3 items for $513 (6% bundle discount). Delivered within 2 days, inside your 7-day window. Alternative at $457."
       },
       "id": 14,
-      "ts": "2026-09-12T22:37:25.642+10:00"
+      "ts": "2026-09-13T10:43:11.742+10:00"
     },
     {
       "type": "stage",
       "run_id": "golden_happy_path",
       "lane": "system",
       "payload": {
-        "note": "4 items, coverage 6/6",
+        "note": "3 items, coverage 6/6",
         "stage": "proposal_engine",
         "status": "passed"
       },
       "id": 15,
-      "ts": "2026-09-12T22:37:25.676+10:00"
+      "ts": "2026-09-13T10:43:11.785+10:00"
     },
     {
       "type": "stage",
@@ -348,7 +334,7 @@
         "status": "running"
       },
       "id": 16,
-      "ts": "2026-09-12T22:37:25.710+10:00"
+      "ts": "2026-09-13T10:43:11.933+10:00"
     },
     {
       "type": "tool",
@@ -359,12 +345,12 @@
         "args": {
           "sku": "MIC-DYN-01"
         },
-        "result_summary": "MIC-DYN-01: ships in 2 days, 12 in stock",
-        "latency_ms": 41,
-        "tool_result_id": "run_20260912_223700_6226-tool-3"
+        "result_summary": "MIC-DYN-01 ships in 2 days, 12 in stock",
+        "latency_ms": 134,
+        "tool_result_id": "run_20260913_104248_2935-tool-3"
       },
       "id": 17,
-      "ts": "2026-09-12T22:37:25.855+10:00"
+      "ts": "2026-09-13T10:43:12.253+10:00"
     },
     {
       "type": "tool",
@@ -375,12 +361,12 @@
         "args": {
           "sku": "IF-USB-02"
         },
-        "result_summary": "IF-USB-02: ships in 2 days, 10 in stock",
-        "latency_ms": 33,
-        "tool_result_id": "run_20260912_223700_6226-tool-4"
+        "result_summary": "IF-USB-02 ships in 2 days, 10 in stock",
+        "latency_ms": 156,
+        "tool_result_id": "run_20260913_104248_2935-tool-4"
       },
       "id": 18,
-      "ts": "2026-09-12T22:37:25.922+10:00"
+      "ts": "2026-09-13T10:43:12.480+10:00"
     },
     {
       "type": "tool",
@@ -391,28 +377,12 @@
         "args": {
           "sku": "ARM-DESK-01"
         },
-        "result_summary": "ARM-DESK-01: ships in 1 day, 11 in stock",
-        "latency_ms": 52,
-        "tool_result_id": "run_20260912_223700_6226-tool-5"
+        "result_summary": "ARM-DESK-01 ships in 1 day, 11 in stock",
+        "latency_ms": 48,
+        "tool_result_id": "run_20260913_104248_2935-tool-5"
       },
       "id": 19,
-      "ts": "2026-09-12T22:37:26.026+10:00"
-    },
-    {
-      "type": "tool",
-      "run_id": "golden_happy_path",
-      "lane": "a2a",
-      "payload": {
-        "name": "get_shipping",
-        "args": {
-          "sku": "CAB-XLR-01"
-        },
-        "result_summary": "CAB-XLR-01: ships in 1 day, 80 in stock",
-        "latency_ms": 42,
-        "tool_result_id": "run_20260912_223700_6226-tool-6"
-      },
-      "id": 20,
-      "ts": "2026-09-12T22:37:26.112+10:00"
+      "ts": "2026-09-13T10:43:12.587+10:00"
     },
     {
       "type": "gate",
@@ -422,23 +392,23 @@
         "gate": "outbound",
         "after": null,
         "before": null,
-        "reason": "bundle 550 within discount cap and margin floor; all items grounded; delivers in 2 days against a 7-day deadline",
+        "reason": "Bundle $513 stays within the 15% discount cap and above the margin floor. Every item came from a catalogue lookup. Delivers in 2 days against a 7-day deadline.",
         "verdict": "pass"
       },
-      "id": 21,
-      "ts": "2026-09-12T22:37:26.143+10:00"
+      "id": 20,
+      "ts": "2026-09-13T10:43:13.097+10:00"
     },
     {
       "type": "stage",
       "run_id": "golden_happy_path",
       "lane": "system",
       "payload": {
-        "note": "bundle 550 within discount cap and margin floor; all items grounded; delivers in 2 days against a 7-day deadline",
+        "note": "Bundle $513 stays within the 15% discount cap and above the margin floor. Every item came from a catalogue lookup. Delivers in 2 days against a 7-day deadline.",
         "stage": "outbound_gate",
         "status": "passed"
       },
-      "id": 22,
-      "ts": "2026-09-12T22:37:26.165+10:00"
+      "id": 21,
+      "ts": "2026-09-13T10:43:13.143+10:00"
     },
     {
       "type": "message",
@@ -446,10 +416,10 @@
       "lane": "a2a",
       "payload": {
         "from": "buyer_agent",
-        "text": "This bundle nicely covers the noisy-street environment, beginner skill level, and sustainability values with fast delivery\u2014thank you. However, please confirm delivery to my apartment is guaranteed by next weekend, and given the budget target, could you bring the bundle price down to around $510?"
+        "text": "This bundle nicely covers noise rejection, beginner ease, and sustainability certifications, but there's no headphones or pop filter mentioned, which are essentials for a beginner podcaster to monitor and clean up audio. Given that gap, please requote closer to $475-480 (about 7% off the $513 bundle) so I have room to add those missing essentials within my $600 budget."
       },
-      "id": 23,
-      "ts": "2026-09-12T22:37:28.859+10:00"
+      "id": 22,
+      "ts": "2026-09-13T10:43:16.556+10:00"
     },
     {
       "type": "decision",
@@ -457,13 +427,13 @@
       "lane": "a2a",
       "payload": {
         "action": "counter",
-        "proposal_price": 550.0,
-        "message": "This bundle nicely covers the noisy-street environment, beginner skill level, and sustainability values with fast delivery\u2014thank you. However, please confirm delivery to my apartment is guaranteed by next weekend, and given the budget target, could you bring the bundle price down to around $510?",
-        "counter_budget": 510.0,
+        "proposal_price": 513.0,
+        "message": "This bundle nicely covers noise rejection, beginner ease, and sustainability certifications, but there's no headphones or pop filter mentioned, which are essentials for a beginner podcaster to monitor and clean up audio. Given that gap, please requote closer to $475-480 (about 7% off the $513 bundle) so I have room to add those missing essentials within my $600 budget.",
+        "counter_budget": 478.0,
         "round": 1
       },
-      "id": 24,
-      "ts": "2026-09-12T22:37:28.904+10:00"
+      "id": 23,
+      "ts": "2026-09-13T10:43:16.612+10:00"
     },
     {
       "type": "stage",
@@ -474,30 +444,30 @@
         "stage": "proposal_engine",
         "status": "running"
       },
-      "id": 25,
-      "ts": "2026-09-12T22:37:28.944+10:00"
+      "id": 24,
+      "ts": "2026-09-13T10:43:16.673+10:00"
     },
     {
       "type": "proposal",
       "run_id": "golden_happy_path",
       "lane": "a2a",
       "payload": {
-        "bundle_price": 522.7,
+        "bundle_price": 590.0,
         "delivery_days": 2,
         "alternative": {
-          "name": "Loopline U1 USB audio interface",
-          "bundle_price": 486.0,
-          "sku": "IF-USB-01",
-          "tradeoff": "Swaps to the previous-gen interface without one-knob gain, saving cost but slightly less beginner-friendly gain control.",
+          "name": "Plugtalk U1 USB microphone",
+          "bundle_price": 462.0,
+          "sku": "MIC-USB-01",
+          "tradeoff": "Drops the audio interface and swaps in a USB mic to cut cost, sacrificing dedicated noise-rejecting dynamic mic quality and upgrade headroom.",
           "items": [
-            "MIC-DYN-01",
-            "IF-USB-01",
+            "MIC-USB-01",
+            "ARM-DESK-01",
             "HP-REC-01",
-            "CAB-XLR-01"
+            "POP-01"
           ]
         },
-        "expires_at": "2026-09-13T23:59:59+10:00",
-        "discount_pct": 5.0,
+        "expires_at": "2026-09-14T23:59:59+10:00",
+        "discount_pct": 6.0,
         "items": [
           {
             "name": "Northwind D1 dynamic microphone",
@@ -505,39 +475,37 @@
               "goal",
               "skill_level",
               "environment",
-              "hard_constraints",
               "soft_preferences"
             ],
             "grounded_on": [
               {
                 "sku": "MIC-DYN-01",
-                "tool_result_id": "run_20260912_223700_6226-tool-2"
+                "tool_result_id": "run_20260913_104248_2935-tool-2"
               }
             ],
             "price": 179.0,
-            "rationale": "Dynamic mic rejects background noise from the noisy street and suits beginners in small apartments.",
+            "rationale": "Dynamic mic rejects background noise for the noisy street and suits beginners in small apartments.",
             "sku": "MIC-DYN-01"
           },
           {
-            "name": "Loopline U2 USB audio interface",
+            "name": "Loopline U1 USB audio interface",
             "satisfies": [
               "goal",
               "skill_level",
-              "environment",
-              "hard_constraints"
+              "soft_preferences"
             ],
             "grounded_on": [
               {
-                "sku": "IF-USB-02",
-                "tool_result_id": "run_20260912_223700_6226-tool-2"
+                "sku": "IF-USB-01",
+                "tool_result_id": "run_20260913_104248_2935-tool-2"
               }
             ],
-            "price": 199.0,
-            "rationale": "Plug-and-play interface with one-knob gain simplifies setup for a beginner in a small space.",
-            "sku": "IF-USB-02"
+            "price": 144.0,
+            "rationale": "Plug and play interface is easy for beginners to set up quickly in a small apartment studio.",
+            "sku": "IF-USB-01"
           },
           {
-            "name": "Evergreen R1 recycled shell headphones",
+            "name": "Compact desk clamp boom arm",
             "satisfies": [
               "environment",
               "values",
@@ -545,35 +513,52 @@
             ],
             "grounded_on": [
               {
-                "sku": "HP-REC-01",
-                "tool_result_id": "run_20260912_223700_6226-tool-2"
+                "sku": "ARM-DESK-01",
+                "tool_result_id": "run_20260913_104248_2935-tool-2"
               }
             ],
-            "price": 149.0,
-            "rationale": "Closed-back isolation headphones help monitor noise-free audio while using certified sustainable recycled materials.",
-            "sku": "HP-REC-01"
+            "price": 165.0,
+            "rationale": "Low profile boom arm fits a small apartment desk and its recycled materials match sustainability values.",
+            "sku": "ARM-DESK-01"
           },
           {
-            "name": "XLR cable 3m recycled jacket",
+            "name": "Evergreen R1 recycled shell headphones",
             "satisfies": [
-              "hard_constraints",
+              "goal",
+              "skill_level",
               "values"
             ],
             "grounded_on": [
               {
-                "sku": "CAB-XLR-01",
-                "tool_result_id": "run_20260912_223700_6226-tool-2"
+                "sku": "HP-REC-01",
+                "tool_result_id": "run_20260913_104248_2935-tool-2"
               }
             ],
-            "price": 24.0,
-            "rationale": "Recycled-jacket cable connects mic to interface reliably while matching your sustainability values.",
-            "sku": "CAB-XLR-01"
+            "price": 149.0,
+            "rationale": "Closed-back monitoring headphones let a beginner check audio quality and are made from recycled materials.",
+            "sku": "HP-REC-01"
+          },
+          {
+            "name": "Mesh pop filter",
+            "satisfies": [
+              "goal",
+              "skill_level"
+            ],
+            "grounded_on": [
+              {
+                "sku": "POP-01",
+                "tool_result_id": "run_20260913_104248_2935-tool-2"
+              }
+            ],
+            "price": 25.0,
+            "rationale": "Basic pop filter cleans up plosives for a beginner recording vocals, rounding out the essentials.",
+            "sku": "POP-01"
           }
         ],
         "intent_coverage": "6/6"
       },
-      "id": 26,
-      "ts": "2026-09-12T22:37:44.487+10:00"
+      "id": 25,
+      "ts": "2026-09-13T10:43:34.295+10:00"
     },
     {
       "type": "message",
@@ -581,22 +566,22 @@
       "lane": "a2a",
       "payload": {
         "from": "merchant_agent",
-        "text": "Proposed 4 items at 522.7 (5% bundle discount). Delivered within 2 days, inside your 7-day window. Alternative at 486."
+        "text": "Proposed 5 items for $590 (6% bundle discount). Delivered within 2 days, inside your 7-day window. Alternative at $462."
       },
-      "id": 27,
-      "ts": "2026-09-12T22:37:44.536+10:00"
+      "id": 26,
+      "ts": "2026-09-13T10:43:34.375+10:00"
     },
     {
       "type": "stage",
       "run_id": "golden_happy_path",
       "lane": "system",
       "payload": {
-        "note": "4 items, coverage 6/6",
+        "note": "5 items, coverage 6/6",
         "stage": "proposal_engine",
         "status": "passed"
       },
-      "id": 28,
-      "ts": "2026-09-12T22:37:44.571+10:00"
+      "id": 27,
+      "ts": "2026-09-13T10:43:34.427+10:00"
     },
     {
       "type": "stage",
@@ -607,8 +592,8 @@
         "stage": "outbound_gate",
         "status": "running"
       },
-      "id": 29,
-      "ts": "2026-09-12T22:37:44.608+10:00"
+      "id": 28,
+      "ts": "2026-09-13T10:43:34.496+10:00"
     },
     {
       "type": "tool",
@@ -619,12 +604,12 @@
         "args": {
           "sku": "MIC-DYN-01"
         },
-        "result_summary": "MIC-DYN-01: ships in 2 days, 12 in stock",
-        "latency_ms": 32,
-        "tool_result_id": "run_20260912_223700_6226-tool-7"
+        "result_summary": "MIC-DYN-01 ships in 2 days, 12 in stock",
+        "latency_ms": 222,
+        "tool_result_id": "run_20260913_104248_2935-tool-6"
       },
-      "id": 30,
-      "ts": "2026-09-12T22:37:44.724+10:00"
+      "id": 29,
+      "ts": "2026-09-13T10:43:34.805+10:00"
     },
     {
       "type": "tool",
@@ -633,14 +618,30 @@
       "payload": {
         "name": "get_shipping",
         "args": {
-          "sku": "IF-USB-02"
+          "sku": "IF-USB-01"
         },
-        "result_summary": "IF-USB-02: ships in 2 days, 10 in stock",
-        "latency_ms": 50,
-        "tool_result_id": "run_20260912_223700_6226-tool-8"
+        "result_summary": "IF-USB-01 ships in 2 days, 9 in stock",
+        "latency_ms": 82,
+        "tool_result_id": "run_20260913_104248_2935-tool-7"
+      },
+      "id": 30,
+      "ts": "2026-09-13T10:43:34.981+10:00"
+    },
+    {
+      "type": "tool",
+      "run_id": "golden_happy_path",
+      "lane": "a2a",
+      "payload": {
+        "name": "get_shipping",
+        "args": {
+          "sku": "ARM-DESK-01"
+        },
+        "result_summary": "ARM-DESK-01 ships in 1 day, 11 in stock",
+        "latency_ms": 53,
+        "tool_result_id": "run_20260913_104248_2935-tool-8"
       },
       "id": 31,
-      "ts": "2026-09-12T22:37:44.814+10:00"
+      "ts": "2026-09-13T10:43:35.167+10:00"
     },
     {
       "type": "tool",
@@ -651,12 +652,12 @@
         "args": {
           "sku": "HP-REC-01"
         },
-        "result_summary": "HP-REC-01: ships in 1 day, 14 in stock",
-        "latency_ms": 40,
-        "tool_result_id": "run_20260912_223700_6226-tool-9"
+        "result_summary": "HP-REC-01 ships in 1 day, 14 in stock",
+        "latency_ms": 73,
+        "tool_result_id": "run_20260913_104248_2935-tool-9"
       },
       "id": 32,
-      "ts": "2026-09-12T22:37:44.894+10:00"
+      "ts": "2026-09-13T10:43:35.307+10:00"
     },
     {
       "type": "tool",
@@ -665,14 +666,14 @@
       "payload": {
         "name": "get_shipping",
         "args": {
-          "sku": "CAB-XLR-01"
+          "sku": "POP-01"
         },
-        "result_summary": "CAB-XLR-01: ships in 1 day, 80 in stock",
-        "latency_ms": 37,
-        "tool_result_id": "run_20260912_223700_6226-tool-10"
+        "result_summary": "POP-01 ships in 1 day, 50 in stock",
+        "latency_ms": 235,
+        "tool_result_id": "run_20260913_104248_2935-tool-10"
       },
       "id": 33,
-      "ts": "2026-09-12T22:37:44.959+10:00"
+      "ts": "2026-09-13T10:43:35.610+10:00"
     },
     {
       "type": "gate",
@@ -682,23 +683,23 @@
         "gate": "outbound",
         "after": null,
         "before": null,
-        "reason": "bundle 522.7 within discount cap and margin floor; all items grounded; delivers in 2 days against a 7-day deadline",
+        "reason": "Bundle $590 stays within the 15% discount cap and above the margin floor. Every item came from a catalogue lookup. Delivers in 2 days against a 7-day deadline.",
         "verdict": "pass"
       },
       "id": 34,
-      "ts": "2026-09-12T22:37:45.004+10:00"
+      "ts": "2026-09-13T10:43:35.695+10:00"
     },
     {
       "type": "stage",
       "run_id": "golden_happy_path",
       "lane": "system",
       "payload": {
-        "note": "bundle 522.7 within discount cap and margin floor; all items grounded; delivers in 2 days against a 7-day deadline",
+        "note": "Bundle $590 stays within the 15% discount cap and above the margin floor. Every item came from a catalogue lookup. Delivers in 2 days against a 7-day deadline.",
         "stage": "outbound_gate",
         "status": "passed"
       },
       "id": 35,
-      "ts": "2026-09-12T22:37:45.034+10:00"
+      "ts": "2026-09-13T10:43:35.783+10:00"
     },
     {
       "type": "message",
@@ -706,10 +707,10 @@
       "lane": "a2a",
       "payload": {
         "from": "buyer_agent",
-        "text": "This bundle fits the noisy-apartment beginner setup with sustainable materials, full intent coverage, and stays under $600 with delivery well before next weekend. Please proceed with the order."
+        "text": "This bundle fits our $600 budget at $590, covers all sustainability, beginner, and noisy-apartment requirements, and arrives well within the next-weekend deadline. Please proceed with the order."
       },
       "id": 36,
-      "ts": "2026-09-12T22:37:47.147+10:00"
+      "ts": "2026-09-13T10:43:38.253+10:00"
     },
     {
       "type": "decision",
@@ -717,13 +718,13 @@
       "lane": "a2a",
       "payload": {
         "action": "accept",
-        "proposal_price": 522.7,
-        "message": "This bundle fits the noisy-apartment beginner setup with sustainable materials, full intent coverage, and stays under $600 with delivery well before next weekend. Please proceed with the order.",
+        "proposal_price": 590.0,
+        "message": "This bundle fits our $600 budget at $590, covers all sustainability, beginner, and noisy-apartment requirements, and arrives well within the next-weekend deadline. Please proceed with the order.",
         "counter_budget": null,
         "round": 2
       },
       "id": 37,
-      "ts": "2026-09-12T22:37:47.195+10:00"
+      "ts": "2026-09-13T10:43:38.339+10:00"
     },
     {
       "type": "stage",
@@ -735,7 +736,7 @@
         "status": "running"
       },
       "id": 38,
-      "ts": "2026-09-12T22:37:47.229+10:00"
+      "ts": "2026-09-13T10:43:38.384+10:00"
     },
     {
       "type": "gate",
@@ -745,23 +746,23 @@
         "gate": "execution",
         "after": null,
         "before": null,
-        "reason": "total 522.7; mandate has no spend cap; scope and expiry valid",
+        "reason": "Total $590. The mandate has no spend cap, and its scope and expiry are valid.",
         "verdict": "pass"
       },
       "id": 39,
-      "ts": "2026-09-12T22:37:47.265+10:00"
+      "ts": "2026-09-13T10:43:38.450+10:00"
     },
     {
       "type": "stage",
       "run_id": "golden_happy_path",
       "lane": "system",
       "payload": {
-        "note": "total 522.7; mandate has no spend cap; scope and expiry valid",
+        "note": "Total $590. The mandate has no spend cap, and its scope and expiry are valid.",
         "stage": "execution_gate",
         "status": "passed"
       },
       "id": 40,
-      "ts": "2026-09-12T22:37:47.300+10:00"
+      "ts": "2026-09-13T10:43:38.574+10:00"
     },
     {
       "type": "stage",
@@ -773,7 +774,7 @@
         "status": "running"
       },
       "id": 41,
-      "ts": "2026-09-12T22:37:47.334+10:00"
+      "ts": "2026-09-13T10:43:38.625+10:00"
     },
     {
       "type": "tool",
@@ -785,17 +786,19 @@
           "mandate_id": "mandate-001",
           "skus": [
             "MIC-DYN-01",
-            "IF-USB-02",
+            "IF-USB-01",
+            "ARM-DESK-01",
             "HP-REC-01",
-            "CAB-XLR-01"
-          ]
+            "POP-01"
+          ],
+          "total": 590.0
         },
-        "result_summary": "order ord_53c81f89 placed, total 551, ships in 2 days",
-        "latency_ms": 184,
-        "tool_result_id": "run_20260912_223700_6226-tool-11"
+        "result_summary": "Order ord_44aa9598 placed, total $590, ships in 2 days",
+        "latency_ms": 521,
+        "tool_result_id": "run_20260913_104248_2935-tool-11"
       },
       "id": 42,
-      "ts": "2026-09-12T22:37:47.556+10:00"
+      "ts": "2026-09-13T10:43:39.191+10:00"
     },
     {
       "type": "order",
@@ -806,16 +809,17 @@
         "mandate_id": "mandate-001",
         "skus": [
           "MIC-DYN-01",
-          "IF-USB-02",
+          "IF-USB-01",
+          "ARM-DESK-01",
           "HP-REC-01",
-          "CAB-XLR-01"
+          "POP-01"
         ],
-        "order_id": "ord_53c81f89",
+        "order_id": "ord_44aa9598",
         "status": "placed",
-        "total": 522.7
+        "total": 590.0
       },
       "id": 43,
-      "ts": "2026-09-12T22:37:47.592+10:00"
+      "ts": "2026-09-13T10:43:39.241+10:00"
     },
     {
       "type": "message",
@@ -823,22 +827,22 @@
       "lane": "a2a",
       "payload": {
         "from": "merchant_agent",
-        "text": "Order placed: ord_53c81f89, 4 items, total 522.7. Arrives within 2 days."
+        "text": "Order placed: ord_44aa9598, 5 items, total $590. Arrives within 2 days."
       },
       "id": 44,
-      "ts": "2026-09-12T22:37:47.626+10:00"
+      "ts": "2026-09-13T10:43:39.281+10:00"
     },
     {
       "type": "stage",
       "run_id": "golden_happy_path",
       "lane": "system",
       "payload": {
-        "note": "order ord_53c81f89 placed, total 522.7, ships in 2 days",
+        "note": "order ord_44aa9598 placed, total 590, ships in 2 days",
         "stage": "retailer_systems",
         "status": "passed"
       },
       "id": 45,
-      "ts": "2026-09-12T22:37:47.659+10:00"
+      "ts": "2026-09-13T10:43:39.330+10:00"
     }
   ]
 }

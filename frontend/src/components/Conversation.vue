@@ -63,7 +63,10 @@ function time(ts) {
     <header class="brand">
       <div class="brand-lockup">
         <img class="brand-mark" src="/logo-mark.png" alt="" />
-        <h1>MACS</h1>
+        <div>
+          <h1>MACS</h1>
+          <p class="brand-sub">The merchant's agent for AI shoppers</p>
+        </div>
       </div>
       <div class="brand-actions">
         <button v-if="!pipelineVisible" type="button" class="ghost" @click="emit('show-pipeline')">Show pipeline</button>
@@ -89,8 +92,9 @@ function time(ts) {
 
     <div class="thread-wrap scroll">
       <div v-if="!bubbles.length && !running" class="thread-empty">
-        <p>Type what an incoming shopping agent would say, and watch the merchant agent answer it.</p>
-        <p>The pipeline on the right shows every gate, tool call, and proposal behind the reply.</p>
+        <p><strong>You play the buyer's AI agent.</strong> Type what it would ask the store, pick an identity, and run.</p>
+        <p><strong>MACS answers as the merchant.</strong> It verifies the agent, decodes what the buyer needs, composes a bundle from the catalogue, negotiates within the merchant's rules, and places the order.</p>
+        <p>Every step behind the reply appears in the pipeline on the right.</p>
       </div>
       <ol ref="thread" class="thread">
         <li v-for="m in bubbles" :key="m.id" :class="['bubble', m.from]">

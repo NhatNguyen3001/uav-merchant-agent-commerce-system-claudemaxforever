@@ -114,7 +114,7 @@ async def test_custom_query_with_unregistered_agent_blocks(app):
         run_id = (await c.post("/api/runs", json={"agent_id": "buyer-999", "query": "anything"})).json()["run_id"]
         events = await _drain_sse(c, run_id)
         assert events[-1]["payload"] == {"stage": "inbound_gate", "status": "blocked",
-                                         "note": "no credential on file for agent buyer-999"}
+                                         "note": "No credential on file for agent buyer-999. Unregistered agents are refused."}
 
 
 async def test_delete_run_and_clear_history_keep_golden(app, seeded_store):

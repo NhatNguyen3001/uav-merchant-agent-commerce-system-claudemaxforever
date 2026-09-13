@@ -7,6 +7,7 @@ from typing import Any
 from fastmcp import Client
 
 from macs.emitter import Emitter
+from macs.graph.gates import money
 
 
 class ToolCaller:
@@ -31,15 +32,20 @@ class ToolCaller:
         return data, tool_result_id
 
 
+def _names(rows: list[dict], limit: int) -> str:
+    shown = ", ".join(r.get("name", r["sku"]) for r in rows[:limit])
+    return shown + (f", and {len(rows) - limit} more" if len(rows) > limit else "")
+
+
 def _summarise(name: str, data: Any) -> str:
     if name == "semantic_search":
-        return "top matches: " + ", ".join(f"{h['sku']} ({h['distance']:.3f})" for h in data[:5])
+        return f"{len(data)} closest matches: {_names(data, 5)}"
     if name == "search_products":
-        return f"{len(data)} products after hard filters: " + ", ".join(p["sku"] for p in data[:8])
+        return f"{len(data)} products within budget, delivery, and stock limits: {_names(data, 6)}"
     if name == "get_shipping":
-        return f"{data['sku']}: ships in {data['ship_days']} day{'s' if data['ship_days'] != 1 else ''}, {data['stock']} in stock"
+        return f"{data['sku']} ships in {data['ship_days']} day{'s' if data['ship_days'] != 1 else ''}, {data['stock']} in stock"
     if name == "create_order":
         days = data.get("ship_days")
         when = f", ships in {days} day{'s' if days != 1 else ''}" if days is not None else ""
-        return f"order {data['order_id']} {data['status']}, total {data['total']}{when}"
+        return f"Order {data['order_id']} {data['status']}, total {money(data['total'])}{when}"
     return json.dumps(data)[:160]

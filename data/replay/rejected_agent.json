@@ -1,8 +1,8 @@
 {
   "run": {
-    "finished_at": "2026-09-12T12:42:09+10:00",
+    "finished_at": "2026-09-13T10:34:26+10:00",
     "scenario": "rejected_agent",
-    "started_at": "2026-09-12T12:42:06+10:00",
+    "started_at": "2026-09-13T10:34:22+10:00",
     "summary": {
       "bundle_price": null,
       "order_status": "none",
@@ -29,7 +29,7 @@
         "status": "running"
       },
       "id": 1,
-      "ts": "2026-09-12T12:42:08.131+10:00"
+      "ts": "2026-09-13T10:34:24.366+10:00"
     },
     {
       "type": "message",
@@ -40,7 +40,7 @@
         "text": "Looking for a podcast microphone under 200."
       },
       "id": 2,
-      "ts": "2026-09-12T12:42:08.326+10:00"
+      "ts": "2026-09-13T10:34:24.782+10:00"
     },
     {
       "type": "stage",
@@ -52,7 +52,7 @@
         "status": "passed"
       },
       "id": 3,
-      "ts": "2026-09-12T12:42:08.514+10:00"
+      "ts": "2026-09-13T10:34:25.035+10:00"
     },
     {
       "type": "stage",
@@ -64,7 +64,18 @@
         "status": "running"
       },
       "id": 4,
-      "ts": "2026-09-12T12:42:08.696+10:00"
+      "ts": "2026-09-13T10:34:25.252+10:00"
+    },
+    {
+      "type": "message",
+      "run_id": "golden_rejected_agent",
+      "lane": "a2a",
+      "payload": {
+        "from": "merchant_agent",
+        "text": "Cannot proceed. No credential on file for agent buyer-999. Unregistered agents are refused."
+      },
+      "id": 5,
+      "ts": "2026-09-13T10:34:25.724+10:00"
     },
     {
       "type": "gate",
@@ -74,23 +85,23 @@
         "gate": "inbound",
         "after": null,
         "before": null,
-        "reason": "no credential on file for agent buyer-999",
+        "reason": "No credential on file for agent buyer-999. Unregistered agents are refused.",
         "verdict": "blocked"
       },
-      "id": 5,
-      "ts": "2026-09-12T12:42:09.080+10:00"
+      "id": 6,
+      "ts": "2026-09-13T10:34:25.951+10:00"
     },
     {
       "type": "stage",
       "run_id": "golden_rejected_agent",
       "lane": "system",
       "payload": {
-        "note": "no credential on file for agent buyer-999",
+        "note": "No credential on file for agent buyer-999. Unregistered agents are refused.",
         "stage": "inbound_gate",
         "status": "blocked"
       },
-      "id": 6,
-      "ts": "2026-09-12T12:42:09.262+10:00"
+      "id": 7,
+      "ts": "2026-09-13T10:34:26.183+10:00"
     }
   ]
 }

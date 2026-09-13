@@ -105,7 +105,9 @@ code { font: inherit; font-weight: 500; }
 .brand { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 10px; gap: 8px; }
 .brand-lockup { display: flex; align-items: center; gap: 10px; }
 .brand-mark { width: 32px; height: 32px; object-fit: contain; }
-.brand h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--ink); }
+.brand h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--ink); line-height: 1.1; }
+.brand-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
+.brand-actions .ghost { white-space: nowrap; }
 .brand-actions { display: flex; align-items: center; gap: 4px; }
 .empty { color: var(--muted); font-size: 14px; padding: 6px 8px; }
 
@@ -162,11 +164,19 @@ code { font: inherit; font-weight: 500; }
 
 /* Composer, pinned at the bottom of the panel */
 .composer { padding: 12px 18px 14px; border-top: 1px solid var(--hair); background: var(--paper-2); display: grid; gap: 8px; }
-.composer-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: stretch; }
-.agent {
-  border: 1px solid var(--hair); border-radius: 8px; background: var(--card); padding: 0 10px; min-width: 0; height: 38px;
-  color: var(--ink-2); font-size: 14px;
+.composer-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; }
+.agents { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 4px; }
+.agents legend { font-size: 12.5px; color: var(--muted); padding: 0; margin-bottom: 4px; }
+.agent-card {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px;
+  padding: 5px 9px; border: 1px solid var(--hair); border-radius: 8px; cursor: pointer; font-size: 14px; color: var(--ink-2);
 }
+.agent-card input { margin: 0; accent-color: var(--pass); }
+.agent-card.picked { border-color: var(--pass); color: var(--ink); background: rgba(88, 127, 252, 0.06); }
+.agent-card.refused.picked { border-color: var(--blocked-fill); background: rgba(255, 134, 146, 0.1); }
+.agent-label { line-height: 1.3; }
+.agent-id { font-size: 12.5px; color: var(--muted); }
+.run-btn { height: 40px; padding: 0 22px; }
 .query {
   resize: none; min-height: 68px; max-height: 180px; padding: 10px 12px; line-height: 1.5; width: 100%;
   border: 1px solid var(--hair); border-radius: 8px; background: var(--card); font-size: 16.5px;

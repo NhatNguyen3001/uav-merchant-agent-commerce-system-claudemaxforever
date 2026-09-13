@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Callable
 
 from macs.emitter import Emitter
-from macs.graph.gates import check_execution, check_inbound, check_outbound
+from macs.graph.gates import check_execution, check_inbound, check_outbound, money
 from macs.graph.tools import ToolCaller
 from macs.llm import LLM
 from macs.models import BuyerDecision, HardRules, Intent, MerchantRequest, Proposal
@@ -93,7 +93,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         req = MerchantRequest.model_validate(state["request"])
         r = check_inbound(store, req, now)
         if r.verdict == "blocked":
-            em.message("merchant_agent", f"Cannot proceed: {r.reason}.")
+            em.message("merchant_agent", f"Cannot proceed. {r.reason}")
         em.gate("inbound", r.verdict, r.reason)
         return {"credential": r.credential, "mandate": r.mandate, "blocked": r.verdict == "blocked",
                 "gate_results": state["gate_results"] + [{"gate": "inbound", "verdict": r.verdict}]}
@@ -146,10 +146,10 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
             delivery = (f" Delivered within {proposal.delivery_days} day{'s' if proposal.delivery_days != 1 else ''}, "
                         f"{fit} your {deadline}-day window.")
         if proposal.alternative:
-            text = (f"Proposed {len(proposal.items)} items at {proposal.bundle_price:g} "
-                    f"({proposal.discount_pct:g}% bundle discount).{delivery} Alternative at {proposal.alternative.bundle_price:g}.")
+            text = (f"Proposed {len(proposal.items)} items for {money(proposal.bundle_price)} "
+                    f"({proposal.discount_pct:.0f}% bundle discount).{delivery} Alternative at {money(proposal.alternative.bundle_price)}.")
         else:
-            text = f"Proposed {len(proposal.items)} items at {proposal.bundle_price:g}.{delivery}"
+            text = f"Proposed {len(proposal.items)} items for {money(proposal.bundle_price)}.{delivery}"
         em.message("merchant_agent", text)
         em.stage("proposal_engine", "passed", f"{len(proposal.items)} items, coverage {proposal.intent_coverage}")
         return {"proposal": proposal.model_dump()}
@@ -167,7 +167,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         r = check_outbound(proposal, state["candidates"], tools.issued, hard,
                            state["intent"]["hard_constraints"]["deliver_by_days"], shipping)
         if r.verdict == "blocked":
-            em.message("merchant_agent", f"Cannot proceed: {r.reason}.")
+            em.message("merchant_agent", f"Cannot proceed. {r.reason}")
         em.gate("outbound", r.verdict, r.reason, r.before, r.after)
         if r.verdict == "corrected":
             em.emit("a2a", "proposal", r.proposal.model_dump())
@@ -199,7 +199,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         reply = state.get("buyer_reply") or {}
         if reply.get("action") != "accept":
             # Two rounds are up and the buyer's agent has not accepted: nothing is ordered.
-            reason = "buyer's agent did not accept the final proposal; no order placed"
+            reason = "The buyer's agent did not accept the final proposal, so no order was placed."
             em.message("merchant_agent", "No order placed. We could not reach agreement within two rounds; "
                                          "the final proposal stays open until it expires.")
             em.gate("execution", "blocked", reason)
@@ -211,7 +211,7 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
         types = [state["candidates"][i.sku]["type"] for i in proposal.items]
         r = check_execution(proposal, types, state["mandate"], now)
         if r.verdict == "blocked":
-            em.message("merchant_agent", f"Cannot proceed: {r.reason}.")
+            em.message("merchant_agent", f"Cannot proceed. {r.reason}")
         em.gate("execution", r.verdict, r.reason)
         if r.verdict == "blocked":
             order = {"order_id": "", "skus": skus, "total": proposal.bundle_price,
@@ -220,12 +220,13 @@ def make_nodes(store: Store, llm: LLM, tools: ToolCaller, em: Emitter, now: date
             return {"order": order, "blocked": True,
                     "gate_results": state["gate_results"] + [{"gate": "execution", "verdict": "blocked"}]}
         em.stage("retailer_systems", "running")
-        data, _ = await tools.call("create_order", {"skus": skus, "mandate_id": state["mandate"]["mandate_id"]})
+        data, _ = await tools.call("create_order", {"skus": skus, "mandate_id": state["mandate"]["mandate_id"],
+                                                    "total": proposal.bundle_price})
         order = {**data, "total": proposal.bundle_price}
         em.emit("a2a", "order", order)
         days = order.get("ship_days")
         arrival = f" Arrives within {days} day{'s' if days != 1 else ''}." if days is not None else ""
-        em.message("merchant_agent", f"Order placed: {order['order_id']}, {len(skus)} items, total {order['total']:g}.{arrival}")
+        em.message("merchant_agent", f"Order placed: {order['order_id']}, {len(skus)} items, total {money(order['total'])}.{arrival}")
         em.stage("retailer_systems", "passed", f"order {order['order_id']} placed, total {order['total']:g}"
                                                + (f", ships in {days} day{'s' if days != 1 else ''}" if days is not None else ""))
         return {"order": order, "gate_results": state["gate_results"] + [{"gate": "execution", "verdict": "pass"}]}

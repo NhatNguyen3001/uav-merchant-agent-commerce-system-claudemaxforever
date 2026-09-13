@@ -38,26 +38,43 @@ def _parse(ts: str) -> datetime:
     return datetime.fromisoformat(ts)
 
 
+def money(x: float) -> str:
+    """US dollars for people: $179, $522.70, $1,650."""
+    return f"${x:,.0f}" if float(x).is_integer() else f"${x:,.2f}"
+
+
+def _date(ts: str) -> str:
+    return _parse(ts).strftime("%d %b %Y").lstrip("0")
+
+
+def _scope_text(scope: str) -> str:
+    return {"any": "any product category", "audio_equipment": "audio equipment only"}.get(scope, f"scope {scope}")
+
+
+def _label(prod: dict) -> str:
+    return f"{prod.get('name', prod['sku'])} ({prod['sku']})"
+
+
 def check_inbound(store: Store, request: MerchantRequest, now: datetime) -> InboundResult:
     cred = store.get("credentials", request.agent_id)
     if cred is None:
-        return InboundResult("blocked", f"no credential on file for agent {request.agent_id}")
+        return InboundResult("blocked", f"No credential on file for agent {request.agent_id}. Unregistered agents are refused.")
     if cred.get("status") != "active":
-        return InboundResult("blocked", f"credential for {request.agent_id} is {cred.get('status')}")
+        return InboundResult("blocked", f"The credential for {request.agent_id} is {cred.get('status')}.")
     mandate = store.get("mandates", request.mandate_id)
     if mandate is None or mandate.get("agent_id") != request.agent_id:
-        return InboundResult("blocked", f"no mandate {request.mandate_id} for agent {request.agent_id}", cred)
+        return InboundResult("blocked", f"No mandate {request.mandate_id} on file for agent {request.agent_id}.", cred)
     if _parse(mandate["expires_at"]) <= now:
-        return InboundResult("blocked", f"mandate {request.mandate_id} expired at {mandate['expires_at']}", cred, mandate)
+        return InboundResult("blocked", f"Mandate {request.mandate_id} expired on {_date(mandate['expires_at'])}.", cred, mandate)
     patterns = (store.get("injection_patterns", "current") or {}).get("phrases", [])
     text = " ".join([request.raw_query] + [m.content for m in request.conversation]).lower()
     for phrase in patterns:
         if phrase.lower() in text:
-            return InboundResult("blocked", f"injection pattern matched: '{phrase}'", cred, mandate)
+            return InboundResult("blocked", f"The message contains a blocked phrase: '{phrase}'.", cred, mandate)
     cap = mandate.get("spend_cap")
-    cap_text = f"cap {cap:g} {mandate['currency']}" if cap is not None else "no spend cap"
-    return InboundResult("pass", f"agent {request.agent_id} verified; mandate {cap_text}, "
-                                 f"scope {mandate['scope']}, expires {mandate['expires_at']}", cred, mandate)
+    cap_text = f"spend cap {money(cap)} {mandate['currency']}" if cap is not None else "no spend cap"
+    return InboundResult("pass", f"{request.agent_id} is a registered agent. Mandate: {cap_text}, "
+                                 f"{_scope_text(mandate['scope'])}, valid until {_date(mandate['expires_at'])}.", cred, mandate)
 
 
 def check_outbound(proposal: Proposal, candidates: dict[str, dict], valid_ids: set[str],
@@ -72,27 +89,27 @@ def check_outbound(proposal: Proposal, candidates: dict[str, dict], valid_ids: s
     for item in p.items:
         if item.sku not in candidates or not item.grounded_on or any(
                 ref.tool_result_id not in valid_ids or ref.sku != item.sku for ref in item.grounded_on):
-            return OutboundResult("blocked", f"item {item.sku} is not grounded in a tool result of this run", p)
+            return OutboundResult("blocked", f"{item.name} ({item.sku}) was not returned by any catalogue lookup in this run.", p)
     for item in p.items:
         prod = candidates[item.sku]
         if prod["ship_days"] > deliver_by_days:
-            return OutboundResult("blocked", f"item {item.sku} ships in {prod['ship_days']} days, deadline is {deliver_by_days}", p)
+            return OutboundResult("blocked", f"{_label(prod)} ships in {prod['ship_days']} days; the deadline is {deliver_by_days} days.", p)
         if prod["stock"] < 1:
-            return OutboundResult("blocked", f"item {item.sku} is out of stock", p)
+            return OutboundResult("blocked", f"{_label(prod)} is out of stock.", p)
     slowest = max(candidates[i.sku]["ship_days"] for i in p.items) if p.items else 0
     if p.delivery_days != slowest:
         if p.delivery_days is not None:
-            notes.append(f"delivery promise {p.delivery_days} days corrected to {slowest} (slowest item)")
+            notes.append(f"delivery promise corrected from {p.delivery_days} to {slowest} days (slowest item)")
         p.delivery_days = slowest
 
     for item in p.items:
         prod = candidates[item.sku]
         if item.price != prod["list_price"]:
-            notes.append(f"{item.sku} price {item.price:g} corrected to list {prod['list_price']:g}")
+            notes.append(f"{_label(prod)} price {money(item.price)} corrected to the list price {money(prod['list_price'])}")
             item.price = prod["list_price"]
         certs = (prod.get("sustainability") or {}).get("certifications") or []
         if "values" in item.satisfies and not certs:
-            notes.append(f"{item.sku} has no certification; sustainability claim removed")
+            notes.append(f"{_label(prod)} has no certification, so its sustainability claim was removed")
             item.satisfies = [s for s in item.satisfies if s != "values"]
 
     list_sum = sum(candidates[i.sku]["list_price"] for i in p.items)
@@ -100,11 +117,13 @@ def check_outbound(proposal: Proposal, candidates: dict[str, dict], valid_ids: s
     before = {"bundle_price": p.bundle_price, "discount_pct": p.discount_pct}
     cap_price = round(list_sum * (1 - hard.max_discount_pct / 100))
     if p.bundle_price < cap_price:
-        notes.append(f"bundle discount {p.discount_pct:g}% exceeds merchant cap of {hard.max_discount_pct:g}%")
+        actual = (1 - p.bundle_price / list_sum) * 100 if list_sum else 0
+        notes.append(f"price {money(p.bundle_price)} is a {actual:.0f}% discount, above the merchant cap of "
+                     f"{hard.max_discount_pct:g}%, so it was raised to {money(cap_price)}")
         p.bundle_price = cap_price
     floor_price = math.ceil(cost_sum / (1 - hard.min_margin_pct / 100))
     if p.bundle_price < floor_price:
-        notes.append(f"bundle margin below floor of {hard.min_margin_pct:g}%")
+        notes.append(f"price raised to {money(floor_price)} to keep the margin above {hard.min_margin_pct:g}%")
         p.bundle_price = floor_price
     p.discount_pct = round((1 - p.bundle_price / list_sum) * 100, 1) if list_sum else 0.0
 
@@ -117,36 +136,38 @@ def check_outbound(proposal: Proposal, candidates: dict[str, dict], valid_ids: s
             alt_skus = [i.sku for i in p.items if candidates[i.sku]["type"] != alt_type] + [alt.sku]
         unknown = [s for s in alt_skus if s not in candidates]
         if unknown:
-            notes.append(f"alternative references {', '.join(unknown)} outside this run's tool results; removed")
+            notes.append(f"alternative referenced {', '.join(unknown)}, which no lookup returned, so it was removed")
             p.alternative = None
         else:
             alt_list = sum(candidates[s]["list_price"] for s in alt_skus)
             alt_cap = round(alt_list * (1 - hard.max_discount_pct / 100))
             if alt.bundle_price < alt_cap:
-                notes.append(f"alternative bundle {alt.bundle_price:g} corrected to {alt_cap:g}")
+                notes.append(f"alternative price {money(alt.bundle_price)} corrected to {money(alt_cap)}")
                 alt.bundle_price = alt_cap
 
     after = {"bundle_price": p.bundle_price, "discount_pct": p.discount_pct}
-    delivery = f"delivers in {slowest} day{'s' if slowest != 1 else ''} against a {deliver_by_days}-day deadline"
+    delivery = f"Delivers in {slowest} day{'s' if slowest != 1 else ''} against a {deliver_by_days}-day deadline."
     if notes:
-        return OutboundResult("corrected", "; ".join(notes) + f"; {delivery}", p, before, after)
-    return OutboundResult("pass", f"bundle {p.bundle_price:g} within discount cap and margin floor; all items grounded; {delivery}", p)
+        return OutboundResult("corrected", "Corrected: " + "; ".join(notes) + f". {delivery}", p, before, after)
+    return OutboundResult("pass", f"Bundle {money(p.bundle_price)} stays within the {hard.max_discount_pct:g}% discount cap and above "
+                                  f"the margin floor. Every item came from a catalogue lookup. {delivery}", p)
 
 
 def check_execution(proposal: Proposal, item_types: list[str], mandate: dict, now: datetime) -> ExecutionResult:
     if not mandate.get("signature"):
-        return ExecutionResult("blocked", "mandate signature missing")
+        return ExecutionResult("blocked", "The mandate signature is missing.")
     if _parse(mandate["expires_at"]) <= now:
-        return ExecutionResult("blocked", f"mandate expired at {mandate['expires_at']}")
+        return ExecutionResult("blocked", f"The mandate expired on {_date(mandate['expires_at'])}.")
     scope = mandate.get("scope")
     if scope == "audio_equipment":
         if any(t not in AUDIO_TYPES for t in item_types):
-            return ExecutionResult("blocked", f"items outside mandate scope {scope}")
+            return ExecutionResult("blocked", f"The bundle includes items outside the mandate scope ({_scope_text(scope)}).")
     elif scope != "any":
-        return ExecutionResult("blocked", f"unsupported mandate scope {scope}")
+        return ExecutionResult("blocked", f"Unsupported mandate scope {scope}.")
     cap = mandate.get("spend_cap")
+    total = money(proposal.bundle_price)
     if cap is None:
-        return ExecutionResult("pass", f"total {proposal.bundle_price:g}; mandate has no spend cap; scope and expiry valid")
+        return ExecutionResult("pass", f"Total {total}. The mandate has no spend cap, and its scope and expiry are valid.")
     if proposal.bundle_price > cap:
-        return ExecutionResult("blocked", f"total {proposal.bundle_price:g} exceeds mandate cap {cap:g}")
-    return ExecutionResult("pass", f"total {proposal.bundle_price:g} within cap {cap:g}; scope and expiry valid")
+        return ExecutionResult("blocked", f"Total {total} exceeds the mandate spend cap of {money(cap)}.")
+    return ExecutionResult("pass", f"Total {total} is within the spend cap of {money(cap)}. Scope and expiry are valid.")

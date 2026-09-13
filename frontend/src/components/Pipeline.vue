@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import ProgressBar from './ProgressBar.vue'
 import Transcript from './Transcript.vue'
+import { coverage, days, money, pct } from '../format.js'
 
 const props = defineProps({
   events: { type: Array, required: true },
@@ -19,7 +20,6 @@ const finished = computed(() => {
 const proposal = computed(() => last('proposal')?.payload)
 const order = computed(() => last('order')?.payload)
 const blockedStage = computed(() => [...props.stages].reverse().find((e) => e.payload.status === 'blocked')?.payload)
-const money = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 })
 </script>
 
 <template>
@@ -31,7 +31,7 @@ const money = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits
     <div v-if="finished" class="outcome" :class="order?.status === 'placed' ? 'placed' : 'blocked'">
       <template v-if="order?.status === 'placed'">
         <span class="outcome-title">Order placed</span>
-        <span>{{ proposal.items.length }} items, {{ money(proposal.bundle_price) }} total, {{ (100 - proposal.discount_pct).toFixed(0) }}% of list retained, intent coverage {{ proposal.intent_coverage }}<template v-if="proposal.delivery_days != null">, arrives in {{ proposal.delivery_days }} day{{ proposal.delivery_days === 1 ? '' : 's' }}</template></span>
+        <span>{{ proposal.items.length }} items for {{ money(proposal.bundle_price) }}<template v-if="proposal.delivery_days != null">, delivered in {{ days(proposal.delivery_days) }}</template>. {{ pct(proposal.discount_pct) }} discount, margin kept. {{ coverage(proposal.intent_coverage) }}.</span>
       </template>
       <template v-else>
         <span class="outcome-title">No order</span>

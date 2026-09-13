@@ -47,3 +47,5 @@ async def test_create_order_writes(seeded_store):
         r = await c.call_tool("create_order", {"skus": ["MIC-DYN-01", "HP-REC-01"], "mandate_id": "mandate-001"})
         assert r.data["status"] == "placed" and r.data["total"] == 328 and r.data["ship_days"] == 2
         assert seeded_store.get("orders", r.data["order_id"])["mandate_id"] == "mandate-001"
+        agreed = await c.call_tool("create_order", {"skus": ["MIC-DYN-01", "HP-REC-01"], "mandate_id": "mandate-001", "total": 311.5})
+        assert agreed.data["total"] == 311.5 and seeded_store.get("orders", agreed.data["order_id"])["total"] == 311.5

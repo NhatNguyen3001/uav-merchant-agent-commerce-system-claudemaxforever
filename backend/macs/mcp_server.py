@@ -65,10 +65,10 @@ def build_server(store: Store) -> FastMCP:
         return {"sku": sku, "ship_days": p["ship_days"], "stock": p["stock"]}
 
     @mcp.tool
-    def create_order(skus: list[str], mandate_id: str) -> dict:
-        """Place an order. The only tool that writes."""
+    def create_order(skus: list[str], mandate_id: str, total: float | None = None) -> dict:
+        """Place an order at the agreed bundle price (list total when none is given). The only tool that writes."""
         products = [_product(s) for s in skus]
-        total = sum(p["list_price"] for p in products)
+        total = total if total is not None else sum(p["list_price"] for p in products)
         ship_days = max((p["ship_days"] for p in products), default=0)
         order = {
             "order_id": "ord_" + uuid.uuid4().hex[:8], "skus": skus, "total": total,

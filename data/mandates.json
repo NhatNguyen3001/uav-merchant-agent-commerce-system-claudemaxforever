@@ -3,7 +3,7 @@
     "mandate_id": "mandate-001",
     "agent_id": "buyer-001",
     "spend_cap": null,
-    "currency": "AUD",
+    "currency": "USD",
     "scope": "any",
     "expires_at": "2026-12-31T23:59:59+10:00",
     "signature": "sig_demo_buyer001_ok"
@@ -12,7 +12,7 @@
     "mandate_id": "mandate-002",
     "agent_id": "buyer-002",
     "spend_cap": null,
-    "currency": "AUD",
+    "currency": "USD",
     "scope": "any",
     "expires_at": "2026-12-31T23:59:59+10:00",
     "signature": "sig_demo_buyer002_ok"

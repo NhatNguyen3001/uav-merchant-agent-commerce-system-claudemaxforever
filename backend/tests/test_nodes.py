@@ -63,7 +63,7 @@ async def test_inbound_blocks_rejected_agent(seeded_store):
     assert state["blocked"] is True
     evs = reg.events("r1")
     assert evs[-1]["payload"] == {"stage": "inbound_gate", "status": "blocked",
-                                  "note": "no credential on file for agent buyer-999"}
+                                  "note": "No credential on file for agent buyer-999. Unregistered agents are refused."}
     merchant = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"]
     assert merchant and merchant[-1]["payload"]["text"].startswith("Cannot proceed")
     await client.__aexit__(None, None, None)
@@ -79,7 +79,9 @@ async def test_decode_match_compose_outbound_negotiate(seeded_store):
     assert state["proposal"]["delivery_days"] == 2
     gate = [e for e in reg.events("r1") if e["type"] == "gate" and e["payload"]["gate"] == "outbound"][0]
     assert gate["payload"]["verdict"] == "corrected" and gate["payload"]["after"]["bundle_price"] == 588
-    assert "delivers in 2 days against a 7-day deadline" in gate["payload"]["reason"]
+    assert "Delivers in 2 days against a 7-day deadline." in gate["payload"]["reason"]
+    search = [e for e in reg.events("r1") if e["type"] == "tool" and e["payload"]["name"] == "semantic_search"][0]
+    assert "closest matches: " in search["payload"]["result_summary"] and "MIC-DYN-01" not in search["payload"]["result_summary"]
     shipping_calls = [e for e in reg.events("r1") if e["type"] == "tool" and e["payload"]["name"] == "get_shipping"]
     assert [c["payload"]["args"]["sku"] for c in shipping_calls] == ["MIC-DYN-01", "IF-USB-02", "HP-REC-01", "ARM-DESK-01"]
     merchant = [e for e in reg.events("r1") if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]
@@ -98,7 +100,7 @@ async def test_decode_match_compose_outbound_negotiate(seeded_store):
     evs = reg.events("r1")
     assert evs[-1]["payload"]["stage"] == "retailer_systems"
     closing = [e for e in evs if e["type"] == "message" and e["payload"]["from"] == "merchant_agent"][-1]
-    assert closing["payload"]["text"] == f"Order placed: {state['order']['order_id']}, 4 items, total 588. Arrives within 2 days."
+    assert closing["payload"]["text"] == f"Order placed: {state['order']['order_id']}, 4 items, total $588. Arrives within 2 days."
     assert state["order"]["ship_days"] == 2
     assert evs[-1]["payload"]["note"].endswith("ships in 2 days")
     await client.__aexit__(None, None, None)
