@@ -6,7 +6,7 @@
   <p><i>A retailer-side service that sells to autonomous AI shopping agents: verifies the agent, decodes what the buyer needs, composes a grounded product bundle, negotiates inside the merchant's rules, and places the order. Language models reason; deterministic gates decide.</i></p>
 
   <p>
-    <a href="https://merchant-agent-commerce-system.web.app"><img src="https://img.shields.io/badge/live%20demo-Firebase%20Hosting-587FFC" alt="Live demo"></a>
+    <a href="https://merchant-agent-commerce-system.firebaseapp.com/"><img src="https://img.shields.io/badge/live%20demo-Firebase%20Hosting-587FFC" alt="Live demo"></a>
     <img src="https://img.shields.io/badge/python-3.11-blue" alt="Python">
     <img src="https://img.shields.io/badge/Vue-3-42b883" alt="Vue 3">
     <img src="https://img.shields.io/badge/Claude-Sonnet%205-1E1E5D" alt="Claude Sonnet 5">
@@ -14,6 +14,8 @@
     <img src="https://img.shields.io/badge/tests-65%20passing-brightgreen" alt="Tests">
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
   </p>
+
+  <p><b>Live Demo:</b> <a href="https://merchant-agent-commerce-system.firebaseapp.com/">https://merchant-agent-commerce-system.firebaseapp.com/</a></p>
 
   <p>Built in 16 hours for the UAVS Hackathon 2026 by Team ClaudeMax Forever, in response to the problem statement set by FPT Australasia.</p>
 </div>
