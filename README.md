@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/logo.png" width="110" alt="MACS" />
+  <img src="assets/logo.png" width="170" alt="MACS" />
 
   <h1>MACS: Merchant Agent Commerce System</h1>
 
