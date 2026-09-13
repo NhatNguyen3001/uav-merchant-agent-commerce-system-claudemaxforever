@@ -36,9 +36,15 @@
 
 ## Architecture
 
-![System architecture](assets/architecture.png)
+![MVP architecture](assets/architecture.png)
 
-A request enters through the protocol adapter, passes the inbound gate, and reaches the merchant intelligence layer, which decodes intent, queries retailer systems through MCP tools, composes the proposal, and negotiates. The outbound gate governs every response before it leaves. The execution gate authorises the order against the AP2-style mandate, and the integration gate carries it into the retailer's own catalogue, pricing, and order systems.
+The deployed MVP: a Vue console on Firebase Hosting streams from a FastAPI service on Cloud Run. Inside the service, a LangGraph pipeline calls Claude for intent and proposals, runs the three deterministic gates, and reaches retailer data through FastMCP tools. Firestore holds the catalogue, governance data, run events, and orders; Vertex AI embeds the decoded intent for vector search. An interactive version with guided views is in [`docs/diagrams/architecture.html`](docs/diagrams/architecture.html), generated from [`architecture.archify.json`](docs/diagrams/architecture.archify.json).
+
+### Workflow
+
+![Workflow: how a request moves through the layers](assets/workflow.png)
+
+A request enters through the protocol adapter, passes the inbound gate, and reaches the merchant intelligence layer, which decodes intent, queries retailer systems, composes the proposal, and negotiates. The outbound gate governs every response before it leaves. The execution gate authorises the order against the AP2-style mandate, and the integration layer carries it into the retailer's own catalogue, pricing, and order systems.
 
 ### Request flow
 
@@ -224,7 +230,8 @@ The script builds the backend with Cloud Build, grants the runtime service accou
 │   └── tests/                # pytest suite
 ├── frontend/                 # Vue 3 console (Vite)
 ├── data/                     # Catalogues, merchant rules, mandates, credentials, injection patterns, examples
-├── assets/                   # Logo, architecture diagram, screenshots
+├── assets/                   # Logo, architecture and workflow diagrams, screenshots
+├── docs/diagrams/            # Interactive architecture diagram (Archify) and its source
 ├── docs/superpowers/         # Design specification and implementation plan
 ├── docker-compose.yml
 ├── deploy.sh

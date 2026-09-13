@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "MACS MVP architecture",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1120,
+      640
+    ],
+    "views": [
+      {
+        "id": "request-path",
+        "label": "Request path",
+        "focus": [
+          "console",
+          "api",
+          "graph",
+          "gates",
+          "mcp",
+          "firestore"
+        ],
+        "note": "A typed request streams from the console through the graph, the gates, and the retailer tools to Firestore."
+      },
+      {
+        "id": "model-and-retrieval",
+        "label": "Model and retrieval",
+        "focus": [
+          "graph",
+          "claude",
+          "mcp",
+          "vertex",
+          "firestore"
+        ],
+        "note": "Claude decodes intent and composes proposals; Vertex AI embeds the intent and Firestore vector search returns candidates."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "console",
+      "type": "frontend",
+      "label": "Merchant console",
+      "sublabel": "Vue 3 on Firebase Hosting",
+      "pos": [
+        40,
+        100
+      ],
+      "size": [
+        170,
+        68
+      ],
+      "brand": "vue"
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "FastAPI service",
+      "sublabel": "Cloud Run, SSE stream",
+      "pos": [
+        330,
+        100
+      ],
+      "size": [
+        170,
+        68
+      ]
+    },
+    {
+      "id": "claude",
+      "type": "external",
+      "label": "Claude Sonnet 5",
+      "sublabel": "Anthropic API",
+      "pos": [
+        40,
+        240
+      ],
+      "size": [
+        170,
+        68
+      ],
+      "brand": "claude"
+    },
+    {
+      "id": "graph",
+      "type": "backend",
+      "label": "LangGraph pipeline",
+      "sublabel": "intent, proposal, negotiate",
+      "pos": [
+        330,
+        240
+      ],
+      "size": [
+        170,
+        68
+      ]
+    },
+    {
+      "id": "gates",
+      "type": "security",
+      "label": "Deterministic gates",
+      "sublabel": "inbound, outbound, execution",
+      "pos": [
+        610,
+        240
+      ],
+      "size": [
+        170,
+        68
+      ]
+    },
+    {
+      "id": "mcp",
+      "type": "backend",
+      "label": "FastMCP retailer tools",
+      "sublabel": "search, price, shipping, order",
+      "pos": [
+        330,
+        380
+      ],
+      "size": [
+        170,
+        68
+      ]
+    },
+    {
+      "id": "firestore",
+      "type": "database",
+      "label": "Firestore",
+      "sublabel": "catalogue, runs, orders",
+      "pos": [
+        880,
+        380
+      ],
+      "size": [
+        170,
+        68
+      ],
+      "brand": "google-cloud"
+    },
+    {
+      "id": "vertex",
+      "type": "cloud",
+      "label": "Vertex AI",
+      "sublabel": "text-embedding-005",
+      "pos": [
+        880,
+        520
+      ],
+      "size": [
+        170,
+        68
+      ],
+      "brand": "google-cloud"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "Cloud Run service macs-api",
+      "wraps": [
+        "api",
+        "graph",
+        "gates",
+        "mcp"
+      ],
+      "pad": 28
+    },
+    {
+      "kind": "region",
+      "label": "Google Cloud australia-southeast1",
+      "wraps": [
+        "api",
+        "graph",
+        "gates",
+        "mcp",
+        "firestore",
+        "vertex"
+      ],
+      "pad": 56
+    }
+  ],
+  "connections": [
+    {
+      "id": "console-to-api",
+      "from": "console",
+      "to": "api",
+      "label": "POST /api/runs, SSE events",
+      "variant": "emphasis",
+      "labelDy": 58
+    },
+    {
+      "id": "api-to-graph",
+      "from": "api",
+      "to": "graph",
+      "label": "run",
+      "labelDy": 24
+    },
+    {
+      "id": "graph-to-claude",
+      "from": "graph",
+      "to": "claude",
+      "label": "forced tool calls",
+      "variant": "dashed"
+    },
+    {
+      "id": "graph-to-gates",
+      "from": "graph",
+      "to": "gates",
+      "label": "verdicts"
+    },
+    {
+      "id": "graph-to-mcp",
+      "from": "graph",
+      "to": "mcp",
+      "label": "in-process MCP client",
+      "labelDy": 24
+    },
+    {
+      "id": "mcp-to-firestore",
+      "from": "mcp",
+      "to": "firestore",
+      "label": "reads; create_order writes",
+      "labelDx": 60
+    },
+    {
+      "id": "mcp-to-vertex",
+      "from": "mcp",
+      "to": "vertex",
+      "label": "embed intent",
+      "variant": "dashed",
+      "fromSide": "bottom"
+    },
+    {
+      "id": "gates-to-firestore",
+      "from": "gates",
+      "to": "firestore",
+      "label": "credentials, mandates, rules"
+    },
+    {
+      "id": "api-to-firestore",
+      "from": "api",
+      "to": "firestore",
+      "label": "persist run events",
+      "fromSide": "right",
+      "toSide": "top"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Trust boundary",
+      "items": [
+        "Hard merchant rules are read only by the gates and never enter a prompt",
+        "Every gate verdict is a fixed rule; the model proposes, the gate decides"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Traceability",
+      "items": [
+        "Every price and shipping figure carries the id of the tool result it came from",
+        "Every event is persisted per run, so history and replay read the same stream"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Delivery",
+      "items": [
+        "Cloud Build to Artifact Registry to Cloud Run, key from Secret Manager",
+        "Console built with the Cloud Run URL so SSE bypasses Hosting rewrites"
+      ]
+    }
+  ]
+}
