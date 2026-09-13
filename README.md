@@ -245,12 +245,12 @@ The script builds the backend with Cloud Build, grants the runtime service accou
 | Source | Records | Notes |
 |---|---|---|
 | `data/catalogue.json` | 32 | Hand-built podcasting products the demonstration resolves against, with cost, stock, shipping days, and certifications |
-| `data/catalogue_scraped.json` | 499 | Public Amazon listings (electronics, health and beauty, Kindle books) enriched by `backend/enrich.py` |
+| `data/catalogue_scraped.json` | 499 | Public Amazon listings (electronics, health and beauty, Kindle books) collected with [nexscope.ai](https://nexscope.ai) and enriched by `backend/enrich.py` |
 | `data/merchant_rules.json` | 1 | Hard rules (15 percent discount cap, 20 percent margin floor) and soft guidance |
 | `data/mandates.json`, `data/credentials.json` | 2, 3 | AP2-style mandates and agent credentials, including a revoked credential for the negative path |
 | `data/replay/` | 2 | Recorded live runs: the podcast happy path and the refused unregistered agent |
 
-Enrichment asks Claude Haiku 4.5, ten listings per call, for a product type, who it suits, outcome tags, a one-sentence description, durability, compatibility, and any certification present in the title. Fields a scrape cannot provide are assigned by rule: cost is 60 percent of list price, shipping days are parsed from the delivery text with a default of 3, and stock is 25. The full 499-listing pass took 50 calls and about 90 seconds.
+The raw listings were collected with [nexscope.ai](https://nexscope.ai), the team's tool for extracting product data from Amazon search results, and saved as JSON. Enrichment then asks Claude Haiku 4.5, ten listings per call, for a product type, who it suits, outcome tags, a one-sentence description, durability, compatibility, and any certification present in the title. Fields a scrape cannot provide are assigned by rule: cost is 60 percent of list price, shipping days are parsed from the delivery text with a default of 3, and stock is 25. The full 499-listing pass took 50 calls and about 90 seconds.
 
 ---
 
@@ -295,6 +295,7 @@ Two design decisions came from measurement. Structured outputs and strict tool u
 - [Firestore vector search](https://cloud.google.com/firestore/docs/vector-search) and [Vertex AI embeddings](https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings) for retrieval
 - [FastAPI](https://fastapi.tiangolo.com/), [Pydantic](https://docs.pydantic.dev/), [Vue](https://vuejs.org/), and [Vite](https://vite.dev/)
 - Fonts by [IBM Plex](https://github.com/IBM/plex) and [JetBrains Mono](https://www.jetbrains.com/lp/mono/) via Fontsource
+- [nexscope.ai](https://nexscope.ai) for collecting the Amazon product listings used in the catalogue
 - Problem statement by FPT Australasia for the UAVS Hackathon 2026
 - AI coding assistants (Claude Code) were used under team review, as permitted by the hackathon rulebook
 
