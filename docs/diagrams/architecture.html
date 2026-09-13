@@ -5032,13 +5032,15 @@
         <!-- Boundaries (behind everything) -->
         <rect data-graph-role="structural-frame" data-composition-frame-kind="security-group" data-composition-frame-id="0" data-composition-frame-label="Cloud Run service macs-api, australia-southeast1" x="300" y="70" width="510" height="398" rx="8" class="c-security-group" stroke-width="1"/>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="Google Cloud managed services, australia-southeast1" x="839.5225653451613" y="350" width="250.95486930967743" height="258" rx="12" class="c-region" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="Google Cloud, australia-southeast1" x="850" y="350" width="230" height="258" rx="12" class="c-region" stroke-width="1"/>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="2" data-composition-frame-label="Google Cloud, Firebase Hosting (global)" x="10" y="240" width="230" height="118" rx="12" class="c-region" stroke-width="1"/>
 
         <!-- Connection paths (before components for correct z-order) -->
         <path data-edge-from="console" data-edge-to="api" data-edge-label="POST /api/runs, SSE events" data-edge-key="0" data-edge-id="console-to-api" data-composition-points="210,134;330,134" d="M 210 134 L 330 134" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="hosting" data-edge-to="console" data-edge-label="static assets over HTTPS" data-edge-key="1" data-edge-id="hosting-to-console" data-composition-points="125,240;125,168" d="M 125 240 L 125 168" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="hosting" data-edge-to="console" data-edge-label="static assets over HTTPS" data-edge-key="1" data-edge-id="hosting-to-console" data-composition-points="125,270;125,168" d="M 125 270 L 125 168" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="api" data-edge-to="graph" data-edge-label="run" data-edge-key="2" data-edge-id="api-to-graph" data-composition-points="415,168;415,240" d="M 415 168 L 415 240" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="graph" data-edge-to="claude" data-edge-label="forced tool calls" data-edge-key="3" data-edge-id="graph-to-claude" data-composition-points="330,274;270,274;270,414;210,414" d="M 330 274 L 278 274 Q 270 274 270 282 L 270 406 Q 270 414 262 414 L 210 414" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="graph" data-edge-to="claude" data-edge-label="forced tool calls" data-edge-key="3" data-edge-id="graph-to-claude" data-composition-points="330,274;270,274;270,444;210,444" d="M 330 274 L 278 274 Q 270 274 270 282 L 270 436 Q 270 444 262 444 L 210 444" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
         <path data-edge-from="graph" data-edge-to="gates" data-edge-label="verdicts" data-edge-key="4" data-edge-id="graph-to-gates" data-composition-points="500,274;610,274" d="M 500 274 L 610 274" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="graph" data-edge-to="mcp" data-edge-label="in-process MCP client" data-edge-key="5" data-edge-id="graph-to-mcp" data-composition-points="415,308;415,380" d="M 415 308 L 415 380" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="mcp" data-edge-to="firestore" data-edge-label="reads; create_order writes" data-edge-key="6" data-edge-id="mcp-to-firestore" data-composition-points="500,421;880,421" d="M 500 421 L 880 421" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
@@ -5066,20 +5068,20 @@
         <text data-detail="context" x="125" y="148" class="t-muted" font-size="9" text-anchor="middle">Vue 3 single-page app</text>
         </g>
 
-        <g id="node-hosting" data-node-id="hosting" data-node-label="Firebase Hosting" tabindex="0" role="button" aria-label="Focus Firebase Hosting, serves the console build, Architecture component, Firebase" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="serves the console build" data-node-context="Architecture component" data-node-brand="Firebase" data-node-brand-id="firebase" data-node-brand-status="preset" data-node-brand-source="https://firebase.google.com/brand-guidelines">
-          <title>Firebase Hosting · serves the console build · Architecture component · Firebase</title>
-          <rect x="40" y="240" width="170" height="68" rx="6" class="c-mask"/>
-          <rect x="40" y="240" width="170" height="68" rx="6" class="c-cloud" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(46 246) scale(0.6875)">
+        <g id="node-hosting" data-node-id="hosting" data-node-label="Firebase Hosting" tabindex="0" role="button" aria-label="Focus Firebase Hosting, serves the console build, Google Cloud, Firebase Hosting (global), Firebase" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="serves the console build" data-node-context="Google Cloud, Firebase Hosting (global)" data-node-brand="Firebase" data-node-brand-id="firebase" data-node-brand-status="preset" data-node-brand-source="https://firebase.google.com/brand-guidelines">
+          <title>Firebase Hosting · serves the console build · Google Cloud, Firebase Hosting (global) · Firebase</title>
+          <rect x="40" y="270" width="170" height="68" rx="6" class="c-mask"/>
+          <rect x="40" y="270" width="170" height="68" rx="6" class="c-cloud" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(46 276) scale(0.6875)">
             <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
           </g>
-          <g aria-hidden="true" data-brand-mark="firebase" data-brand-title="Firebase" data-brand-status="preset" data-brand-source="https://firebase.google.com/brand-guidelines" class="brand-mark" transform="translate(188 246)">
+          <g aria-hidden="true" data-brand-mark="firebase" data-brand-title="Firebase" data-brand-status="preset" data-brand-source="https://firebase.google.com/brand-guidelines" class="brand-mark" transform="translate(188 276)">
             <rect width="16" height="16" rx="4" class="brand-mark-badge"/>
             <path d="M19.455 8.369c-.538-.748-1.778-2.285-3.681-4.569-.826-.991-1.535-1.832-1.884-2.245a146 146 0 0 0-.488-.576l-.207-.245-.113-.133-.022-.032-.01-.005L12.57 0l-.609.488c-1.555 1.246-2.828 2.851-3.681 4.64-.523 1.064-.864 2.105-1.043 3.176-.047.241-.088.489-.121.738-.209-.017-.421-.028-.632-.033-.018-.001-.035-.002-.059-.003a7.46 7.46 0 0 0-2.28.274l-.317.089-.163.286c-.765 1.342-1.198 2.869-1.252 4.416-.07 2.01.477 3.954 1.583 5.625 1.082 1.633 2.61 2.882 4.42 3.611l.236.095.071.025.003-.001a9.59 9.59 0 0 0 2.941.568q.171.006.342.006c1.273 0 2.513-.249 3.69-.742l.008.004.313-.145a9.63 9.63 0 0 0 3.927-3.335c1.01-1.49 1.577-3.234 1.641-5.042.075-2.161-.643-4.304-2.133-6.371m-7.083 6.695c.328 1.244.264 2.44-.191 3.558-1.135-1.12-1.967-2.352-2.475-3.665-.543-1.404-.87-2.74-.974-3.975.48.157.922.366 1.315.622 1.132.737 1.914 1.902 2.325 3.461zm.207 6.022c.482.368.99.712 1.513 1.028-.771.21-1.565.302-2.369.273a8 8 0 0 1-.373-.022c.458-.394.869-.823 1.228-1.279zm1.347-6.431c-.516-1.957-1.527-3.437-3.002-4.398-.647-.421-1.385-.741-2.194-.95.011-.134.026-.268.043-.4.014-.113.03-.216.046-.313.133-.689.332-1.37.589-2.025.099-.25.206-.499.321-.74l.004-.008c.177-.358.376-.719.61-1.105l.092-.152-.003-.001c.544-.851 1.197-1.627 1.942-2.311l.288.341c.672.796 1.304 1.548 1.878 2.237 1.291 1.549 2.966 3.583 3.612 4.48 1.277 1.771 1.893 3.579 1.83 5.375-.049 1.395-.461 2.755-1.195 3.933-.694 1.116-1.661 2.05-2.8 2.708-.636-.318-1.559-.839-2.539-1.599.79-1.575.952-3.28.479-5.072zm-2.575 5.397c-.725.939-1.587 1.55-2.09 1.856-.081-.029-.163-.06-.243-.093l-.065-.026c-1.49-.616-2.747-1.656-3.635-3.01-.907-1.384-1.356-2.993-1.298-4.653.041-1.19.338-2.327.882-3.379.316-.07.638-.114.96-.131l.084-.002c.162-.003.324-.003.478 0 .227.011.454.035.677.07.073 1.513.445 3.145 1.105 4.852.637 1.644 1.694 3.162 3.144 4.515z" transform="translate(3 3) scale(0.4166666666666667)" fill="#DD2C00"/>
             <rect width="16" height="16" rx="4" class="brand-mark-frame"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="125" y="272" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Firebase Hosting</text>
-        <text data-detail="context" x="125" y="288" class="t-muted" font-size="9" text-anchor="middle">serves the console build</text>
+          <text data-node-label="" data-detail-anchor="" x="125" y="302" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Firebase Hosting</text>
+        <text data-detail="context" x="125" y="318" class="t-muted" font-size="9" text-anchor="middle">serves the console build</text>
         </g>
 
         <g id="node-api" data-node-id="api" data-node-label="FastAPI service" tabindex="0" role="button" aria-label="Focus FastAPI service, Cloud Run, SSE stream, Cloud Run service macs-api, australia-southeast1" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Cloud Run, SSE stream" data-node-context="Cloud Run service macs-api, australia-southeast1">
@@ -5095,19 +5097,19 @@
 
         <g id="node-claude" data-node-id="claude" data-node-label="Claude Sonnet 5" tabindex="0" role="button" aria-label="Focus Claude Sonnet 5, Anthropic API, Architecture component, Claude" aria-pressed="false" data-node-kind="external" data-node-sublabel="Anthropic API" data-node-context="Architecture component" data-node-brand="Claude" data-node-brand-id="claude" data-node-brand-status="preset" data-node-brand-source="https://claude.ai">
           <title>Claude Sonnet 5 · Anthropic API · Architecture component · Claude</title>
-          <rect x="40" y="380" width="170" height="68" rx="6" class="c-mask"/>
-          <rect x="40" y="380" width="170" height="68" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(46 386) scale(0.6875)">
+          <rect x="40" y="410" width="170" height="68" rx="6" class="c-mask"/>
+          <rect x="40" y="410" width="170" height="68" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(46 416) scale(0.6875)">
             <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
-          <g aria-hidden="true" data-brand-mark="claude" data-brand-title="Claude" data-brand-status="preset" data-brand-source="https://claude.ai" class="brand-mark" transform="translate(188 386)">
+          <g aria-hidden="true" data-brand-mark="claude" data-brand-title="Claude" data-brand-status="preset" data-brand-source="https://claude.ai" class="brand-mark" transform="translate(188 416)">
             <rect width="16" height="16" rx="4" class="brand-mark-badge"/>
             <path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z" transform="translate(3 3) scale(0.4166666666666667)" fill="#D97757"/>
             <rect width="16" height="16" rx="4" class="brand-mark-frame"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="125" y="412" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Claude Sonnet 5</text>
-        <text data-detail="context" x="125" y="428" class="t-muted" font-size="9" text-anchor="middle">Anthropic API</text>
+          <text data-node-label="" data-detail-anchor="" x="125" y="442" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Claude Sonnet 5</text>
+        <text data-detail="context" x="125" y="458" class="t-muted" font-size="9" text-anchor="middle">Anthropic API</text>
         </g>
 
         <g id="node-graph" data-node-id="graph" data-node-label="LangGraph pipeline" tabindex="0" role="button" aria-label="Focus LangGraph pipeline, intent, proposal, negotiate, Cloud Run service macs-api, australia-southeast1" aria-pressed="false" data-node-kind="backend" data-node-sublabel="intent, proposal, negotiate" data-node-context="Cloud Run service macs-api, australia-southeast1">
@@ -5144,8 +5146,8 @@
         <text data-detail="context" x="415" y="428" class="t-muted" font-size="9" text-anchor="middle">search, price, shipping, order</text>
         </g>
 
-        <g id="node-firestore" data-node-id="firestore" data-node-label="Firestore" tabindex="0" role="button" aria-label="Focus Firestore, catalogue, runs, orders, Google Cloud managed services, australia-southeast1, Google Cloud" aria-pressed="false" data-node-kind="database" data-node-sublabel="catalogue, runs, orders" data-node-context="Google Cloud managed services, australia-southeast1" data-node-brand="Google Cloud" data-node-brand-id="google-cloud" data-node-brand-status="preset" data-node-brand-source="https://cloud.google.com">
-          <title>Firestore · catalogue, runs, orders · Google Cloud managed services, australia-southeast1 · Google Cloud</title>
+        <g id="node-firestore" data-node-id="firestore" data-node-label="Firestore" tabindex="0" role="button" aria-label="Focus Firestore, catalogue, runs, orders, Google Cloud, australia-southeast1, Google Cloud" aria-pressed="false" data-node-kind="database" data-node-sublabel="catalogue, runs, orders" data-node-context="Google Cloud, australia-southeast1" data-node-brand="Google Cloud" data-node-brand-id="google-cloud" data-node-brand-status="preset" data-node-brand-source="https://cloud.google.com">
+          <title>Firestore · catalogue, runs, orders · Google Cloud, australia-southeast1 · Google Cloud</title>
           <rect x="880" y="380" width="170" height="68" rx="6" class="c-mask"/>
           <rect x="880" y="380" width="170" height="68" rx="6" class="c-database" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(886 386) scale(0.6875)">
@@ -5161,8 +5163,8 @@
         <text data-detail="context" x="965" y="428" class="t-muted" font-size="9" text-anchor="middle">catalogue, runs, orders</text>
         </g>
 
-        <g id="node-vertex" data-node-id="vertex" data-node-label="Vertex AI" tabindex="0" role="button" aria-label="Focus Vertex AI, text-embedding-005, Google Cloud managed services, australia-southeast1, Google Cloud" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="text-embedding-005" data-node-context="Google Cloud managed services, australia-southeast1" data-node-brand="Google Cloud" data-node-brand-id="google-cloud" data-node-brand-status="preset" data-node-brand-source="https://cloud.google.com">
-          <title>Vertex AI · text-embedding-005 · Google Cloud managed services, australia-southeast1 · Google Cloud</title>
+        <g id="node-vertex" data-node-id="vertex" data-node-label="Vertex AI" tabindex="0" role="button" aria-label="Focus Vertex AI, text-embedding-005, Google Cloud, australia-southeast1, Google Cloud" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="text-embedding-005" data-node-context="Google Cloud, australia-southeast1" data-node-brand="Google Cloud" data-node-brand-id="google-cloud" data-node-brand-status="preset" data-node-brand-source="https://cloud.google.com">
+          <title>Vertex AI · text-embedding-005 · Google Cloud, australia-southeast1 · Google Cloud</title>
           <rect x="880" y="520" width="170" height="68" rx="6" class="c-mask"/>
           <rect x="880" y="520" width="170" height="68" rx="6" class="c-cloud" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(886 526) scale(0.6875)">
@@ -5183,16 +5185,16 @@
           <text x="270" y="182" class="t-backend" font-size="8" text-anchor="middle">POST /api/runs, SSE events</text>
         </g>
         <g data-detail="context" data-edge-from="hosting" data-edge-to="console" data-edge-label="static assets over HTTPS" data-edge-key="1" data-edge-id="hosting-to-console">
-          <rect x="62.400000000000006" y="220" width="125.19999999999999" height="14" rx="3" class="c-mask"/>
-          <text x="125" y="230" class="t-muted" font-size="8" text-anchor="middle">static assets over HTTPS</text>
+          <rect x="62.400000000000006" y="230" width="125.19999999999999" height="14" rx="3" class="c-mask"/>
+          <text x="125" y="240" class="t-muted" font-size="8" text-anchor="middle">static assets over HTTPS</text>
         </g>
         <g data-detail="context" data-edge-from="api" data-edge-to="graph" data-edge-label="run" data-edge-key="2" data-edge-id="api-to-graph">
           <rect x="400" y="172" width="30" height="14" rx="3" class="c-mask"/>
           <text x="415" y="182" class="t-muted" font-size="8" text-anchor="middle">run</text>
         </g>
         <g data-detail="context" data-edge-from="graph" data-edge-to="claude" data-edge-label="forced tool calls" data-edge-key="3" data-edge-id="graph-to-claude">
-          <rect x="224.2" y="324" width="91.6" height="14" rx="3" class="c-mask"/>
-          <text x="270" y="334" class="t-messagebus" font-size="8" text-anchor="middle">forced tool calls</text>
+          <rect x="224.2" y="339" width="91.6" height="14" rx="3" class="c-mask"/>
+          <text x="270" y="349" class="t-messagebus" font-size="8" text-anchor="middle">forced tool calls</text>
         </g>
         <g data-detail="context" data-edge-from="graph" data-edge-to="gates" data-edge-label="verdicts" data-edge-key="4" data-edge-id="graph-to-gates">
           <rect x="530.8" y="254" width="48.4" height="14" rx="3" class="c-mask"/>
@@ -5225,9 +5227,14 @@
           <text data-boundary-label="" x="308" y="93" class="t-security" font-size="9" font-weight="600">Cloud Run service macs-api, australia-southeast1</text>
         </g>
 
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="Google Cloud managed services, australia-southeast1">
-          <rect data-graph-role="structural-frame-label-mask" x="843.5225653451613" y="360" width="242.95486930967743" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" x="847.5225653451613" y="371.61290422580646" class="t-cloud" font-size="7.612904225806453" font-weight="600">Google Cloud managed services, australia-southeast1</text>
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="Google Cloud, australia-southeast1">
+          <rect data-graph-role="structural-frame-label-mask" x="854" y="360" width="193.6" height="16" rx="3" class="c-mask"/>
+          <text data-boundary-label="" x="858" y="373" class="t-cloud" font-size="9" font-weight="600">Google Cloud, australia-southeast1</text>
+        </g>
+
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="2" data-composition-frame-kind="region" data-composition-frame-label="Google Cloud, Firebase Hosting (global)">
+          <rect data-graph-role="structural-frame-label-mask" x="14" y="250" width="220.6" height="16" rx="3" class="c-mask"/>
+          <text data-boundary-label="" x="18" y="263" class="t-cloud" font-size="9" font-weight="600">Google Cloud, Firebase Hosting (global)</text>
         </g>
 
         <!-- Legend -->

@@ -60,7 +60,7 @@
       "sublabel": "serves the console build",
       "pos": [
         40,
-        240
+        270
       ],
       "size": [
         170,
@@ -89,7 +89,7 @@
       "sublabel": "Anthropic API",
       "pos": [
         40,
-        380
+        410
       ],
       "size": [
         170,
@@ -184,10 +184,18 @@
     },
     {
       "kind": "region",
-      "label": "Google Cloud managed services, australia-southeast1",
+      "label": "Google Cloud, australia-southeast1",
       "wraps": [
         "firestore",
         "vertex"
+      ],
+      "pad": 30
+    },
+    {
+      "kind": "region",
+      "label": "Google Cloud, Firebase Hosting (global)",
+      "wraps": [
+        "hosting"
       ],
       "pad": 30
     }
@@ -205,7 +213,8 @@
       "id": "hosting-to-console",
       "from": "hosting",
       "to": "console",
-      "label": "static assets over HTTPS"
+      "label": "static assets over HTTPS",
+      "labelDy": -20
     },
     {
       "id": "api-to-graph",
