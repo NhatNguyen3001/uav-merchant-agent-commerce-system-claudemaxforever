@@ -117,6 +117,8 @@ code { font: inherit; font-weight: 500; }
 .drawer label { display: grid; gap: 4px; font-size: 14px; color: var(--ink-2); }
 .drawer input { border: 1px solid var(--hair); border-radius: 6px; padding: 7px 9px; background: var(--card); }
 .drawer input:focus { border-color: var(--ink); outline: none; }
+.drawer input:disabled { background: var(--lavender); color: var(--ink-2); border-color: var(--hair); cursor: not-allowed; }
+.drawer-locked { font-size: 14px; color: var(--ink-2); }
 .drawer-actions { display: flex; align-items: center; gap: 10px; }
 .status { color: var(--muted); font-size: 14px; }
 

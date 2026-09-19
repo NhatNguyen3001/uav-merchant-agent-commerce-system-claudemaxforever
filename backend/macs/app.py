@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import os
+import re
 from datetime import datetime
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
@@ -19,6 +21,26 @@ from macs.seeddata import load_seed
 from macs.store import FirestoreStore, MemoryStore, Store, VertexEmbedder
 
 REPLAY_GAP_S = 0.3
+
+# Each browser keeps a random session key and sends it with every request (header), or in the URL for the
+# EventSource stream, which cannot send headers. Runs store only its SHA-256, never the key itself.
+SESSION_HEADER = "X-MACS-Session"
+_SESSION_KEY = re.compile(r"^[A-Za-z0-9_-]{16,128}$")
+
+
+def session_owner(request: Request) -> str | None:
+    """Hashed session of the caller, or None when the key is missing or malformed."""
+    key = request.headers.get(SESSION_HEADER) or request.query_params.get("session")
+    if not key or not _SESSION_KEY.match(key):
+        return None
+    return hashlib.sha256(key.encode()).hexdigest()
+
+
+def visible(run: dict | None, owner: str | None) -> bool:
+    """The recorded examples are open to everyone; every other run only to the session that started it."""
+    if run is None:
+        return False
+    return bool(run.get("is_golden")) or (owner is not None and run.get("owner") == owner)
 
 
 class StartRun(BaseModel):
@@ -64,7 +86,8 @@ def mark_interrupted_runs(store: Store) -> int:
     return len(stale)
 
 
-def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> FastAPI:
+def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool, rules_locked: bool = False) -> FastAPI:
+    """`rules_locked` makes the merchant rules read-only (the hosted demo runs locked)."""
     app = FastAPI(title="MACS")
     mark_interrupted_runs(store)
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -81,10 +104,12 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> F
 
     @app.get("/api/config/rules")
     async def get_rules():
-        return store.get("merchant_rules", "current")
+        return {**(store.get("merchant_rules", "current") or {}), "locked": rules_locked}
 
     @app.put("/api/config/rules")
     async def put_rules(rules: MerchantRules):
+        if rules_locked:
+            raise HTTPException(403, "Merchant rules are locked for the demo.")
         store.set("merchant_rules", "current", rules.model_dump())
         return rules
 
@@ -93,21 +118,24 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> F
         return AGENTS
 
     @app.post("/api/runs")
-    async def start_run(body: StartRun):
+    async def start_run(body: StartRun, request: Request):
+        owner = session_owner(request)
+        if owner is None:
+            raise HTTPException(400, "missing or invalid session key")
         if body.scenario is None:
             if not body.agent_id or not (body.query or "").strip():
                 raise HTTPException(400, "provide either scenario, or agent_id and query")
             if body.agent_id not in AGENT_BY_ID:
                 raise HTTPException(400, f"unknown agent_id {body.agent_id}")
             run_id = new_run_id()
-            registry.open(run_id)
+            registry.open(run_id, owner)
             _spawn(run_scenario("custom", run_id, store, llm, registry,
-                                input=build_input(body.agent_id, body.query.strip())))
+                                input=build_input(body.agent_id, body.query.strip()), owner=owner))
             return {"run_id": run_id}
         run_id = new_run_id()
-        registry.open(run_id)
         if body.scenario in SCENARIOS and not replay:
-            _spawn(run_scenario(body.scenario, run_id, store, llm, registry))
+            registry.open(run_id, owner)
+            _spawn(run_scenario(body.scenario, run_id, store, llm, registry, owner=owner))
             return {"run_id": run_id}
         source = body.scenario
         if source in SCENARIOS:
@@ -115,22 +143,25 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> F
             if not golden:
                 raise HTTPException(400, f"no golden run recorded for scenario {source}")
             source = golden[0]["run_id"]
-        if store.get("runs", source) is None:
+        # Someone else's run answers exactly like an unknown one, so its existence is not revealed.
+        if not visible(store.get("runs", source), owner):
             raise HTTPException(400, f"unknown scenario or run id {body.scenario}")
+        registry.open(run_id, owner)
         _spawn(_replay_run(source, run_id, store, registry))
         return {"run_id": run_id, "replay_of": source}
 
     @app.get("/api/runs")
-    async def list_runs():
-        runs = store.list_runs()
+    async def list_runs(request: Request):
+        owner = session_owner(request)
+        runs = [r for r in store.list_runs() if visible(r, owner)]
         golden = [r for r in runs if r.get("is_golden")]
         others = sorted((r for r in runs if not r.get("is_golden")), key=lambda r: r.get("started_at") or "", reverse=True)
         return golden + others
 
     @app.delete("/api/runs/{run_id}")
-    async def delete_run(run_id: str):
+    async def delete_run(run_id: str, request: Request):
         run = store.get("runs", run_id)
-        if run is None:
+        if not visible(run, session_owner(request)):
             raise HTTPException(404, "run not found")
         if run.get("is_golden"):
             raise HTTPException(403, "golden example runs cannot be deleted")
@@ -138,23 +169,28 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> F
         return {"deleted": run_id}
 
     @app.delete("/api/runs")
-    async def clear_history():
-        """Delete every run except the golden examples."""
-        victims = [r["run_id"] for r in store.list_runs() if not r.get("is_golden")]
+    async def clear_history(request: Request):
+        """Delete this session's runs; other sessions' runs and the golden examples stay."""
+        owner = session_owner(request)
+        victims = [r["run_id"] for r in store.list_runs() if not r.get("is_golden") and visible(r, owner)]
         for rid in victims:
             store.delete_run(rid)
         return {"deleted": len(victims)}
 
     @app.get("/api/runs/{run_id}")
-    async def get_run(run_id: str):
-        if store.get("runs", run_id) is None:
+    async def get_run(run_id: str, request: Request):
+        if not visible(store.get("runs", run_id), session_owner(request)):
             raise HTTPException(404, "run not found")
         return store.list_events(run_id)
 
     @app.get("/api/runs/{run_id}/events")
-    async def stream_events(run_id: str):
-        if not registry.has(run_id):
-            if store.get("runs", run_id) is None:
+    async def stream_events(run_id: str, request: Request):
+        owner = session_owner(request)
+        if registry.has(run_id):
+            if owner is None or registry.owner(run_id) != owner:
+                raise HTTPException(404, "run not found")
+        else:
+            if not visible(store.get("runs", run_id), owner):
                 raise HTTPException(404, "run not found")
 
             async def from_store():
@@ -179,7 +215,9 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool) -> F
 
 
 def build_from_env() -> FastAPI:
-    return create_app(_store_from_env(), LLM.from_env(), RunRegistry(), replay=os.environ.get("REPLAY") == "1")
+    # Locked unless explicitly opened with RULES_LOCKED=0, so a forgotten setting cannot leave the demo editable.
+    return create_app(_store_from_env(), LLM.from_env(), RunRegistry(), replay=os.environ.get("REPLAY") == "1",
+                      rules_locked=os.environ.get("RULES_LOCKED", "1") != "0")
 
 
 app = build_from_env()

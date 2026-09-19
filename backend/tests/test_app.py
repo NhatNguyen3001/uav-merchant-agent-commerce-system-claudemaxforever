@@ -8,13 +8,18 @@ from macs.emitter import RunRegistry
 from macs.llm import LLM
 
 
+JUDGE_A = "a" * 32
+JUDGE_B = "b" * 32
+
+
 @pytest.fixture
 def app(seeded_store):
     return create_app(seeded_store, LLM(fake=True), RunRegistry(), replay=False)
 
 
-async def _client(app):
-    return httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t")
+async def _client(app, session: str | None = JUDGE_A):
+    headers = {"X-MACS-Session": session} if session else {}
+    return httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t", headers=headers)
 
 
 async def _drain_sse(client, run_id):
@@ -31,7 +36,7 @@ async def test_health_and_rules(app):
     async with await _client(app) as c:
         assert (await c.get("/health")).json()["status"] == "ok"
         rules = (await c.get("/api/config/rules")).json()
-        assert rules["hard"]["max_discount_pct"] == 15
+        assert rules["hard"]["max_discount_pct"] == 15 and rules["locked"] is False
         rules["hard"]["max_discount_pct"] = 10
         assert (await c.put("/api/config/rules", json=rules)).status_code == 200
         assert (await c.get("/api/config/rules")).json()["hard"]["max_discount_pct"] == 10
@@ -132,3 +137,74 @@ async def test_delete_run_and_clear_history_keep_golden(app, seeded_store):
         assert (await c.delete("/api/runs")).json() == {"deleted": 1}
         ids = [r["run_id"] for r in (await c.get("/api/runs")).json()]
         assert ids == ["golden_x"]
+
+
+def _golden(store):
+    store.set("runs", "golden_x", {"run_id": "golden_x", "scenario": "rejected_agent", "is_golden": True,
+                                   "started_at": "2026-09-12T10:00:00+10:00", "status": "finished", "summary": {}})
+    store.add_event("golden_x", {"id": 1, "run_id": "golden_x", "ts": "2026-09-12T10:00:00+10:00", "lane": "a2a",
+                                 "type": "message", "payload": {"from": "buyer_agent", "text": "example"}})
+
+
+async def test_locked_rules_cannot_be_changed(seeded_store):
+    app = create_app(seeded_store, LLM(fake=True), RunRegistry(), replay=False, rules_locked=True)
+    async with await _client(app) as c:
+        rules = (await c.get("/api/config/rules")).json()
+        assert rules["locked"] is True
+        rules["hard"]["max_discount_pct"] = 60
+        r = await c.put("/api/config/rules", json=rules)
+        assert r.status_code == 403 and "locked" in r.json()["detail"].lower()
+        assert (await c.get("/api/config/rules")).json()["hard"]["max_discount_pct"] == 15
+
+
+async def test_starting_a_run_needs_a_valid_session(app):
+    async with await _client(app, session=None) as c:
+        assert (await c.post("/api/runs", json={"agent_id": "buyer-999", "query": "hi"})).status_code == 400
+        assert (await c.get("/api/runs")).json() == []  # no session: no private runs, and no examples seeded here
+    async with await _client(app, session="short") as c:
+        assert (await c.post("/api/runs", json={"agent_id": "buyer-999", "query": "hi"})).status_code == 400
+
+
+async def test_judges_only_see_and_touch_their_own_runs(app, seeded_store):
+    _golden(seeded_store)
+    async with await _client(app, JUDGE_A) as a, await _client(app, JUDGE_B) as b:
+        rid = (await a.post("/api/runs", json={"agent_id": "buyer-999", "query": "my private note"})).json()["run_id"]
+        await _drain_sse(a, rid)
+        assert [r["run_id"] for r in (await a.get("/api/runs")).json()] == ["golden_x", rid]
+        assert [r["run_id"] for r in (await b.get("/api/runs")).json()] == ["golden_x"]
+        # judge B cannot open, stream, replay or delete judge A's run; not-found hides that it exists
+        assert (await b.get(f"/api/runs/{rid}")).status_code == 404
+        assert (await b.get(f"/api/runs/{rid}/events")).status_code == 404
+        assert (await b.post("/api/runs", json={"scenario": rid})).status_code == 400
+        assert (await b.delete(f"/api/runs/{rid}")).status_code == 404
+        assert (await b.delete("/api/runs")).json() == {"deleted": 0}
+        assert (await a.get(f"/api/runs/{rid}")).status_code == 200
+        # the examples stay open to everyone
+        assert (await b.get("/api/runs/golden_x")).status_code == 200
+        replay = (await b.post("/api/runs", json={"scenario": "golden_x"})).json()
+        assert replay["replay_of"] == "golden_x" and len(await _drain_sse(b, replay["run_id"])) == 1
+        assert (await a.get(f"/api/runs/{replay['run_id']}/events")).status_code == 404
+        assert (await a.delete("/api/runs")).json() == {"deleted": 1}
+
+
+async def test_live_stream_is_private_and_accepts_the_key_in_the_url(app):
+    async with await _client(app, JUDGE_A) as a, await _client(app, session=None) as anon:
+        rid = (await a.post("/api/runs", json={"scenario": "rejected_agent"})).json()["run_id"]
+        # the browser's EventSource cannot send headers, so the key rides in the query string
+        assert (await anon.get(f"/api/runs/{rid}/events?session={JUDGE_B}")).status_code == 404
+        events = []
+        async with anon.stream("GET", f"/api/runs/{rid}/events?session={JUDGE_A}") as r:
+            assert r.status_code == 200
+            async for line in r.aiter_lines():
+                if line.startswith("data:"):
+                    events.append(json.loads(line[5:].strip()))
+        assert events and events[-1]["payload"]["status"] == "blocked"
+
+
+async def test_runs_store_a_hash_of_the_session_not_the_key(app, seeded_store):
+    import hashlib
+    async with await _client(app, JUDGE_A) as a:
+        rid = (await a.post("/api/runs", json={"agent_id": "buyer-999", "query": "x"})).json()["run_id"]
+        await _drain_sse(a, rid)
+    doc = seeded_store.get("runs", rid)
+    assert doc["owner"] == hashlib.sha256(JUDGE_A.encode()).hexdigest() and JUDGE_A not in json.dumps(doc)

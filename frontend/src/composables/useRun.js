@@ -1,6 +1,12 @@
 import { ref } from 'vue'
+import { SESSION_HEADER, sessionKey } from '../session.js'
 
 const API = import.meta.env.VITE_API_BASE || ''
+
+// Every call carries this browser's session key, so the server only returns this person's runs.
+function api(path, init = {}) {
+  return fetch(`${API}${path}`, { ...init, headers: { ...(init.headers || {}), [SESSION_HEADER]: sessionKey() } })
+}
 
 export function useRun() {
   const events = ref([])
@@ -15,7 +21,7 @@ export function useRun() {
     events.value = []
     error.value = ''
     running.value = true
-    const res = await fetch(`${API}/api/runs`, {
+    const res = await api('/api/runs', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
@@ -26,7 +32,8 @@ export function useRun() {
       return
     }
     runId.value = (await res.json()).run_id
-    source = new EventSource(`${API}/api/runs/${runId.value}/events`)
+    // EventSource cannot send headers, so the session key rides in the URL for the stream.
+    source = new EventSource(`${API}/api/runs/${runId.value}/events?session=${encodeURIComponent(sessionKey())}`)
     source.addEventListener('event', (e) => {
       events.value.push(JSON.parse(e.data))
     })
@@ -46,34 +53,35 @@ export function useRun() {
 }
 
 export async function fetchRules() {
-  return (await fetch(`${API}/api/config/rules`)).json()
+  return (await api('/api/config/rules')).json()
 }
 
 export async function saveRules(rules) {
-  const res = await fetch(`${API}/api/config/rules`, {
+  const { locked, ...body } = rules
+  const res = await api('/api/config/rules', {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(rules),
+    body: JSON.stringify(body),
   })
   if (!res.ok) throw new Error(await res.text())
   return res.json()
 }
 
 export async function fetchRuns() {
-  return (await fetch(`${API}/api/runs`)).json()
+  return (await api('/api/runs')).json()
 }
 
 export async function fetchAgents() {
-  return (await fetch(`${API}/api/agents`)).json()
+  return (await api('/api/agents')).json()
 }
 
 export async function deleteRun(runId) {
-  const res = await fetch(`${API}/api/runs/${runId}`, { method: 'DELETE' })
+  const res = await api(`/api/runs/${runId}`, { method: 'DELETE' })
   if (!res.ok && res.status !== 404) throw new Error(await res.text())
 }
 
 export async function clearHistory() {
-  const res = await fetch(`${API}/api/runs`, { method: 'DELETE' })
+  const res = await api('/api/runs', { method: 'DELETE' })
   if (!res.ok) throw new Error(await res.text())
   return res.json()
 }

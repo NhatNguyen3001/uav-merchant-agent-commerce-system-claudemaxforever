@@ -177,6 +177,7 @@ The script builds the backend with Cloud Build, grants the runtime service accou
 | `MACS_MODEL` | Claude model for all three roles | `claude-sonnet-5` |
 | `FAKE_LLM` | `1` returns recorded model outputs, no API calls | `0` |
 | `REPLAY` | `1` streams recorded runs instead of executing the graph | `0` |
+| `RULES_LOCKED` | `0` makes the merchant rules editable; any other value keeps them read-only | `1` (locked) |
 | `WEB_PORT` | Host port for the console under Docker Compose | `8080` |
 
 ---
@@ -189,24 +190,26 @@ The script builds the backend with Cloud Build, grants the runtime service accou
 
 **Pipeline panel.** A progress bar across the seven stages, an outcome sentence, and one collapsible row per event: gate verdicts with before-and-after corrections, the decoded intent, grouped tool calls with latency, proposals with rationale and SKU, the buyer's decision each round, and the order. The decoded intent and the proposal open by default.
 
-**Merchant rules.** Edit the discount cap, margin floor, and negotiation style, save, and run again. Hard rules take effect in the gates immediately and never reach a prompt.
+**Merchant rules.** Shows the discount cap, margin floor, and negotiation style. The hosted demo keeps them read-only; with `RULES_LOCKED=0` they can be edited and saved, and take effect in the gates immediately. Hard rules never reach a prompt.
 
-**History.** Replay any past run or either recorded example. Delete your own runs; the examples are protected. All amounts are in US dollars.
+**History.** Each browser keeps a random session key and sees only its own runs plus the two recorded examples; nobody can open, replay, or delete another person's run. Runs store a hash of the key, never the key. All amounts are in US dollars.
 
 ---
 
 ## API
 
+Run endpoints identify the caller by the `X-MACS-Session` header, a random key each browser generates and keeps. The event stream also accepts it as `?session=`, because a browser `EventSource` cannot send headers. Another session's run answers 404.
+
 | Method and path | Description |
 |---|---|
-| `POST /api/runs` | Start a run. Body `{agent_id, query}` for a typed request, or `{scenario}` for a canned scenario or a past run id to replay. Returns `{run_id}`. |
-| `GET /api/runs/{run_id}/events` | Server-Sent Events stream of the run. |
-| `GET /api/runs` | Past runs with summaries, recorded examples first. |
-| `GET /api/runs/{run_id}` | Full event list for a run. |
-| `DELETE /api/runs/{run_id}` | Delete a run. Recorded examples return 403. |
-| `DELETE /api/runs` | Delete every run except the recorded examples. |
+| `POST /api/runs` | Start a run. Body `{agent_id, query}` for a typed request, or `{scenario}` for a canned scenario or a past run id to replay. Returns `{run_id}`. Requires a session key. |
+| `GET /api/runs/{run_id}/events` | Server-Sent Events stream of one of your runs or an example. |
+| `GET /api/runs` | Your runs with summaries, recorded examples first. |
+| `GET /api/runs/{run_id}` | Full event list for one of your runs or an example. |
+| `DELETE /api/runs/{run_id}` | Delete one of your runs. Recorded examples return 403. |
+| `DELETE /api/runs` | Delete all of your runs; other sessions and the recorded examples are untouched. |
 | `GET /api/agents` | Identities the console can simulate. |
-| `GET /api/config/rules`, `PUT /api/config/rules` | Read or update merchant rules. |
+| `GET /api/config/rules`, `PUT /api/config/rules` | Read merchant rules, including whether they are locked; update them when unlocked (403 when locked). |
 | `GET /health` | Liveness and active project. |
 
 ---

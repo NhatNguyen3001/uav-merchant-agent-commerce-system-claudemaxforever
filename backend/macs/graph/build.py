@@ -55,13 +55,14 @@ def _summary(state: dict) -> dict:
 
 
 async def run_scenario(scenario: str, run_id: str, store: Store, llm: LLM, registry: RunRegistry,
-                       now: datetime | None = None, input: dict | None = None) -> dict:
-    """Execute a canned scenario, or a custom ACP-shaped `input` (scenario label then becomes 'custom')."""
+                       now: datetime | None = None, input: dict | None = None, owner: str | None = None) -> dict:
+    """Execute a canned scenario, or a custom ACP-shaped `input` (scenario label then becomes 'custom').
+    `owner` is the hashed browser session that started the run; only that session can see it."""
     now = now or datetime.now(TZ)
     if not registry.has(run_id):
-        registry.open(run_id)
+        registry.open(run_id, owner)
     doc = {"run_id": run_id, "scenario": scenario, "started_at": now.isoformat(timespec="seconds"),
-           "finished_at": None, "status": "running", "is_golden": False, "summary": {}}
+           "finished_at": None, "status": "running", "is_golden": False, "summary": {}, "owner": owner}
     if input is not None:
         doc.update({"agent_id": input["agent_id"], "query": input["messages"][-1]["content"]})
     store.set("runs", run_id, doc)

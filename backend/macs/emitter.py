@@ -17,13 +17,20 @@ class RunRegistry:
         self._events: dict[str, list[dict]] = {}
         self._done: set[str] = set()
         self._signals: dict[str, asyncio.Event] = {}
+        self._owners: dict[str, str | None] = {}
 
-    def open(self, run_id: str) -> None:
+    def open(self, run_id: str, owner: str | None = None) -> None:
+        """`owner` is the hashed session that started the run; recorded before the run starts so a stream
+        request that races the first Firestore write is still checked."""
         self._events[run_id] = []
         self._signals[run_id] = asyncio.Event()
+        self._owners[run_id] = owner
 
     def has(self, run_id: str) -> bool:
         return run_id in self._events
+
+    def owner(self, run_id: str) -> str | None:
+        return self._owners.get(run_id)
 
     def publish(self, run_id: str, event: dict) -> None:
         self._events[run_id].append(event)

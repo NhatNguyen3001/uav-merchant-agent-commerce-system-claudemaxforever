@@ -9,6 +9,7 @@ services:
       FAKE_LLM: ${FAKE_LLM:-0}
       MACS_MODEL: ${MACS_MODEL:-claude-sonnet-5}
       REPLAY: ${REPLAY:-0}
+      RULES_LOCKED: ${RULES_LOCKED:-1}
     volumes:
       - ${ADC_FILE:-${APPDATA}/gcloud/application_default_credentials.json}:/gcp/adc.json:ro
   web:
