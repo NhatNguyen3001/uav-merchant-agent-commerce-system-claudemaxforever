@@ -20,6 +20,12 @@ const EXAMPLES = [
     text: 'Wireless earbuds with noise cancelling for the gym, plus a power bank for travel, under 250, need them by Sunday.',
   },
   {
+    // Same request as "Gym earbuds", sent as the buyer that accepts the first offer: one round, no counter.
+    label: 'Gym earbuds, no haggling',
+    text: 'Wireless earbuds with noise cancelling for the gym, plus a power bank for travel, under 250, need them by Sunday.',
+    agent: 'buyer-002',
+  },
+  {
     label: 'Skincare routine',
     text: 'A red light therapy mask and under-eye patches for sensitive skin, cruelty-free brands only, under 300, delivered within a week.',
   },
@@ -43,8 +49,9 @@ function submit() {
   emit('run', { agent_id: agentId.value, query: text })
 }
 
-function useExample(text) {
-  query.value = text
+function useExample(example) {
+  query.value = example.text
+  if (example.agent) agentId.value = example.agent // a chip may pick the identity the example is written for
   box.value?.focus()
 }
 
@@ -79,7 +86,7 @@ function onKeydown(e) {
     </button>
     <div class="examples">
       <span class="examples-label">Try</span>
-      <button v-for="ex in EXAMPLES" :key="ex.label" class="chip" type="button" @click="useExample(ex.text)">{{ ex.label }}</button>
+      <button v-for="ex in EXAMPLES" :key="ex.label" class="chip" type="button" @click="useExample(ex)">{{ ex.label }}</button>
     </div>
     <p v-if="error" class="error">{{ error }}</p>
   </section>
