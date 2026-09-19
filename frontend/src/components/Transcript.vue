@@ -91,18 +91,74 @@ const pending = computed(() => {
   }[lastStage.payload.stage]
 })
 
+// Follow new rows only while the reader is at the bottom, like a chat. Scrolling up to read stops following;
+// the "New steps below" button, or scrolling back down, resumes it. Only this panel scrolls, never the page.
+const scroller = ref(null)
+const following = ref(true)
+const unseen = ref(false)
+const NEAR_BOTTOM_PX = 80
+// Following jumps instantly, so there is never an animation in flight for a reader's scroll to fight. Only the
+// button glides; its own scroll events are ignored until it settles, unless the reader takes over.
+let autoUntil = 0
+
+const atBottom = (el) => el.scrollHeight - el.scrollTop - el.clientHeight <= NEAR_BOTTOM_PX
+
+function scrollToLatest(smooth = false) {
+  const el = scroller.value
+  if (!el) return
+  if (smooth) autoUntil = Date.now() + 700
+  el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' })
+}
+
+function onScroll() {
+  const el = scroller.value
+  if (!el || Date.now() < autoUntil) return
+  following.value = atBottom(el)
+  if (following.value) unseen.value = false
+}
+
+// Any direct input means the reader is steering, so their scroll counts even mid-animation.
+function onUserIntent() {
+  autoUntil = 0
+}
+
+function jumpToLatest() {
+  following.value = true
+  unseen.value = false
+  scrollToLatest(true)
+}
+
+// A new run (events cleared) starts from the top and follows again.
+watch(
+  () => props.events.length === 0,
+  (empty) => {
+    if (!empty) return
+    following.value = true
+    unseen.value = false
+  },
+)
+
 watch(
   () => [props.events.length, pending.value],
   async () => {
     if (!props.running) return
     await nextTick()
-    list.value?.lastElementChild?.scrollIntoView({ block: 'end', behavior: 'smooth' })
+    if (following.value) scrollToLatest()
+    else unseen.value = true
   },
 )
 </script>
 
 <template>
-  <section class="transcript scroll">
+  <section
+    ref="scroller"
+    class="transcript scroll"
+    @scroll.passive="onScroll"
+    @wheel.passive="onUserIntent"
+    @touchstart.passive="onUserIntent"
+    @keydown="onUserIntent"
+    @mousedown="onUserIntent"
+  >
     <div v-if="!events.length && !running" class="transcript-empty">
       <img src="/logo-full.png" alt="MACS" />
       <p>What happens behind the merchant's reply: the identity check, the decoded intent, the catalogue lookups, the proposal, the rule checks, and the order.</p>
@@ -178,5 +234,10 @@ watch(
         <span class="shimmer"></span>{{ pending }}
       </li>
     </ol>
+
+    <button v-if="unseen" type="button" class="jump-latest" @click="jumpToLatest">
+      New steps below
+      <Chevron :open="false" />
+    </button>
   </section>
 </template>

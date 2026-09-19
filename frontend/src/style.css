@@ -304,8 +304,16 @@ code { font: inherit; font-weight: 500; }
 }
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
+/* Shown when new pipeline rows arrive while the reader is scrolled up; sticks to the panel's bottom edge. */
+.jump-latest {
+  position: sticky; bottom: 14px; display: flex; align-items: center; gap: 6px; margin: 12px auto 0; width: max-content;
+  padding: 7px 14px; border-radius: 999px; border: 1px solid var(--pass); background: var(--pass); color: #fff;
+  font-size: 14px; box-shadow: 0 4px 14px rgba(30, 30, 93, 0.18); animation: reveal var(--reveal) both;
+}
+.jump-latest:hover { background: #4a6fe8; border-color: #4a6fe8; }
+
 @media (prefers-reduced-motion: reduce) {
-  .block, .block.pending, .bubble, .outcome { animation: none; }
+  .block, .block.pending, .bubble, .outcome, .jump-latest { animation: none; }
   .dots i, .shimmer, .progress.running .knob { animation: none; }
 
   .bar-fill, .knob { transition: none; }
