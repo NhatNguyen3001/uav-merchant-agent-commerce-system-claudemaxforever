@@ -26,7 +26,7 @@
 
 1. **A governed pipeline for machine customers.** A buyer's agent arrives with a multi-constraint request. MACS verifies its credential and spending mandate, decodes the request into a structured intent (goal, skill level, environment, values, hard constraints, preferences), retrieves candidates by vector search, and composes a bundle with a rationale per item and a cheaper alternative. Every price and delivery figure in the proposal carries the id of the tool result it came from.
 
-2. **Three deterministic gates around the model.** Inbound (identity, mandate, injection screen), outbound (grounding, prices, shipping, discount cap, margin floor, claims), and execution (buyer acceptance, mandate signature, expiry, scope, spend cap). Hard merchant rules never enter a prompt. The outbound gate corrects a proposal rather than rejecting it, and the console shows the before and after.
+2. **Three deterministic gates around the model.** Inbound (identity, mandate, injection screen), outbound (grounding, prices, shipping, discount cap, margin floor), and execution (buyer acceptance, mandate signature, expiry, scope, spend cap). Hard merchant rules never enter a prompt. The outbound gate corrects a proposal rather than rejecting it, and the console shows the before and after.
 
 3. **A console that explains itself.** Type what a buyer's agent would ask, pick one of three identities, and watch the negotiation as a chat while the pipeline streams every gate verdict, tool call, and decision in plain language. Two recorded runs replay on demand; everything else runs live against Claude and Firestore.
 
@@ -62,7 +62,7 @@ Buyer's agent (external, simulated)
                         Claude returns a Proposal with rationale and alternative
         v
   Outbound gate         grounding, prices, shipping, discount cap,
-                        margin floor, claims                         (deterministic, corrects)
+                        margin floor                                 (deterministic, corrects)
         v
   Negotiate             buyer's agent counters once, merchant re-proposes (max two rounds)
         v
@@ -94,7 +94,7 @@ Validate what comes in, govern what goes out, authorise what gets executed.
 | Gate | Checks | Outcome on failure |
 |---|---|---|
 | Inbound | Credential exists and is active. Mandate exists, belongs to the agent, and is unexpired. Free text contains no known injection phrase. | Blocked. The merchant replies with the reason. |
-| Outbound | Every item cites a tool result from this run. Item prices match list prices. Shipping meets the deadline and items are in stock. Bundle discount is within the cap. Margin is above the floor. Sustainability claims apply only to certified products. The alternative is priced within the cap. | Corrected and re-issued, or blocked when an item is ungrounded, late, or out of stock. |
+| Outbound | Every item cites a tool result from this run. Item prices match list prices. Shipping meets the deadline and items are in stock. Bundle discount is within the cap. Margin is above the floor. The alternative is priced within the cap. | Corrected and re-issued, or blocked when an item is ungrounded, late, or out of stock. |
 | Execution | The buyer's agent accepted the final proposal. Mandate signature is present and the mandate is unexpired. Items are within the mandate scope. Total is within the spend cap when one is set. | Blocked. No order is written. |
 
 A deterministic catalogue check runs between the inbound gate and the proposal engine. If the best vector-search match is too far from the request (cosine distance above 0.45; on-catalogue requests score 0.24 to 0.33, off-catalogue ones 0.51 to 0.58), or no related product survives the budget, delivery, and stock filters, the run stops with a plain reply that names the closest items the store carries. If the model still cannot shape a bundle from good candidates, the run ends the same clean way instead of surfacing an error.

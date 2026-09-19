@@ -84,10 +84,12 @@ def test_outbound_enforces_margin_floor(seeded_store):
     assert r.verdict == "corrected" and r.proposal.bundle_price == 538
 
 
-def test_outbound_strips_unsupported_sustainability_claim(seeded_store):
-    p = _proposal(89, 0, items=[("HP-STD-01", 89)], alt=False)
+def test_outbound_leaves_claims_alone_and_corrects_money_only(seeded_store):
+    # The outbound gate governs money, shipping and grounding. Claim wording is left to the proposal prompt.
+    p = _proposal(89, 0, items=[("HP-STD-01", 89)], alt=False)  # HP-STD-01 carries no certification
     r = check_outbound(p, _cands(seeded_store), {"t1"}, HARD, deliver_by_days=7)
-    assert r.verdict == "corrected" and "values" not in r.proposal.items[0].satisfies
+    assert r.verdict == "pass" and r.proposal.items[0].satisfies == ["values"]
+    assert "certification" not in r.reason and "claim" not in r.reason
 
 
 def test_execution_pass_and_blocks(seeded_store):

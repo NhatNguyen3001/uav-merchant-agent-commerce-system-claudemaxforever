@@ -159,10 +159,6 @@ def check_outbound(proposal: Proposal, candidates: dict[str, dict], valid_ids: s
         if item.price != prod["list_price"]:
             notes.append(f"{_label(prod)} price {money(item.price)} corrected to the list price {money(prod['list_price'])}")
             item.price = prod["list_price"]
-        certs = (prod.get("sustainability") or {}).get("certifications") or []
-        if "values" in item.satisfies and not certs:
-            notes.append(f"{_label(prod)} has no certification, so its sustainability claim was removed")
-            item.satisfies = [s for s in item.satisfies if s != "values"]
 
     list_sum = sum(candidates[i.sku]["list_price"] for i in p.items)
     cost_sum = sum(candidates[i.sku]["cost"] for i in p.items)
