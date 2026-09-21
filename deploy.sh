@@ -28,7 +28,7 @@ gcloud builds submit backend --tag "$IMAGE" --project "$PROJECT"
 
 gcloud run deploy "$SERVICE" --image "$IMAGE" --region "$REGION" --project "$PROJECT" \
   --allow-unauthenticated --min-instances 1 --max-instances 1 --memory 1Gi --timeout 900 \
-  --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT,FAKE_LLM=0,REPLAY=${REPLAY:-1},RULES_LOCKED=${RULES_LOCKED:-1},MACS_MODEL=${MACS_MODEL:-claude-sonnet-5}" \
+  --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT,FAKE_LLM=0,REPLAY=1,RULES_LOCKED=${RULES_LOCKED:-1},MACS_MODEL=${MACS_MODEL:-claude-sonnet-5}" \
   --set-secrets "ANTHROPIC_API_KEY=anthropic-api-key:latest"
 
 # Firebase Hosting buffers rewritten responses, which breaks Server-Sent Events. The console therefore calls
