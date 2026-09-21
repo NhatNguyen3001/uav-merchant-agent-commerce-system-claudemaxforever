@@ -71,6 +71,10 @@ export async function fetchRuns() {
   return (await api('/api/runs')).json()
 }
 
+export async function fetchHealth() {
+  return (await api('/health')).json()
+}
+
 export async function fetchAgents() {
   return (await api('/api/agents')).json()
 }

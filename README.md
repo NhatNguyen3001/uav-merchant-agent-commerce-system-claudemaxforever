@@ -176,7 +176,7 @@ The script builds the backend with Cloud Build, grants the runtime service accou
 | `GOOGLE_CLOUD_PROJECT` | Firestore and Vertex AI project | Unset; a seeded in-memory store is used |
 | `MACS_MODEL` | Claude model for all three roles | `claude-sonnet-5` |
 | `FAKE_LLM` | `1` returns recorded model outputs, no API calls | `0` |
-| `REPLAY` | `1` streams recorded runs instead of executing the graph | `0` |
+| `REPLAY` | Showcase mode: `1` replays the recorded examples instead of running the graph, and refuses typed queries so a public demo cannot run up model spend | `0` locally, `1` on the hosted demo |
 | `RULES_LOCKED` | `0` makes the merchant rules editable; any other value keeps them read-only | `1` (locked) |
 | `WEB_PORT` | Host port for the console under Docker Compose | `8080` |
 
@@ -191,6 +191,8 @@ The script builds the backend with Cloud Build, grants the runtime service accou
 **Pipeline panel.** A progress bar across the seven stages, an outcome sentence, and one collapsible row per event: gate verdicts with before-and-after corrections, the decoded intent, grouped tool calls with latency, proposals with rationale and SKU, the buyer's decision each round, and the order. The decoded intent and the proposal open by default.
 
 **Merchant rules.** Shows the discount cap, margin floor, and negotiation style. The hosted demo keeps them read-only; with `RULES_LOCKED=0` they can be edited and saved, and take effect in the gates immediately. Hard rules never reach a prompt.
+
+**Showcase mode.** With `REPLAY=1`, the composer becomes a picker of the three recorded examples: the podcast starter, the gym earbuds request sent by the buyer that accepts the first offer, and the refused unregistered agent. Typed queries are switched off.
 
 **History.** Each browser keeps a random session key and sees only its own runs plus the two recorded examples; nobody can open, replay, or delete another person's run. Runs store a hash of the key, never the key. All amounts are in US dollars.
 
@@ -253,7 +255,7 @@ Run endpoints identify the caller by the `X-MACS-Session` header, a random key e
 | `data/catalogue_scraped.json` | 499 | Public Amazon listings (electronics, health and beauty, Kindle books) collected with [nexscope.ai](https://nexscope.ai) and enriched by `backend/enrich.py` |
 | `data/merchant_rules.json` | 1 | Hard rules (15 percent discount cap, 20 percent margin floor) and soft guidance |
 | `data/mandates.json`, `data/credentials.json` | 2, 3 | AP2-style mandates and agent credentials, including a revoked credential for the negative path |
-| `data/replay/` | 2 | Recorded live runs: the podcast happy path and the refused unregistered agent |
+| `data/replay/` | 3 | Recorded live runs: the podcast happy path, the gym earbuds request accepted first time, and the refused unregistered agent |
 
 The raw listings were collected with [nexscope.ai](https://nexscope.ai), the team's tool for extracting product data from Amazon search results, and saved as JSON. Enrichment then asks Claude Haiku 4.5, ten listings per call, for a product type, who it suits, outcome tags, a one-sentence description, durability, compatibility, and any certification present in the title. Fields a scrape cannot provide are assigned by rule: cost is 60 percent of list price, shipping days are parsed from the delivery text with a default of 3, and stock is 25. The full 499-listing pass took 50 calls and about 90 seconds.
 

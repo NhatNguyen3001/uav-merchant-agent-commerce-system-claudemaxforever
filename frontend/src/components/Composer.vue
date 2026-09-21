@@ -2,8 +2,15 @@
 import { onMounted, ref } from 'vue'
 import { fetchAgents } from '../composables/useRun.js'
 
-const props = defineProps({ running: Boolean, error: String })
+const props = defineProps({ running: Boolean, error: String, showcase: Boolean })
 const emit = defineEmits(['run'])
+
+// Showcase mode (the hosted demo): typed queries are switched off, so these recorded runs are the only way in.
+const RECORDED = [
+  { scenario: 'happy_path', label: 'Podcast starter', note: 'Registered buyer, negotiates once' },
+  { scenario: 'instant_buyer', label: 'Gym earbuds, no haggling', note: 'Registered buyer, accepts the first offer' },
+  { scenario: 'rejected_agent', label: 'Unregistered agent', note: 'Refused at the inbound gate' },
+]
 
 const agents = ref([])
 const agentId = ref('buyer-001')
@@ -64,7 +71,23 @@ function onKeydown(e) {
 </script>
 
 <template>
-  <section class="composer">
+  <section v-if="showcase" class="composer showcase">
+    <p class="examples-label">Replay a recorded run</p>
+    <button
+      v-for="ex in RECORDED"
+      :key="ex.scenario"
+      type="button"
+      class="recorded"
+      :disabled="running"
+      @click="emit('run', { scenario: ex.scenario })"
+    >
+      <span class="recorded-label">{{ ex.label }}</span>
+      <span class="recorded-note">{{ ex.note }}</span>
+    </button>
+    <p v-if="error" class="error">{{ error }}</p>
+  </section>
+
+  <section v-else class="composer">
     <textarea
       ref="box"
       v-model="query"

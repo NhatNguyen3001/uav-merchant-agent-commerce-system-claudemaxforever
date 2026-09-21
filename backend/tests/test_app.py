@@ -208,3 +208,16 @@ async def test_runs_store_a_hash_of_the_session_not_the_key(app, seeded_store):
         await _drain_sse(a, rid)
     doc = seeded_store.get("runs", rid)
     assert doc["owner"] == hashlib.sha256(JUDGE_A.encode()).hexdigest() and JUDGE_A not in json.dumps(doc)
+
+
+async def test_showcase_mode_refuses_typed_queries_and_replays_examples(seeded_store):
+    _golden(seeded_store)
+    app = create_app(seeded_store, LLM(fake=True), RunRegistry(), replay=True)
+    async with await _client(app) as c:
+        r = await c.post("/api/runs", json={"agent_id": "buyer-001", "query": "anything at all"})
+        assert r.status_code == 403 and "example" in r.json()["detail"].lower()
+        assert (await c.get("/health")).json()["replay"] is True
+        # the examples still run: a canned scenario replays its recorded run, with no model call
+        res = (await c.post("/api/runs", json={"scenario": "rejected_agent"})).json()
+        assert res["replay_of"] == "golden_x"
+        assert len(await _drain_sse(c, res["run_id"])) == 1

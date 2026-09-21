@@ -10,6 +10,7 @@ from pathlib import Path
 from macs.emitter import RunRegistry
 from macs.graph.build import new_run_id, run_scenario
 from macs.llm import LLM
+from macs.scenarios import SCENARIOS
 from macs.store import FirestoreStore, MemoryStore, VertexEmbedder
 
 DATA = Path(__file__).resolve().parents[1] / "data"
@@ -18,7 +19,7 @@ DATA = Path(__file__).resolve().parents[1] / "data"
 async def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--project", required=True)
-    ap.add_argument("--scenario", required=True, choices=["happy_path", "rejected_agent"])
+    ap.add_argument("--scenario", required=True, choices=sorted(SCENARIOS))
     ap.add_argument("--fake", action="store_true", help="use FAKE_LLM fixtures and the in-memory store")
     a = ap.parse_args()
 

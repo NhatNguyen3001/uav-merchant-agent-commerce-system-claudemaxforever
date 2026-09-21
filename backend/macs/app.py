@@ -123,6 +123,9 @@ def create_app(store: Store, llm: LLM, registry: RunRegistry, replay: bool, rule
         if owner is None:
             raise HTTPException(400, "missing or invalid session key")
         if body.scenario is None:
+            if replay:
+                # Showcase mode: recorded examples only, so a public demo cannot run up model spend.
+                raise HTTPException(403, "Typed queries are switched off on this demo. Run one of the examples.")
             if not body.agent_id or not (body.query or "").strip():
                 raise HTTPException(400, "provide either scenario, or agent_id and query")
             if body.agent_id not in AGENT_BY_ID:

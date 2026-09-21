@@ -1,0 +1,540 @@
+{
+  "run": {
+    "finished_at": "2026-09-21T22:07:25+10:00",
+    "run_id": "golden_instant_buyer",
+    "scenario": "instant_buyer",
+    "summary": {
+      "bundle_price": 45.15,
+      "order_status": "placed",
+      "gate_verdicts": [
+        {
+          "gate": "inbound",
+          "verdict": "pass"
+        },
+        {
+          "gate": "catalogue",
+          "verdict": "pass"
+        },
+        {
+          "gate": "outbound",
+          "verdict": "pass"
+        },
+        {
+          "gate": "execution",
+          "verdict": "pass"
+        }
+      ]
+    },
+    "is_golden": true,
+    "status": "finished",
+    "owner": null,
+    "started_at": "2026-09-21T22:07:00+10:00",
+    "recorded_with": "live"
+  },
+  "events": [
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "",
+        "stage": "protocol_adapter",
+        "status": "running"
+      },
+      "id": 1,
+      "ts": "2026-09-21T22:07:01.929+10:00"
+    },
+    {
+      "type": "message",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "from": "buyer_agent",
+        "text": "Wireless earbuds with noise cancelling for the gym, plus a power bank for travel, under 250, need them by Sunday."
+      },
+      "id": 2,
+      "ts": "2026-09-21T22:07:02.092+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "ACP message mapped to MerchantRequest",
+        "stage": "protocol_adapter",
+        "status": "passed"
+      },
+      "id": 3,
+      "ts": "2026-09-21T22:07:02.281+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "",
+        "stage": "inbound_gate",
+        "status": "running"
+      },
+      "id": 4,
+      "ts": "2026-09-21T22:07:02.459+10:00"
+    },
+    {
+      "type": "gate",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "gate": "inbound",
+        "after": null,
+        "before": null,
+        "reason": "buyer-002 is a registered agent. Mandate: no spend cap, any product category, valid until 31 Dec 2026.",
+        "verdict": "pass"
+      },
+      "id": 5,
+      "ts": "2026-09-21T22:07:03.076+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "buyer-002 is a registered agent. Mandate: no spend cap, any product category, valid until 31 Dec 2026.",
+        "stage": "inbound_gate",
+        "status": "passed"
+      },
+      "id": 6,
+      "ts": "2026-09-21T22:07:03.230+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "",
+        "stage": "intent_decoder",
+        "status": "running"
+      },
+      "id": 7,
+      "ts": "2026-09-21T22:07:03.386+10:00"
+    },
+    {
+      "type": "intent",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "goal": "Buy wireless noise-cancelling earbuds for gym use and a power bank for travel",
+        "constraint_count": 5,
+        "soft_preferences": [
+          "noise cancelling",
+          "suitable for gym use",
+          "suitable for travel"
+        ],
+        "environment": [
+          "gym",
+          "travel"
+        ],
+        "hard_constraints": {
+          "budget_max": 250.0,
+          "deliver_by_days": 7
+        },
+        "values": [],
+        "skill_level": "unknown"
+      },
+      "id": 8,
+      "ts": "2026-09-21T22:07:10.891+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "5 constraints decoded",
+        "stage": "intent_decoder",
+        "status": "passed"
+      },
+      "id": 9,
+      "ts": "2026-09-21T22:07:10.911+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "",
+        "stage": "proposal_engine",
+        "status": "running"
+      },
+      "id": 10,
+      "ts": "2026-09-21T22:07:10.936+10:00"
+    },
+    {
+      "type": "tool",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "name": "semantic_search",
+        "args": {
+          "query_text": "Buy wireless noise-cancelling earbuds for gym use and a power bank for travel for a unknown; environment: gym, travel; values: ; preferences: noise cancelling, suitable for gym use, suitable for travel",
+          "k": 15
+        },
+        "result_summary": "15 closest matches: Hybrid Active Noise Cancelling Wireless Ear Buds 80 Hrs Playtime Hi-Res Stereo Quality\u2026, Apple AirPods 4 Wireless Earbuds | Bluetooth Headphones, Personalized Spatial Audio\u2026, Soundcore P30i by Anker Noise Cancelling Earbuds, Hands-Free Viewing | Strong and Smart\u2026, Apple AirPods Pro 3 Wireless Earbuds with Active Noise Cancellation | Live Translation\u2026, Raycon Impact Earbuds Military-Grade Impact Resistant, IP67 Bluetooth Earbuds with Stereo\u2026, and 10 more",
+        "latency_ms": 2852,
+        "tool_result_id": "run_20260921_220700_6d04-tool-1"
+      },
+      "id": 11,
+      "ts": "2026-09-21T22:07:13.820+10:00"
+    },
+    {
+      "type": "tool",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "name": "search_products",
+        "args": {
+          "max_price": 250.0,
+          "max_ship_days": 7,
+          "sku_in": [
+            "B0H6ZZX194",
+            "B0DGHMNQ5Z",
+            "B0CRTR3PMF",
+            "B0FQFB8FMG",
+            "B0C7XM1P66",
+            "B0G1PJLWLZ",
+            "B0C8PWSW7T",
+            "B09B94C8H8",
+            "B09FT58QQP",
+            "B0DH6WG34X",
+            "B0GSXF7BVN",
+            "B0C3HCD34R",
+            "B0F3PQHWTZ",
+            "B0DRJF2VX3",
+            "B0BQPGJ9LQ"
+          ]
+        },
+        "result_summary": "13 products within budget, delivery, and stock limits: VEEKTOMX 10000mAh Portable Charger with 4 Built-in Cables | Slim Power Bank, USB-C\u2026, TOZO A1 Wireless Earbuds Bluetooth 5.3 Light Weight in Ear Headphones | IPX5 Waterproof,2\u2026, JBL Vibe Beam - True Wireless Earbuds - White | JBL Deep Bass Sound, Comfortable fit, Up\u2026, Soundcore by Anker Q20i Hybrid Active Noise Cancelling Headphones, Black | Over-Ear\u2026, Raycon Impact Earbuds Military-Grade Impact Resistant, IP67 Bluetooth Earbuds with Stereo\u2026, Beats Studio Pro Premium Wireless Over-Ear Headphones- Up to 40-Hour Battery Life, Active\u2026, and 7 more",
+        "latency_ms": 92,
+        "tool_result_id": "run_20260921_220700_6d04-tool-2"
+      },
+      "id": 12,
+      "ts": "2026-09-21T22:07:13.967+10:00"
+    },
+    {
+      "type": "gate",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "gate": "catalogue",
+        "after": null,
+        "before": null,
+        "reason": "13 candidates within budget and delivery; best match distance 0.27.",
+        "verdict": "pass"
+      },
+      "id": 13,
+      "ts": "2026-09-21T22:07:14.011+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "13 candidates within budget and delivery; best match distance 0.27.",
+        "stage": "proposal_engine",
+        "status": "running"
+      },
+      "id": 14,
+      "ts": "2026-09-21T22:07:14.062+10:00"
+    },
+    {
+      "type": "proposal",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "bundle_price": 45.15,
+        "delivery_days": 1,
+        "alternative": {
+          "name": "TOZO A1 Wireless Earbuds Bluetooth 5.3",
+          "bundle_price": 36.64,
+          "sku": "B09FT58QQP",
+          "tradeoff": "Cheaper earbuds option but with basic noise cancellation and less battery life than the Soundcore P30i.",
+          "items": [
+            "B09FT58QQP",
+            "B09B94C8H8"
+          ]
+        },
+        "expires_at": "2026-09-22T23:59:59+10:00",
+        "discount_pct": 5.0,
+        "items": [
+          {
+            "name": "Soundcore P30i by Anker Noise Cancelling Earbuds",
+            "satisfies": [
+              "goal",
+              "environment",
+              "hard_constraints",
+              "soft_preferences"
+            ],
+            "grounded_on": [
+              {
+                "sku": "B0CRTR3PMF",
+                "tool_result_id": "run_20260921_220700_6d04-tool-2"
+              }
+            ],
+            "price": 24.99,
+            "rationale": "Noise-cancelling, waterproof earbuds suited for travel and gym use, well within budget with fast shipping.",
+            "sku": "B0CRTR3PMF"
+          },
+          {
+            "name": "VEEKTOMX 10000mAh Portable Charger with 4 Built-in Cables",
+            "satisfies": [
+              "goal",
+              "environment",
+              "hard_constraints",
+              "soft_preferences"
+            ],
+            "grounded_on": [
+              {
+                "sku": "B09B94C8H8",
+                "tool_result_id": "run_20260921_220700_6d04-tool-2"
+              }
+            ],
+            "price": 22.65,
+            "rationale": "Slim, multi-cable power bank ideal for travel charging, ships in 1 day meeting delivery constraint.",
+            "sku": "B09B94C8H8"
+          }
+        ],
+        "intent_coverage": "5/5"
+      },
+      "id": 15,
+      "ts": "2026-09-21T22:07:21.869+10:00"
+    },
+    {
+      "type": "message",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "from": "merchant_agent",
+        "text": "Proposed 2 items for $45.15 (5% bundle discount). Delivered within 1 day, inside your 7-day window. Alternative at $36.64."
+      },
+      "id": 16,
+      "ts": "2026-09-21T22:07:21.894+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "2 items, coverage 5/5",
+        "stage": "proposal_engine",
+        "status": "passed"
+      },
+      "id": 17,
+      "ts": "2026-09-21T22:07:21.942+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "",
+        "stage": "outbound_gate",
+        "status": "running"
+      },
+      "id": 18,
+      "ts": "2026-09-21T22:07:21.980+10:00"
+    },
+    {
+      "type": "tool",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "name": "get_shipping",
+        "args": {
+          "sku": "B0CRTR3PMF"
+        },
+        "result_summary": "B0CRTR3PMF ships in 1 day, 25 in stock",
+        "latency_ms": 64,
+        "tool_result_id": "run_20260921_220700_6d04-tool-3"
+      },
+      "id": 19,
+      "ts": "2026-09-21T22:07:22.094+10:00"
+    },
+    {
+      "type": "tool",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "name": "get_shipping",
+        "args": {
+          "sku": "B09B94C8H8"
+        },
+        "result_summary": "B09B94C8H8 ships in 1 day, 25 in stock",
+        "latency_ms": 74,
+        "tool_result_id": "run_20260921_220700_6d04-tool-4"
+      },
+      "id": 20,
+      "ts": "2026-09-21T22:07:22.191+10:00"
+    },
+    {
+      "type": "gate",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "gate": "outbound",
+        "after": null,
+        "before": null,
+        "reason": "Bundle $45.15 stays within the 15% discount cap and above the margin floor. Every item came from a catalogue lookup. Delivers in 1 day against a 7-day deadline.",
+        "verdict": "pass"
+      },
+      "id": 21,
+      "ts": "2026-09-21T22:07:22.215+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "Bundle $45.15 stays within the 15% discount cap and above the margin floor. Every item came from a catalogue lookup. Delivers in 1 day against a 7-day deadline.",
+        "stage": "outbound_gate",
+        "status": "passed"
+      },
+      "id": 22,
+      "ts": "2026-09-21T22:07:22.258+10:00"
+    },
+    {
+      "type": "message",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "from": "buyer_agent",
+        "text": "This bundle meets the request with noise-cancelling earbuds and a travel power bank, totaling $45.15\u2014well under the $250 budget and shipping within 1 day for Sunday delivery. Please proceed with the order."
+      },
+      "id": 23,
+      "ts": "2026-09-21T22:07:24.655+10:00"
+    },
+    {
+      "type": "decision",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "action": "accept",
+        "proposal_price": 45.15,
+        "message": "This bundle meets the request with noise-cancelling earbuds and a travel power bank, totaling $45.15\u2014well under the $250 budget and shipping within 1 day for Sunday delivery. Please proceed with the order.",
+        "counter_budget": null,
+        "round": 1
+      },
+      "id": 24,
+      "ts": "2026-09-21T22:07:24.701+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "",
+        "stage": "execution_gate",
+        "status": "running"
+      },
+      "id": 25,
+      "ts": "2026-09-21T22:07:24.737+10:00"
+    },
+    {
+      "type": "gate",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "gate": "execution",
+        "after": null,
+        "before": null,
+        "reason": "Total $45.15. The mandate has no spend cap, and its scope and expiry are valid.",
+        "verdict": "pass"
+      },
+      "id": 26,
+      "ts": "2026-09-21T22:07:24.766+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "Total $45.15. The mandate has no spend cap, and its scope and expiry are valid.",
+        "stage": "execution_gate",
+        "status": "passed"
+      },
+      "id": 27,
+      "ts": "2026-09-21T22:07:24.800+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "",
+        "stage": "retailer_systems",
+        "status": "running"
+      },
+      "id": 28,
+      "ts": "2026-09-21T22:07:24.828+10:00"
+    },
+    {
+      "type": "tool",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "name": "create_order",
+        "args": {
+          "mandate_id": "mandate-002",
+          "skus": [
+            "B0CRTR3PMF",
+            "B09B94C8H8"
+          ],
+          "total": 45.15
+        },
+        "result_summary": "Order ord_26b3096b placed, total $45.15, ships in 1 day",
+        "latency_ms": 131,
+        "tool_result_id": "run_20260921_220700_6d04-tool-5"
+      },
+      "id": 29,
+      "ts": "2026-09-21T22:07:24.994+10:00"
+    },
+    {
+      "type": "order",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "ship_days": 1,
+        "mandate_id": "mandate-002",
+        "skus": [
+          "B0CRTR3PMF",
+          "B09B94C8H8"
+        ],
+        "order_id": "ord_26b3096b",
+        "status": "placed",
+        "total": 45.15
+      },
+      "id": 30,
+      "ts": "2026-09-21T22:07:25.021+10:00"
+    },
+    {
+      "type": "message",
+      "run_id": "golden_instant_buyer",
+      "lane": "a2a",
+      "payload": {
+        "from": "merchant_agent",
+        "text": "Order placed: ord_26b3096b, 2 items, total $45.15. Arrives within 1 day."
+      },
+      "id": 31,
+      "ts": "2026-09-21T22:07:25.042+10:00"
+    },
+    {
+      "type": "stage",
+      "run_id": "golden_instant_buyer",
+      "lane": "system",
+      "payload": {
+        "note": "order ord_26b3096b placed, total 45.15, ships in 1 day",
+        "stage": "retailer_systems",
+        "status": "passed"
+      },
+      "id": 32,
+      "ts": "2026-09-21T22:07:25.068+10:00"
+    }
+  ]
+}

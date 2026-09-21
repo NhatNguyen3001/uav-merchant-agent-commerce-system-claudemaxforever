@@ -3,10 +3,11 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import Conversation from './components/Conversation.vue'
 import MobileTabs from './components/MobileTabs.vue'
 import Pipeline from './components/Pipeline.vue'
-import { deleteRun, clearHistory, fetchRuns, useRun } from './composables/useRun.js'
+import { deleteRun, clearHistory, fetchHealth, fetchRuns, useRun } from './composables/useRun.js'
 
 const { events, runId, running, error, start } = useRun()
 const runs = ref([])
+const showcase = ref(false) // recorded examples only: typed queries are switched off on the hosted demo
 const draft = ref(null) // the typed query shown in the chat before the backend echoes it
 
 const PIPELINE_KEY = 'macs.pipeline.visible'
@@ -47,6 +48,9 @@ async function onClear() {
 }
 
 onMounted(refreshRuns)
+onMounted(async () => {
+  showcase.value = !!(await fetchHealth().catch(() => ({}))).replay
+})
 
 // Phones and small tablets show one panel at a time behind a bottom tab bar.
 const mql = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 960px)') : null
@@ -82,6 +86,7 @@ const outcome = computed(() => {
       :error="error"
       :pipeline-visible="pipelineVisible"
       :mobile="isMobile"
+      :showcase="showcase"
       @run="run"
       @replay="run({ scenario: $event })"
       @delete="onDelete"

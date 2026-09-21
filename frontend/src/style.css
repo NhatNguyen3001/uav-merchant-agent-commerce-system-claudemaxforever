@@ -198,6 +198,21 @@ code { font: inherit; font-weight: 500; }
 .examples-label { color: var(--muted); font-size: 13.5px; margin-right: 2px; }
 .chip { border: 1px solid var(--hair); background: transparent; border-radius: 999px; padding: 4px 11px; font-size: 13.5px; color: var(--ink-2); }
 .chip:hover { border-color: var(--ink); color: var(--ink); }
+
+/* Showcase mode: the recorded runs replace the text box, one button each. */
+/* The typed-query composer uses a two-column grid; the showcase picker is a plain stack. */
+.composer.showcase { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; gap: 6px; }
+.composer.showcase > * { max-width: 560px; }
+.recorded {
+  display: grid; gap: 2px; text-align: left; padding: 9px 12px; border-radius: 8px;
+  border: 1px solid var(--hair); background: var(--card); color: var(--ink);
+}
+.recorded:hover:not(:disabled) { border-color: var(--pass); background: rgba(88, 127, 252, 0.06); }
+.recorded:disabled { opacity: 0.5; cursor: default; }
+.recorded-label { font-size: 15.5px; }
+.recorded-note { font-size: 13px; color: var(--muted); }
+.icon.repo { color: var(--muted); text-decoration: none; }
+.icon.repo:hover { color: var(--ink); }
 .error { color: var(--blocked); font-size: 14px; }
 
 /* Progress: a rounded pill track with a brand-blue fill and a white knob at its leading edge. */

@@ -25,10 +25,17 @@ function when(r) {
   return isNaN(d) ? '' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
+const SCENARIO_TITLE = {
+  happy_path: 'Podcast starter',
+  instant_buyer: 'Gym earbuds, no haggling',
+  rejected_agent: 'Unregistered agent',
+}
+
 function title(r) {
-  if (r.is_golden) return r.scenario === 'happy_path' ? 'Example: podcast starter' : 'Example: unregistered agent'
+  const named = SCENARIO_TITLE[r.scenario]
+  if (r.is_golden) return `Example: ${(named || r.scenario).toLowerCase()}`
   if (r.query) return r.query
-  return r.scenario === 'happy_path' ? 'Podcast starter' : r.scenario === 'rejected_agent' ? 'Unregistered agent' : r.scenario
+  return named || r.scenario
 }
 
 function outcome(r) {

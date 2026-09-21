@@ -21,6 +21,12 @@ SCENARIOS = {
         "protocol": "acp", "agent_id": "buyer-999", "mandate_id": "mandate-999",
         "messages": [{"role": "user", "content": "Looking for a podcast microphone under 200."}],
     },
+    # Same shape as the happy path, sent by the agent that accepts the first offer: one round, no counter.
+    "instant_buyer": {
+        "protocol": "acp", "agent_id": "buyer-002", "mandate_id": "mandate-002",
+        "messages": [{"role": "user", "content": "Wireless earbuds with noise cancelling for the gym, plus a "
+                                                 "power bank for travel, under 250, need them by Sunday."}],
+    },
 }
 
 
