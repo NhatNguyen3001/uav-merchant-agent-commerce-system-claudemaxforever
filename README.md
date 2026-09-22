@@ -11,7 +11,7 @@
     <img src="https://img.shields.io/badge/Vue-3-42b883" alt="Vue 3">
     <img src="https://img.shields.io/badge/Claude-Sonnet%205-1E1E5D" alt="Claude Sonnet 5">
     <img src="https://img.shields.io/badge/Google%20Cloud-Run%20%7C%20Firestore%20%7C%20Vertex%20AI-4285F4" alt="Google Cloud">
-    <img src="https://img.shields.io/badge/tests-71%20passing-brightgreen" alt="Tests">
+    <img src="https://img.shields.io/badge/tests-77%20passing-brightgreen" alt="Tests">
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
   </p>
 
@@ -28,7 +28,7 @@
 
 2. **Three deterministic gates around the model.** Inbound (identity, mandate, injection screen), outbound (grounding, prices, shipping, discount cap, margin floor), and execution (buyer acceptance, mandate signature, expiry, scope, spend cap). Hard merchant rules never enter a prompt. The outbound gate corrects a proposal rather than rejecting it, and the console shows the before and after.
 
-3. **A console that explains itself.** Type what a buyer's agent would ask, pick one of three identities, and watch the negotiation as a chat while the pipeline streams every gate verdict, tool call, and decision in plain language. Two recorded runs replay on demand; everything else runs live against Claude and Firestore.
+3. **A console that explains itself.** The negotiation reads as a chat while the pipeline streams every gate verdict, tool call, and decision in plain language. Run it locally and you type the buyer's request yourself and pick one of three identities. The hosted demo runs in showcase mode: three recorded runs replay on demand and typed queries are switched off, so a public link cannot run up model spend.
 
 ![Console: a live run with the decoded intent and proposal](assets/console-run.png)
 
@@ -42,9 +42,9 @@ The deployed MVP: a Vue console on Firebase Hosting streams from a FastAPI servi
 
 ### Workflow
 
-![Workflow: how a request moves through the layers](assets/workflow.png)
+![Workflow: one request from arrival to a written order](assets/workflow.png)
 
-A request enters through the protocol adapter, passes the inbound gate, and reaches the merchant intelligence layer, which decodes intent, queries retailer systems, composes the proposal, and negotiates. The outbound gate governs every response before it leaves. The execution gate authorises the order against the AP2-style mandate, and the integration layer carries it into the retailer's own catalogue, pricing, and order systems.
+One request, lane by lane. The buyer's agent asks; the inbound check verifies the credential and mandate, and an unknown agent is refused there with a reason. Claude decodes the request into structured requirements. The catalogue check runs vector search and the budget, delivery and stock filters, and stops the run when the store cannot serve the request. Claude then composes a bundle with a reason per item, and the outbound check verifies it against fresh shipping data, the discount cap and the margin floor, correcting it rather than rejecting it. The buyer's agent may counter once before accepting. The execution check tests the mandate, and only then is the order written. An interactive version with guided views is in [`docs/diagrams/workflow.html`](docs/diagrams/workflow.html), generated from [`workflow.archify.json`](docs/diagrams/workflow.archify.json).
 
 ### Request flow
 
@@ -58,8 +58,11 @@ Buyer's agent (external, simulated)
         v
   Intent decoder        Claude returns an Intent                     (forced tool call, Pydantic-validated)
         v
-  Proposal engine       semantic_search + search_products over MCP,
-                        Claude returns a Proposal with rationale and alternative
+  Catalogue check       semantic_search + search_products over MCP;
+                        refuses requests the store cannot serve        (deterministic)
+        v
+  Proposal engine       Claude returns a Proposal with a rationale
+                        per item and a cheaper alternative
         v
   Outbound gate         grounding, prices, shipping, discount cap,
                         margin floor                                 (deterministic, corrects)
@@ -85,6 +88,10 @@ Buyer's agent (external, simulated)
 
 **Event stream.** Every step emits a typed event (message, intent, tool, gate, stage, proposal, decision, order) with a monotonic id. Events stream to the console over Server-Sent Events and are persisted per run in Firestore, which is what history and replay read.
 
+**Runs belong to a browser.** Each browser generates a random session key on first visit and sends it with every request, or as `?session=` on the event stream, which cannot carry headers. A run stores the SHA-256 of that key, never the key itself. History, opening, streaming, replaying and deleting a run are limited to the session that started it; the recorded examples are open to everyone.
+
+**One instance by design.** Live events are held in memory for the run's lifetime, so a second server could not stream a run it did not start. The deploy pins the service to a single Cloud Run instance, which is ample for a demo and keeps streaming simple. Making it horizontal would mean fanning events out through Firestore listeners.
+
 ---
 
 ## The three gates
@@ -94,6 +101,7 @@ Validate what comes in, govern what goes out, authorise what gets executed.
 | Gate | Checks | Outcome on failure |
 |---|---|---|
 | Inbound | Credential exists and is active. Mandate exists, belongs to the agent, and is unexpired. Free text contains no known injection phrase. | Blocked. The merchant replies with the reason. |
+| Catalogue | The nearest product is close enough to the request, and something survives the budget, delivery, and stock filters. | Blocked. The merchant names the closest items it does carry. |
 | Outbound | Every item cites a tool result from this run. Item prices match list prices. Shipping meets the deadline and items are in stock. Bundle discount is within the cap. Margin is above the floor. The alternative is priced within the cap. | Corrected and re-issued, or blocked when an item is ungrounded, late, or out of stock. |
 | Execution | The buyer's agent accepted the final proposal. Mandate signature is present and the mandate is unexpired. Items are within the mandate scope. Total is within the spend cap when one is set. | Blocked. No order is written. |
 
@@ -116,7 +124,8 @@ A deterministic catalogue check runs between the inbound gate and the proposal e
 | Storage | Firestore: catalogue, rules, mandates, credentials, injection patterns, runs, events, orders |
 | Console | Vue 3, Vite; IBM Plex Sans for chat text, JetBrains Mono and IBM Plex Mono for labels and the pipeline |
 | Hosting | Cloud Run (backend), Firebase Hosting (console), Cloud Build, Artifact Registry, Secret Manager |
-| Tests | pytest, 71 tests, recorded model outputs and an in-memory store, no network |
+| Privacy | Per-browser session key; runs stored against its hash, never the key |
+| Tests | pytest, 77 tests, recorded model outputs and an in-memory store, no network |
 
 ---
 
@@ -157,7 +166,7 @@ gcloud firestore indexes composite create --project=<project-id> --collection-gr
   --query-scope=COLLECTION --field-config='vector-config={"dimension":"768","flat":"{}"},field-path=embedding'
 ```
 
-Seeding loads governance data, embeds and writes the catalogue, and loads the two recorded examples. `--golden-only` reloads only the examples.
+Seeding loads governance data, embeds and writes the catalogue, and loads the three recorded examples. `--golden-only` reloads only the examples.
 
 ### Deploy
 
@@ -166,7 +175,9 @@ export ANTHROPIC_API_KEY=sk-ant-...
 bash deploy.sh
 ```
 
-The script builds the backend with Cloud Build, grants the runtime service account access to Firestore, Vertex AI, and the secret, deploys to Cloud Run in `australia-southeast1` with one warm instance, then builds the console with the Cloud Run URL and publishes it to Firebase Hosting. The console calls Cloud Run directly because Firebase Hosting buffers rewritten responses, which would break the event stream.
+The script builds the backend with Cloud Build, grants the runtime service account access to Firestore, Vertex AI, and the secret, deploys to Cloud Run in `australia-southeast1` with exactly one warm instance, then builds the console with the Cloud Run URL and publishes it to Firebase Hosting. The console calls Cloud Run directly because Firebase Hosting buffers rewritten responses, which would break the event stream.
+
+The hosted service always runs with `REPLAY=1` and `RULES_LOCKED=1`: recorded examples only, merchant rules read-only. `backend/.env` sets `REPLAY=0` for local work, so the deploy fixes the hosted value rather than inheriting it.
 
 ### Configuration
 
@@ -186,15 +197,15 @@ The script builds the backend with Cloud Build, grants the runtime service accou
 
 ![Console: proposal with a rationale per item and a cheaper alternative](assets/console-proposal.png)
 
-**Conversation panel.** You play the buyer's agent. Type a request, choose an identity (registered and negotiates once, registered and accepts the first offer, or unregistered and refused), and run. The merchant agent replies in chat and closes every conversation with the outcome. Five example requests are provided.
+**Conversation panel.** You play the buyer's agent. Type a request, choose an identity (registered and negotiates once, registered and accepts the first offer, or unregistered and refused), and run. The merchant agent replies in chat and closes every conversation with the outcome. Six example requests fill the box in one click, and one of them also switches the identity to the buyer that accepts the first offer.
 
-**Pipeline panel.** A progress bar across the seven stages, an outcome sentence, and one collapsible row per event: gate verdicts with before-and-after corrections, the decoded intent, grouped tool calls with latency, proposals with rationale and SKU, the buyer's decision each round, and the order. The decoded intent and the proposal open by default.
+**Pipeline panel.** A progress bar across the seven stages, an outcome sentence, and one collapsible row per event: gate verdicts with before-and-after corrections, the decoded intent, grouped tool calls with latency, proposals with rationale and SKU, the buyer's decision each round, and the order. The decoded intent and the proposal open by default. While a run streams, the panel follows new rows only if you are already at the bottom; scroll up to read and it stays put, with a button to jump back.
 
 **Merchant rules.** Shows the discount cap, margin floor, and negotiation style. The hosted demo keeps them read-only; with `RULES_LOCKED=0` they can be edited and saved, and take effect in the gates immediately. Hard rules never reach a prompt.
 
 **Showcase mode.** With `REPLAY=1`, the composer becomes a picker of the three recorded examples: the podcast starter, the gym earbuds request sent by the buyer that accepts the first offer, and the refused unregistered agent. Typed queries are switched off.
 
-**History.** Each browser keeps a random session key and sees only its own runs plus the two recorded examples; nobody can open, replay, or delete another person's run. Runs store a hash of the key, never the key. All amounts are in US dollars.
+**History.** Each browser keeps a random session key and sees only its own runs plus the three recorded examples; nobody can open, replay, or delete another person's run. Runs store a hash of the key, never the key. All amounts are in US dollars.
 
 ---
 
@@ -204,7 +215,7 @@ Run endpoints identify the caller by the `X-MACS-Session` header, a random key e
 
 | Method and path | Description |
 |---|---|
-| `POST /api/runs` | Start a run. Body `{agent_id, query}` for a typed request, or `{scenario}` for a canned scenario or a past run id to replay. Returns `{run_id}`. Requires a session key. |
+| `POST /api/runs` | Start a run. Body `{agent_id, query}` for a typed request, or `{scenario}` for a canned scenario or a past run id to replay. Returns `{run_id}`. Requires a session key; a typed request returns 403 in showcase mode. |
 | `GET /api/runs/{run_id}/events` | Server-Sent Events stream of one of your runs or an example. |
 | `GET /api/runs` | Your runs with summaries, recorded examples first. |
 | `GET /api/runs/{run_id}` | Full event list for one of your runs or an example. |
@@ -278,6 +289,18 @@ From the recorded happy-path run on Claude Sonnet 5 (`data/replay/happy_path.jso
 | Execution gate | 0.2 s | Total $590, mandate valid |
 | Order | 0.7 s | `create_order` written, ships in 2 days |
 
+### What a run costs
+
+Token usage was measured on Claude Sonnet 5 at $2 per million input tokens and $10 per million output tokens.
+
+| Run | Claude calls | Input tokens | Output tokens | Cost |
+|---|---|---|---|---|
+| Registered buyer that negotiates once | 7 | 32,592 | 3,705 | $0.102 |
+| Registered buyer that accepts the first offer | 4 | 17,785 | 1,999 | $0.056 |
+| Unregistered agent, refused at the inbound gate | 0 | 0 | 0 | none |
+
+So a hundred negotiated runs cost roughly $10 in model spend. Vertex AI embeddings, Firestore and Cloud Run add very little beside that.
+
 Two design decisions came from measurement. Structured outputs and strict tool use both rely on constrained decoding, which ran at about 40 tokens per second on the nested proposal schema; a non-strict forced tool call runs at about 95 tokens per second, so the wrapper uses that and validates afterwards. The first semantic search after a process start pays about 5 seconds for the Vertex AI access token; later searches complete in well under a second.
 
 ---
@@ -289,8 +312,11 @@ Two design decisions came from measurement. Structured outputs and strict tool u
 - **The buyer's agent is scripted.** It is a Claude call under a mandate with a fixed negotiation policy per identity. Real agents would connect through the same adapter.
 - **Retailer systems are mock data in Firestore.** In production the MCP server would sit beside the retailer's product information and order management systems.
 - **The buyer's budget is not enforced by the merchant.** The outbound gate enforces merchant rules and delivery promises. Whether a proposal fits the buyer's budget is left to the buyer's agent, and the model occasionally proposes above it.
+- **Claims are guided, not enforced.** The proposal prompt restricts value claims to products with a certification, but no gate checks it, and most scraped listings record no certification.
 - **Scraped listings carry rule-assigned cost, stock, and shipping days.**
-- **Replay is labelled.** Live demonstrations run live; the two recorded runs are shown as examples.
+- **Proposals are generated twice per round.** The model's first answer fails schema validation and is fed back once, which accounts for roughly 45 percent of a run's cost and several seconds per round. The cause has not been diagnosed.
+- **One instance, so a crowd would queue.** Live events live in the server's memory and Firestore calls are synchronous, so a burst of simultaneous runs would slow each other down. A pilot would need event fan-out and a run queue first.
+- **The hosted demo replays.** It runs in showcase mode with typed queries switched off; the three recorded runs are labelled as examples. Local runs go live against Claude and Firestore.
 
 ---
 

@@ -1,0 +1,294 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "How MACS answers a buyer's agent",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1180,
+      660
+    ],
+    "views": [
+      {
+        "id": "main-path",
+        "label": "Request to order",
+        "focus": [
+          "request",
+          "inbound",
+          "intent",
+          "catalogue",
+          "proposal",
+          "outbound",
+          "decision",
+          "execution",
+          "order"
+        ],
+        "note": "One request from an AI shopping agent, through every step, to a written order."
+      },
+      {
+        "id": "governance",
+        "label": "Where the rules decide",
+        "focus": [
+          "inbound",
+          "catalogue",
+          "outbound",
+          "execution",
+          "refused"
+        ],
+        "note": "Four deterministic checks. The model proposes; these decide, and any of them can stop the run."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "buyer",
+      "label": "Buyer's agent"
+    },
+    {
+      "id": "macs",
+      "label": "MACS reasoning (Claude)"
+    },
+    {
+      "id": "rules",
+      "label": "Deterministic checks",
+      "variant": "exception"
+    },
+    {
+      "id": "retail",
+      "label": "Retailer systems (MCP tools)"
+    }
+  ],
+  "mainPath": [
+    "request",
+    "inbound",
+    "intent",
+    "catalogue",
+    "proposal",
+    "outbound",
+    "decision",
+    "execution",
+    "order"
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "lane": "buyer",
+      "col": 0,
+      "type": "external",
+      "label": "Request arrives",
+      "sublabel": "goal, budget, deadline",
+      "width": 140
+    },
+    {
+      "id": "decision",
+      "lane": "buyer",
+      "col": 5,
+      "type": "external",
+      "label": "Buyer decides",
+      "sublabel": "accept or counter",
+      "width": 140
+    },
+    {
+      "id": "intent",
+      "lane": "macs",
+      "col": 1,
+      "type": "backend",
+      "label": "Decode intent",
+      "sublabel": "six requirements",
+      "width": 140
+    },
+    {
+      "id": "proposal",
+      "lane": "macs",
+      "col": 3,
+      "type": "backend",
+      "label": "Compose bundle",
+      "sublabel": "a reason per item",
+      "width": 140
+    },
+    {
+      "id": "inbound",
+      "lane": "rules",
+      "col": 0,
+      "type": "security",
+      "label": "Inbound check",
+      "sublabel": "credential, mandate",
+      "width": 140
+    },
+    {
+      "id": "refused",
+      "lane": "buyer",
+      "col": 1,
+      "type": "external",
+      "label": "Refused",
+      "sublabel": "told why, no order",
+      "width": 140
+    },
+    {
+      "id": "catalogue",
+      "lane": "rules",
+      "col": 2,
+      "type": "security",
+      "label": "Catalogue check",
+      "sublabel": "can we serve this?",
+      "width": 140
+    },
+    {
+      "id": "outbound",
+      "lane": "rules",
+      "col": 4,
+      "type": "security",
+      "label": "Outbound check",
+      "sublabel": "price, margin, delivery",
+      "tag": "corrects",
+      "width": 140
+    },
+    {
+      "id": "execution",
+      "lane": "rules",
+      "col": 5,
+      "type": "security",
+      "label": "Execution check",
+      "sublabel": "mandate allows it",
+      "width": 140
+    },
+    {
+      "id": "lookups",
+      "lane": "retail",
+      "col": 2,
+      "type": "database",
+      "label": "Catalogue lookups",
+      "sublabel": "vector search, filters",
+      "width": 140
+    },
+    {
+      "id": "shipping",
+      "lane": "retail",
+      "col": 4,
+      "type": "database",
+      "label": "Shipping check",
+      "sublabel": "days and stock",
+      "width": 140
+    },
+    {
+      "id": "order",
+      "lane": "retail",
+      "col": 5,
+      "type": "cloud",
+      "label": "Order written",
+      "sublabel": "agreed price, ship days",
+      "width": 140
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-request-inbound",
+      "from": "request",
+      "to": "inbound",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-inbound-intent",
+      "from": "inbound",
+      "to": "intent",
+      "label": "verified",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-inbound-refused",
+      "from": "inbound",
+      "to": "refused",
+      "label": "unknown agent",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "e-intent-catalogue",
+      "from": "intent",
+      "to": "catalogue",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-lookups-catalogue",
+      "from": "lookups",
+      "to": "catalogue",
+      "label": "candidates",
+      "variant": "dashed"
+    },
+    {
+      "id": "e-catalogue-proposal",
+      "from": "catalogue",
+      "to": "proposal",
+      "label": "in stock, in budget",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-proposal-outbound",
+      "from": "proposal",
+      "to": "outbound",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-shipping-outbound",
+      "from": "shipping",
+      "to": "outbound",
+      "label": "delivery days",
+      "variant": "dashed"
+    },
+    {
+      "id": "e-outbound-decision",
+      "from": "outbound",
+      "to": "decision",
+      "label": "offer sent",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-decision-proposal",
+      "from": "decision",
+      "to": "proposal",
+      "label": "counters once",
+      "variant": "dashed",
+      "role": "branch",
+      "route": "up-channel"
+    },
+    {
+      "id": "e-decision-execution",
+      "from": "decision",
+      "to": "execution",
+      "label": "accepts",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-execution-order",
+      "from": "execution",
+      "to": "order",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "The model proposes, the rules decide",
+      "items": [
+        "Four checks run in code: identity, catalogue, outbound, execution",
+        "Any of them can stop the run, and the buyer is told why"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Nothing is invented",
+      "items": [
+        "Every price and delivery day comes from a catalogue lookup in that run",
+        "The discount cap and margin floor are never shown to the model"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "At most two rounds",
+      "items": [
+        "The buyer's agent may counter once before the final offer",
+        "No order is written unless it accepts"
+      ]
+    }
+  ]
+}
