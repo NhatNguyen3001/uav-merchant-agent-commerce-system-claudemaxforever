@@ -6,6 +6,7 @@
   <p><i>A retailer-side service that sells to autonomous AI shopping agents: verifies the agent, decodes what the buyer needs, composes a grounded product bundle, negotiates inside the merchant's rules, and places the order. Language models reason; deterministic gates decide.</i></p>
 
   <p>
+    <img src="https://img.shields.io/badge/UAVS%20Hackathon%202026-2nd%20place-C0C0C0" alt="Second place, UAVS Hackathon 2026">
     <a href="https://merchant-agent-commerce-system.firebaseapp.com/"><img src="https://img.shields.io/badge/live%20demo-Firebase%20Hosting-587FFC" alt="Live demo"></a>
     <img src="https://img.shields.io/badge/python-3.11-blue" alt="Python">
     <img src="https://img.shields.io/badge/Vue-3-42b883" alt="Vue 3">
@@ -16,6 +17,8 @@
   </p>
 
   <p><b>Live Demo:</b> <a href="https://merchant-agent-commerce-system.firebaseapp.com/">https://merchant-agent-commerce-system.firebaseapp.com/</a></p>
+
+  <p><b>Second place at the UAVS Hackathon 2026.</b></p>
 
   <p>Built in 16 hours for the UAVS Hackathon 2026 by Team ClaudeMax Forever, in response to the problem statement set by FPT Australasia.</p>
 </div>
@@ -329,7 +332,7 @@ Two design decisions came from measurement. Structured outputs and strict tool u
 - [FastAPI](https://fastapi.tiangolo.com/), [Pydantic](https://docs.pydantic.dev/), [Vue](https://vuejs.org/), and [Vite](https://vite.dev/)
 - Fonts by [IBM Plex](https://github.com/IBM/plex) and [JetBrains Mono](https://www.jetbrains.com/lp/mono/) via Fontsource
 - [nexscope.ai](https://nexscope.ai) for collecting the Amazon product listings used in the catalogue
-- Problem statement by FPT Australasia for the UAVS Hackathon 2026
+- Problem statement by FPT Australasia for the UAVS Hackathon 2026, where MACS took second place
 - AI coding assistants (Claude Code) were used under team review, as permitted by the hackathon rulebook
 
 ---
