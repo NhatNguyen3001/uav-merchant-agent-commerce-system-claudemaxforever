@@ -180,7 +180,7 @@ bash deploy.sh
 
 The script builds the backend with Cloud Build, grants the runtime service account access to Firestore, Vertex AI, and the secret, deploys to Cloud Run in `australia-southeast1` with exactly one warm instance, then builds the console with the Cloud Run URL and publishes it to Firebase Hosting. The console calls Cloud Run directly because Firebase Hosting buffers rewritten responses, which would break the event stream.
 
-The hosted service always runs with `REPLAY=1` and `RULES_LOCKED=1`: recorded examples only, merchant rules read-only. `backend/.env` sets `REPLAY=0` for local work, so the deploy fixes the hosted value rather than inheriting it.
+The hosted service runs with `REPLAY=0` and `RULES_LOCKED=1`: typed queries run the live graph against the Claude API, and merchant rules stay read-only. To switch the hosted demo back to showcase mode without a rebuild, run `gcloud run services update macs-api --region australia-southeast1 --update-env-vars REPLAY=1`.
 
 ### Configuration
 
@@ -190,7 +190,7 @@ The hosted service always runs with `REPLAY=1` and `RULES_LOCKED=1`: recorded ex
 | `GOOGLE_CLOUD_PROJECT` | Firestore and Vertex AI project | Unset; a seeded in-memory store is used |
 | `MACS_MODEL` | Claude model for all three roles | `claude-sonnet-5` |
 | `FAKE_LLM` | `1` returns recorded model outputs, no API calls | `0` |
-| `REPLAY` | Showcase mode: `1` replays the recorded examples instead of running the graph, and refuses typed queries so a public demo cannot run up model spend | `0` locally, `1` on the hosted demo |
+| `REPLAY` | Showcase mode: `1` replays the recorded examples instead of running the graph, and refuses typed queries so a public demo cannot run up model spend | `0` (locally and on the hosted service) |
 | `RULES_LOCKED` | `0` makes the merchant rules editable; any other value keeps them read-only | `1` (locked) |
 | `WEB_PORT` | Host port for the console under Docker Compose | `8080` |
 

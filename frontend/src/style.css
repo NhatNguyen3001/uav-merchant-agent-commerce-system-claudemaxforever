@@ -103,21 +103,23 @@ code { font: inherit; font-weight: 500; }
 
 /* Conversation panel */
 .brand { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 10px; gap: 8px; }
-.brand-lockup { display: flex; align-items: center; gap: 10px; }
+.brand-lockup { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .brand-mark { width: 32px; height: 32px; object-fit: contain; }
 .brand h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--ink); line-height: 1.1; }
 .brand-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
 .brand-actions .ghost { white-space: nowrap; }
 .lbl-short { display: none; }
-.brand-actions { display: flex; align-items: center; gap: 4px; }
+.brand-actions { display: flex; align-items: center; gap: 4px; flex: none; }
 .empty { color: var(--muted); font-size: 14px; padding: 6px 8px; }
 
-.drawer { margin: 0 18px 12px; border: 1px solid var(--hair); background: var(--card); border-radius: 8px; padding: 14px; display: grid; gap: 10px; }
+.drawer { margin: 0 18px 12px; border: 1px solid var(--hair); background: var(--card); border-radius: 8px; padding: 14px; display: grid; gap: 10px; max-width: 560px; }
+.drawer-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 .drawer-note { color: var(--muted); font-size: 14px; line-height: 1.4; }
 .drawer label { display: grid; gap: 4px; font-size: 14px; color: var(--ink-2); }
-.drawer input { border: 1px solid var(--hair); border-radius: 6px; padding: 7px 9px; background: var(--card); }
-.drawer input:focus { border-color: var(--ink); outline: none; }
-.drawer input:disabled { background: var(--lavender); color: var(--ink-2); border-color: var(--hair); cursor: not-allowed; }
+.drawer input, .drawer textarea { width: 100%; min-width: 0; border: 1px solid var(--hair); border-radius: 6px; padding: 7px 9px; background: var(--card); }
+.drawer textarea { resize: vertical; line-height: 1.4; }
+.drawer input:focus, .drawer textarea:focus { border-color: var(--ink); outline: none; }
+.drawer input:disabled, .drawer textarea:disabled { background: var(--lavender); color: var(--ink-2); border-color: var(--hair); cursor: not-allowed; }
 .drawer-locked { font-size: 14px; color: var(--ink-2); }
 .drawer-actions { display: flex; align-items: center; gap: 10px; }
 .status { color: var(--muted); font-size: 14px; }
@@ -211,7 +213,8 @@ code { font: inherit; font-weight: 500; }
 .recorded:disabled { opacity: 0.5; cursor: default; }
 .recorded-label { font-size: 15.5px; }
 .recorded-note { font-size: 13px; color: var(--muted); }
-.icon.repo { color: var(--muted); text-decoration: none; }
+/* Same box as the .ghost buttons beside it so the row shares one centre line. */
+.icon.repo { width: 32px; height: 32px; flex: none; color: var(--ink-2); text-decoration: none; }
 .icon.repo:hover { color: var(--ink); }
 .error { color: var(--blocked); font-size: 14px; }
 
@@ -348,6 +351,8 @@ code { font: inherit; font-weight: 500; }
   .brand-sub { white-space: normal; font-size: 11.5px; line-height: 1.25; }
   .lbl-full { display: none; }
   .lbl-short { display: inline; }
+  .brand-actions { gap: 2px; }
+  .brand-actions .ghost { padding: 0 8px; }
   .drawer { margin: 0 14px 10px; }
   .thread-wrap { padding: 12px 14px; }
   .bubble { max-width: 92%; padding: 9px 12px 10px; }

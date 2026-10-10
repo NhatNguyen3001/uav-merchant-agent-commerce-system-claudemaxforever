@@ -92,9 +92,11 @@ function time(ts) {
 
     <form v-if="drawerOpen && rules" class="drawer" @submit.prevent="onSave">
       <p class="drawer-note">Hard limits are enforced by the gates and never shown to the model.</p>
-      <label>Max discount %<input type="number" v-model.number="rules.hard.max_discount_pct" min="0" max="90" :disabled="rules.locked" /></label>
-      <label>Min margin %<input type="number" v-model.number="rules.hard.min_margin_pct" min="0" max="90" :disabled="rules.locked" /></label>
-      <label>Negotiation style<input v-model="rules.soft.negotiation_style" :disabled="rules.locked" /></label>
+      <div class="drawer-row">
+        <label>Max discount %<input type="number" v-model.number="rules.hard.max_discount_pct" min="0" max="90" :disabled="rules.locked" /></label>
+        <label>Min margin %<input type="number" v-model.number="rules.hard.min_margin_pct" min="0" max="90" :disabled="rules.locked" /></label>
+      </div>
+      <label>Negotiation style<textarea v-model="rules.soft.negotiation_style" rows="2" :disabled="rules.locked"></textarea></label>
       <p v-if="rules.locked" class="drawer-locked">Locked for the demo. These limits apply to every run.</p>
       <div v-else class="drawer-actions">
         <button class="primary" type="submit">Save rules</button>
