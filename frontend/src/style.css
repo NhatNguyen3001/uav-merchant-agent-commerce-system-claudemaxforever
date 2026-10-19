@@ -109,6 +109,12 @@ code { font: inherit; font-weight: 500; }
 .brand-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
 .brand-actions .ghost { white-space: nowrap; }
 .lbl-short { display: none; }
+/* The panel is 3/10 of the window, so below ~1600px the full header no longer fits on one line. */
+@media (min-width: 961px) and (max-width: 1600px) {
+  .brand-sub { white-space: normal; line-height: 1.25; }
+  .lbl-full { display: none; }
+  .lbl-short { display: inline; }
+}
 .brand-actions { display: flex; align-items: center; gap: 4px; flex: none; }
 .empty { color: var(--muted); font-size: 14px; padding: 6px 8px; }
 

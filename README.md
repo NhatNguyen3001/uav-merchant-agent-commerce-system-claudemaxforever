@@ -31,7 +31,7 @@
 
 2. **Three deterministic gates around the model.** Inbound (identity, mandate, injection screen), outbound (grounding, prices, shipping, discount cap, margin floor), and execution (buyer acceptance, mandate signature, expiry, scope, spend cap). Hard merchant rules never enter a prompt. The outbound gate corrects a proposal rather than rejecting it, and the console shows the before and after.
 
-3. **A console that explains itself.** The negotiation reads as a chat while the pipeline streams every gate verdict, tool call, and decision in plain language. Run it locally and you type the buyer's request yourself and pick one of three identities. The hosted demo runs in showcase mode: three recorded runs replay on demand and typed queries are switched off, so a public link cannot run up model spend.
+3. **A console that explains itself.** The negotiation reads as a chat while the pipeline streams every gate verdict, tool call, and decision in plain language. You type the buyer's request yourself, pick one of three identities, and every pipeline card is labelled with what its colour means. The hosted demo runs typed queries live against Claude; the three recorded examples replay from History at no model cost, and one environment variable switches the site to replay-only showcase mode.
 
 ![Console: a live run with the decoded intent and proposal](assets/console-run.png)
 
@@ -200,15 +200,27 @@ The hosted service runs with `REPLAY=0` and `RULES_LOCKED=1`: typed queries run 
 
 ![Console: proposal with a rationale per item and a cheaper alternative](assets/console-proposal.png)
 
-**Conversation panel.** You play the buyer's agent. Type a request, choose an identity (registered and negotiates once, registered and accepts the first offer, or unregistered and refused), and run. The merchant agent replies in chat and closes every conversation with the outcome. Six example requests fill the box in one click, and one of them also switches the identity to the buyer that accepts the first offer.
+**Conversation panel.** You play the buyer's agent. The chat takes most of the panel's height; the composer below it is a text box and one toolbar line. **as buyer-001** opens the identities (registered and negotiates once, registered and accepts the first offer, or unregistered and refused), **Examples** opens six example requests that fill the box in one click (one of them also switches to the buyer that accepts the first offer), and **Run** starts the run. Both pop-ups open upward and close on a click outside or Escape. The merchant agent replies in chat and closes every conversation with the outcome.
 
-**Pipeline panel.** A progress bar across the seven stages, an outcome sentence, and one collapsible row per event: gate verdicts with before-and-after corrections, the decoded intent, grouped tool calls with latency, proposals with rationale and SKU, the buyer's decision each round, and the order. The decoded intent and the proposal open by default. While a run streams, the panel follows new rows only if you are already at the bottom; scroll up to read and it stays put, with a button to jump back.
+**Pipeline panel.** Shown by default beside the chat. A progress bar across the seven stages, an outcome sentence, and one collapsible row per event: gate verdicts with before-and-after corrections, the decoded intent, grouped tool calls with latency, proposals with rationale and SKU, the buyer's decision each round, and the order. The decoded intent and the proposal open by default.
+
+Each row's edge colour is named by a badge on the row, so the panel needs no separate key:
+
+| Badge | Colour | Rows |
+|---|---|---|
+| Passed | blue | a gate that passed |
+| Corrected | amber | the outbound gate corrected the proposal |
+| Blocked | coral | a gate or the catalogue check stopped the run; also a run that ended with no order |
+| Claude | periwinkle | the decoded intent and each proposal |
+| Tool | grey | catalogue lookups, shipping checks, the order call |
+| Accepted / Counter | blue / amber | the buyer's agent's decision each round |
+| Placed | blue | the order | While a run streams, the panel follows new rows only if you are already at the bottom; scroll up to read and it stays put, with a button to jump back.
 
 **Merchant rules.** Shows the discount cap, margin floor, and negotiation style. The hosted demo keeps them read-only; with `RULES_LOCKED=0` they can be edited and saved, and take effect in the gates immediately. Hard rules never reach a prompt.
 
 **Showcase mode.** With `REPLAY=1`, the composer becomes a picker of the three recorded examples: the podcast starter, the gym earbuds request sent by the buyer that accepts the first offer, and the refused unregistered agent. Typed queries are switched off.
 
-**History.** Each browser keeps a random session key and sees only its own runs plus the three recorded examples; nobody can open, replay, or delete another person's run. Runs store a hash of the key, never the key. All amounts are in US dollars.
+**History.** Collapsed on every page load, so the chat keeps its height; when opened it sits in a lavender tray, and picking a run folds it away again. Each browser keeps a random session key and sees only its own runs plus the three recorded examples; nobody can open, replay, or delete another person's run. Runs store a hash of the key, never the key. All amounts are in US dollars.
 
 ---
 
@@ -319,7 +331,7 @@ Two design decisions came from measurement. Structured outputs and strict tool u
 - **Scraped listings carry rule-assigned cost, stock, and shipping days.**
 - **Proposals are generated twice per round.** The model's first answer fails schema validation and is fed back once, which accounts for roughly 45 percent of a run's cost and several seconds per round. The cause has not been diagnosed.
 - **One instance, so a crowd would queue.** Live events live in the server's memory and Firestore calls are synchronous, so a burst of simultaneous runs would slow each other down. A pilot would need event fan-out and a run queue first.
-- **The hosted demo replays.** It runs in showcase mode with typed queries switched off; the three recorded runs are labelled as examples. Local runs go live against Claude and Firestore.
+- **The hosted demo spends real credits.** Typed queries on the public link run live against Claude, roughly $0.06 to $0.10 each. Setting `REPLAY=1` on the Cloud Run service turns that off without a rebuild.
 
 ---
 
