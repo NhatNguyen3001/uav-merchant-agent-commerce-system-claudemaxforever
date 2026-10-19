@@ -203,7 +203,7 @@ code { font: inherit; font-weight: 500; }
 .agent-id { font-size: 12.5px; color: var(--muted); }
 .run-btn { height: 40px; padding: 0 22px; }
 .query {
-  resize: none; min-height: 68px; max-height: 180px; padding: 10px 12px; line-height: 1.5; width: 100%;
+  resize: none; min-height: 104px; max-height: 220px; padding: 10px 12px; line-height: 1.5; width: 100%;
   border: 1px solid var(--hair); border-radius: 8px; background: var(--card); font-size: 16.5px;
 }
 .query::placeholder { color: var(--muted); }
@@ -378,7 +378,7 @@ code { font: inherit; font-weight: 500; }
   .bubble { max-width: 92%; padding: 9px 12px 10px; }
   .bubble-text { font-size: 15.5px; }
   .composer { padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); gap: 8px; }
-  .query { min-height: 56px; font-size: 16px; }
+  .query { min-height: 80px; font-size: 16px; }
   .menu-wrap { position: static; }
   .toolbar { position: relative; }
   .menu { left: 0; right: 0; width: auto; max-width: none; min-width: 0; }

@@ -121,7 +121,7 @@ function onKeydown(e) {
     <textarea
       ref="box"
       v-model="query"
-      rows="2"
+      rows="3"
       class="query"
       placeholder="What does the buyer's agent ask for? Enter to run"
       @keydown="onKeydown"
