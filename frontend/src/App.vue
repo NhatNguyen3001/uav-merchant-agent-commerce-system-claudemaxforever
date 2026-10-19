@@ -11,9 +11,10 @@ const showcase = ref(false) // recorded examples only: typed queries are switche
 const draft = ref(null) // the typed query shown in the chat before the backend echoes it
 
 const PIPELINE_KEY = 'macs.pipeline.visible'
-const pipelineVisible = ref(false)
+// Shown by default; stays hidden only in a browser where someone pressed "Hide pipeline".
+const pipelineVisible = ref(true)
 try {
-  pipelineVisible.value = localStorage.getItem(PIPELINE_KEY) === '1'
+  pipelineVisible.value = localStorage.getItem(PIPELINE_KEY) !== '0'
 } catch (_) {}
 watch(pipelineVisible, (v) => {
   try {
