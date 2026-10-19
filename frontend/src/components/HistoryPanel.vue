@@ -1,21 +1,18 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import Chevron from './Chevron.vue'
 import { money } from '../format.js'
 
 const props = defineProps({ runs: { type: Array, required: true }, runId: String, running: Boolean })
 const emit = defineEmits(['replay', 'delete', 'clear'])
 
-const KEY = 'macs.history.open'
+// Starts folded on every load and folds again once a run is picked, so the chat keeps the height.
 const open = ref(false)
-try {
-  open.value = localStorage.getItem(KEY) === '1'
-} catch (_) {}
-watch(open, (v) => {
-  try {
-    localStorage.setItem(KEY, v ? '1' : '0')
-  } catch (_) {}
-})
+
+function pick(id) {
+  open.value = false
+  emit('replay', id)
+}
 
 const own = computed(() => props.runs.filter((r) => !r.is_golden))
 const golden = computed(() => props.runs.filter((r) => r.is_golden))
@@ -62,7 +59,7 @@ function outcome(r) {
       <p v-if="!runs.length" class="empty">No runs yet.</p>
       <ul>
         <li v-for="r in [...golden, ...own]" :key="r.run_id" class="run-row" :class="{ current: r.run_id === runId }">
-          <button type="button" class="run" :disabled="running" @click="emit('replay', r.run_id)">
+          <button type="button" class="run" :disabled="running" @click="pick(r.run_id)">
             <span class="run-title">{{ title(r) }}</span>
             <span class="run-meta"><span>{{ when(r) }}</span><span :class="outcome(r).cls">{{ outcome(r).text }}</span></span>
           </button>

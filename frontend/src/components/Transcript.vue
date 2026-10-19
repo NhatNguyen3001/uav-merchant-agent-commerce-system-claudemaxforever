@@ -76,6 +76,21 @@ function meta(row) {
   return ''
 }
 
+// The badge names what the row's edge colour means, so the pipeline needs no separate key.
+const VERDICT_BADGE = { pass: ['Passed', 'pass'], corrected: ['Corrected', 'corrected'], blocked: ['Blocked', 'blocked'] }
+function badge(row) {
+  const p = row.event?.payload
+  switch (row.kind) {
+    case 'gate': return VERDICT_BADGE[p.verdict] || [p.verdict, 'tool']
+    case 'intent':
+    case 'proposal': return ['Claude', 'claude']
+    case 'tools': return ['Tool', 'tool']
+    case 'decision': return p.action === 'accept' ? ['Accepted', 'pass'] : ['Counter', 'corrected']
+    case 'order': return p.status === 'placed' ? ['Placed', 'pass'] : ['No order', 'blocked']
+    default: return null
+  }
+}
+
 const pending = computed(() => {
   if (!props.running) return null
   const lastStage = props.stages[props.stages.length - 1]
@@ -166,10 +181,11 @@ watch(
     </div>
 
     <ol ref="list" class="blocks">
-      <li v-for="row in rows" :key="row.id" :class="['block', row.kind, row.kind === 'gate' ? row.event.payload.verdict : '', row.kind === 'decision' ? row.event.payload.action : '', { open: isOpen(row) }]">
+      <li v-for="row in rows" :key="row.id" :class="['block', row.kind, row.kind === 'gate' ? row.event.payload.verdict : '', row.kind === 'decision' ? row.event.payload.action : '', row.kind === 'order' ? row.event.payload.status : '', { open: isOpen(row) }]">
         <button type="button" class="row-head" :aria-expanded="isOpen(row)" @click="toggle(row)">
           <span class="who">{{ title(row) }}</span>
           <span class="tag">{{ meta(row) }}</span>
+          <span v-if="badge(row)" class="badge" :class="badge(row)[1]">{{ badge(row)[0] }}</span>
           <Chevron :open="isOpen(row)" />
         </button>
 

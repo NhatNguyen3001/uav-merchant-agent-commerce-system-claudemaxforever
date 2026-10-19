@@ -1,5 +1,6 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import Chevron from './Chevron.vue'
 import { fetchAgents } from '../composables/useRun.js'
 
 const props = defineProps({ running: Boolean, error: String, showcase: Boolean })
@@ -16,6 +17,9 @@ const agents = ref([])
 const agentId = ref('buyer-001')
 const query = ref('')
 const box = ref(null)
+const root = ref(null)
+const menu = ref(null) // 'agent' | 'examples' | null: the toolbar pop-up that is open
+const picked = computed(() => agents.value.find((a) => a.agent_id === agentId.value))
 
 const EXAMPLES = [
   {
@@ -50,6 +54,31 @@ onMounted(async () => {
   agents.value = await fetchAgents()
 })
 
+// A pop-up closes on a click anywhere outside the composer or on Escape.
+function onDocDown(e) {
+  if (menu.value && !root.value?.contains(e.target)) menu.value = null
+}
+function onDocKey(e) {
+  if (e.key === 'Escape') menu.value = null
+}
+onMounted(() => {
+  document.addEventListener('mousedown', onDocDown)
+  document.addEventListener('keydown', onDocKey)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', onDocDown)
+  document.removeEventListener('keydown', onDocKey)
+})
+
+function toggleMenu(name) {
+  menu.value = menu.value === name ? null : name
+}
+
+function pickAgent(id) {
+  agentId.value = id
+  menu.value = null
+}
+
 function submit() {
   const text = query.value.trim()
   if (!text || props.running) return
@@ -58,7 +87,8 @@ function submit() {
 
 function useExample(example) {
   query.value = example.text
-  if (example.agent) agentId.value = example.agent // a chip may pick the identity the example is written for
+  if (example.agent) agentId.value = example.agent // an example may pick the identity the example is written for
+  menu.value = null
   box.value?.focus()
 }
 
@@ -87,7 +117,7 @@ function onKeydown(e) {
     <p v-if="error" class="error">{{ error }}</p>
   </section>
 
-  <section v-else class="composer">
+  <section v-else ref="root" class="composer">
     <textarea
       ref="box"
       v-model="query"
@@ -96,20 +126,54 @@ function onKeydown(e) {
       placeholder="What does the buyer's agent ask for? Enter to run"
       @keydown="onKeydown"
     ></textarea>
-    <fieldset class="agents">
-      <legend>Send as</legend>
-      <label v-for="a in agents" :key="a.agent_id" class="agent-card" :class="{ picked: agentId === a.agent_id, refused: a.agent_id === 'buyer-999' }">
-        <input type="radio" name="agent" :value="a.agent_id" v-model="agentId" />
-        <span class="agent-label">{{ a.label }}</span>
-        <span class="agent-id">{{ a.agent_id }}</span>
-      </label>
-    </fieldset>
-    <button class="primary run-btn" :disabled="running || !query.trim()" @click="submit">
-      {{ running ? 'Running' : 'Run' }}
-    </button>
-    <div class="examples">
-      <span class="examples-label">Try</span>
-      <button v-for="ex in EXAMPLES" :key="ex.label" class="chip" type="button" @click="useExample(ex)">{{ ex.label }}</button>
+    <div class="toolbar">
+      <div class="menu-wrap">
+        <button
+          type="button"
+          class="pill"
+          :class="{ refused: agentId === 'buyer-999' }"
+          aria-haspopup="listbox"
+          :aria-expanded="menu === 'agent'"
+          :title="picked ? `Send as: ${picked.label}` : 'Send as'"
+          @click="toggleMenu('agent')"
+        >
+          <span class="pill-label">as {{ agentId }}</span>
+          <Chevron :open="menu === 'agent'" />
+        </button>
+        <div v-if="menu === 'agent'" class="menu" role="listbox" aria-label="Send as">
+          <p class="menu-title">Send as</p>
+          <button
+            v-for="a in agents"
+            :key="a.agent_id"
+            type="button"
+            role="option"
+            class="menu-item"
+            :class="{ picked: agentId === a.agent_id, refused: a.agent_id === 'buyer-999' }"
+            :aria-selected="agentId === a.agent_id"
+            @click="pickAgent(a.agent_id)"
+          >
+            <span class="dot" aria-hidden="true"></span>
+            <span class="agent-label">{{ a.label }}</span>
+            <span class="agent-id">{{ a.agent_id }}</span>
+          </button>
+        </div>
+      </div>
+      <div class="menu-wrap">
+        <button type="button" class="pill" aria-haspopup="menu" :aria-expanded="menu === 'examples'" @click="toggleMenu('examples')">
+          <span class="pill-label">Examples</span>
+          <Chevron :open="menu === 'examples'" />
+        </button>
+        <div v-if="menu === 'examples'" class="menu" role="menu" aria-label="Example requests">
+          <p class="menu-title">Fill the box with an example</p>
+          <button v-for="ex in EXAMPLES" :key="ex.label" type="button" role="menuitem" class="menu-item example" @click="useExample(ex)">
+            <span class="agent-label">{{ ex.label }}</span>
+            <span v-if="ex.agent" class="agent-id">{{ ex.agent }}</span>
+          </button>
+        </div>
+      </div>
+      <button class="primary run-btn" :disabled="running || !query.trim()" @click="submit">
+        {{ running ? 'Running' : 'Run' }}
+      </button>
     </div>
     <p v-if="error" class="error">{{ error }}</p>
   </section>

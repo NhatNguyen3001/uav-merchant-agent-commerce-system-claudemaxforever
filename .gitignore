@@ -9,3 +9,4 @@ frontend/dist/
 .pytest_cache/
 *.egg-info/
 .firebase/
+.superpowers/
